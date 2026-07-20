@@ -143,11 +143,24 @@ header{
   box-shadow:var(--shadow);padding:8px;
 }
 .pop.open{display:block}
-#colorPop .grid{display:grid;grid-template-columns:repeat(3,46px);gap:6px}
-.swb{width:46px;height:46px;border-radius:12px;display:grid;place-items:center}
+#colorPop{max-width:min(92vw,272px)}
+#colorPop .grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+.swb{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;padding:0}
 .swb:hover{background:rgba(31,42,51,.06)}
-.swb span{width:25px;height:25px;border-radius:50%;box-shadow:0 0 0 1px rgba(31,42,51,.12)}
-.swb.active{outline:2.5px solid var(--accent);outline-offset:-2px}
+.swb span{width:23px;height:23px;border-radius:50%;box-shadow:0 0 0 1px rgba(31,42,51,.16);position:relative}
+.swb span.auto{display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff}
+body[data-theme="dark"] .swb span.auto{color:#141a21}
+.swb.active{outline:2.5px solid var(--accent);outline-offset:1px}
+.ccrow{display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.ccwrap{flex:1;display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;cursor:pointer;position:relative;background:rgba(31,42,51,.05)}
+.ccwrap:hover{background:rgba(31,42,51,.1)}
+body[data-theme="dark"] .ccwrap{background:rgba(230,236,241,.08)}
+body[data-theme="dark"] .ccwrap:hover{background:rgba(230,236,241,.14)}
+.ccdot{width:22px;height:22px;border-radius:50%;box-shadow:0 0 0 1px rgba(31,42,51,.2);background:#2d7ff0;flex:0 0 auto}
+.cclbl{font-size:12.5px;font-weight:600}
+.ccwrap input[type=color]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.ccrand{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:10px;font-size:12.5px;font-weight:600;color:var(--accent);background:var(--accent-soft)}
+.ccrand:hover{filter:brightness(1.05)}
 #widthPop{display:none}
 #widthPop.open{display:flex;gap:6px}
 .wb{width:52px;height:46px;border-radius:12px;display:grid;place-items:center;color:var(--text)}
@@ -320,7 +333,20 @@ header{
   </button>
 </nav>
 
-<div class="pop" id="colorPop"><div class="grid"></div></div>
+<div class="pop" id="colorPop">
+  <div class="grid"></div>
+  <div class="ccrow">
+    <label class="ccwrap" title="Pick any color">
+      <span class="ccdot" id="ccDot"></span>
+      <span class="cclbl">Custom</span>
+      <input type="color" id="ccInput" value="#2d7ff0" aria-label="Custom color picker">
+    </label>
+    <button class="ccrand" id="ccRand" title="Random color" aria-label="Pick a random color">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.3" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.3" fill="currentColor" stroke="none"/></svg>
+      Random
+    </button>
+  </div>
+</div>
 <div class="pop" id="widthPop"></div>
 <div class="pop" id="dlPop">
   <button class="dlopt" data-fmt="png"><span class="fbadge">PNG</span><span><span class="fname">PNG image</span><small>Crisp raster, matches theme</small></span></button>
@@ -368,23 +394,27 @@ const timeAgo=ts=>{const m=Math.floor((Date.now()-ts)/6e4);if(m<1)return'just no
 
 /* ============ constants & state ============ */
 const FONT="'Segoe Print','Bradley Hand','Comic Sans MS','Chalkboard SE',cursive";
-const COLORS=['#1f2a33','#d63a2f','#e8850c','#1e9e6a','#2d7ff0','#8b5cf6'];
+const COLORS=['auto','#e23b2e','#f06400','#f5a300','#e8c400','#7bb800','#1e9e6a',
+  '#12b0a8','#2d7ff0','#3b4cc4','#8b5cf6','#c94db0','#e0567f','#8a5a3c','#6b7684','#ffffff'];
 const WIDTHS=[2,4,7], TEXTSIZES=[16,24,34];
 const CURSORS={select:'default',pen:'crosshair',eraser:'crosshair',line:'crosshair',arrow:'crosshair',rect:'crosshair',ellipse:'crosshair',text:'text'};
 const ICON_TRASH='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></svg>';
 
 let els=[], cur=null, sel=null;
-let tool='pen', color=COLORS[0], widthIdx=1, width=WIDTHS[1];
+let tool='pen', color='auto', widthIdx=1, width=WIDTHS[1];
 let view={x:0,y:0,s:1};
 let notes=[], curId=null, storageOK=false;
 const mem={};
 let undoStack=[], redoStack=[], lastSnap='[]';
 let saveTimer=null, statusTimer=null, toastTimer=null;
-let editing=false, editingEl=null, editPos={x:0,y:0}, editSize=24, editColor=COLORS[0];
+let editing=false, editingEl=null, editPos={x:0,y:0}, editSize=24, editColor='auto';
 let pendingDel=null, pendTimer=null;
 let dark=false;
-const INK=COLORS[0];
-const mapColor=c=>(dark&&String(c).toLowerCase()===INK)?'#e8eef2':c;
+const AUTO_LIGHT='#1f2a33', AUTO_DARK='#e8eef2';
+// upgrade legacy notes: old default-ink strokes become theme-aware 'auto'
+function migrate(arr){if(Array.isArray(arr))for(const el of arr)if(el&&el.color&&el.color.toLowerCase&&el.color.toLowerCase()===AUTO_LIGHT)el.color='auto';return arr;}
+// resolves the special 'auto' color to the theme's default ink; leaves real colors untouched
+const mapColor=c=>c==='auto'?(dark?AUTO_DARK:AUTO_LIGHT):c;
 const gridColor=()=>dark?'#2b3541':'#d5dbe3';
 const accentColor=()=>dark?'#1ba38e':'#0f7b6c';
 const themeBg=()=>dark?'#141a21':'#ffffff';
@@ -771,7 +801,7 @@ function startEdit(el,worldP){
   editColor=el?el.color:color;
   editPos=el?{x:el.x,y:el.y}:worldP;
   ed.value=el?el.text:'';
-  ed.style.color=editColor;
+  ed.style.color=mapColor(editColor);
   positionEditor();
   ed.style.display='block';
   autosizeEd();
@@ -839,10 +869,21 @@ function setTool(t){
 toolBtns.forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
 
 function renderSwatches(){
-  colorPop.querySelector('.grid').innerHTML=COLORS.map(c=>
-    '<button class="swb '+(c===color?'active':'')+'" data-c="'+c+'" aria-label="Color '+c+'"><span style="background:'+mapColor(c)+'"></span></button>'
-  ).join('');
+  colorPop.querySelector('.grid').innerHTML=COLORS.map(c=>{
+    const isAuto=c==='auto';
+    const bg=mapColor(c);
+    const lbl=isAuto?'Default (auto)':c;
+    const inner=isAuto?'<span class="auto" style="background:'+bg+'">A</span>'
+                      :'<span style="background:'+bg+'"></span>';
+    return '<button class="swb '+(c===color?'active':'')+'" data-c="'+c+'" title="'+lbl+'" aria-label="'+lbl+'">'+inner+'</button>';
+  }).join('');
   colorDot.style.background=mapColor(color);
+  // reflect the current color in the custom picker when it isn't a preset swatch
+  if(color!=='auto'&&!COLORS.includes(color)){
+    ccInput.value=color;ccDot.style.background=color;
+  }else{
+    ccDot.style.background=ccInput.value;
+  }
 }
 function renderWidths(){
   widthPop.innerHTML=WIDTHS.map((w,i)=>
@@ -851,7 +892,7 @@ function renderWidths(){
 }
 function setColor(c){
   color=c;renderSwatches();
-  if(editing){editColor=c;ed.style.color=c;}
+  if(editing){editColor=c;ed.style.color=mapColor(c);}
   if(sel){sel.color=c;pushHistory();markDirty();drawAll();}
 }
 function setWidth(i){
@@ -862,9 +903,31 @@ function setWidth(i){
     pushHistory();markDirty();drawAll();
   }
 }
+const ccInput=$('#ccInput'), ccDot=$('#ccDot'), ccRand=$('#ccRand');
 colorPop.addEventListener('click',e=>{
   const b=e.target.closest('[data-c]');
   if(b){setColor(b.dataset.c);closePops();}
+});
+// live custom color — updates as you drag the picker, popover stays open
+ccInput.addEventListener('input',()=>{ccDot.style.background=ccInput.value;setColor(ccInput.value);});
+function randColor(){
+  const h=Math.floor(Math.random()*360);
+  const s=62+Math.floor(Math.random()*30);   // 62-92%
+  const l=42+Math.floor(Math.random()*20);   // 42-62%
+  return hslHex(h,s,l);
+}
+function hslHex(h,s,l){
+  s/=100;l/=100;
+  const k=n=>(n+h/30)%12;
+  const a=s*Math.min(l,1-l);
+  const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+  const to=x=>Math.round(255*x).toString(16).padStart(2,'0');
+  return '#'+to(f(0))+to(f(8))+to(f(4));
+}
+ccRand.addEventListener('click',()=>{
+  const c=randColor();
+  ccInput.value=c;ccDot.style.background=c;
+  setColor(c);
 });
 widthPop.addEventListener('click',e=>{
   const b=e.target.closest('[data-w]');
@@ -934,7 +997,7 @@ async function openNote(id){
   await flushSave();
   let data={title:'',els:[]};
   try{const raw=await sGet('sknotes:'+id);if(raw)data=JSON.parse(raw);}catch(e){}
-  curId=id;els=data.els||[];titleInput.value=data.title||'';
+  curId=id;els=migrate(data.els||[]);titleInput.value=data.title||'';
   sel=null;cur=null;updateChip();resetHistory();fitContent();
   renderList();closeDrawer();
 }
@@ -1007,7 +1070,7 @@ importFile.addEventListener('change',async()=>{
     await flushSave();
     curId=uid();
     notes.unshift({id:curId,title:data.title||'Imported note',updatedAt:Date.now()});
-    els=data.els;titleInput.value=data.title||'Imported note';
+    els=migrate(data.els);titleInput.value=data.title||'Imported note';
     sel=null;cur=null;updateChip();resetHistory();fitContent();
     await saveCurrent();renderList();closeDrawer();
     toast('Note imported');
@@ -1197,7 +1260,7 @@ function applyTheme(d,save){
   themeBtn.innerHTML=d?SUN:MOON;
   const m=document.querySelector('meta[name="theme-color"]');
   if(m)m.content=d?'#141a21':'#f7f8f6';
-  renderSwatches();bgDraw();drawAll();
+  renderSwatches();if(editing)ed.style.color=mapColor(editColor);bgDraw();drawAll();
   if(save)sSet('sknotes:theme',d?'dark':'light');
 }
 themeBtn.addEventListener('click',()=>applyTheme(!dark,true));
