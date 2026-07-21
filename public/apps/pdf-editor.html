@@ -668,12 +668,20 @@ const isPdf = f => f.type === 'application/pdf' || /\.pdf$/i.test(f.name);
 const isImg = f => f.type.startsWith('image/');
 
 /* ============================ navigation ============================ */
+/* Tell the Sketchnotes shell which section is showing so it can update the
+   browser URL (/pdfeditor or /pdfeditor/<section>). Harmless when standalone. */
+function emitRoute(name){
+  if (window.parent && window.parent !== window){
+    window.parent.postMessage({ type: 'sketchnotes:route', tool: name || null }, '*');
+  }
+}
 function showView(name){
   const sec = name ? document.getElementById('tool-' + name) : null;
   $$('.tool').forEach(t => t.hidden = true);
   $('#home').hidden = !!sec;
   if (sec) sec.hidden = false;
   window.scrollTo(0, 0);
+  emitRoute(sec ? name : '');
 }
 function openTool(name){
   if (location.hash !== '#' + name) location.hash = name;   /* Back button returns home */
@@ -684,6 +692,13 @@ function goHome(){
   showView('');
 }
 window.addEventListener('hashchange', () => showView(location.hash.slice(1)));
+
+/* Navigation driven by the shell (browser back/forward, launcher deep links). */
+window.addEventListener('message', e => {
+  if (!e.data || e.data.type !== 'sketchnotes:navigate') return;
+  const t = e.data.tool;
+  if (t) openTool(t); else goHome();
+});
 $$('.tool-card').forEach(c => c.addEventListener('click', () => openTool(c.dataset.tool)));
 $$('.back').forEach(b => b.addEventListener('click', goHome));
 
