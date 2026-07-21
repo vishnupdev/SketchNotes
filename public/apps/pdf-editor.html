@@ -115,13 +115,11 @@
   #brand-home:active{transform:scale(.985)}
   #brand-home:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   .mark{
-    width:46px;height:46px;flex:none;border:1.5px solid var(--gold);border-radius:12px;
-    background:var(--gold-soft);display:grid;place-items:center;position:relative;
-    font-family:Georgia,'Times New Roman',serif;font-size:23px;line-height:1;
-    box-shadow:0 0 0 4px rgba(212,175,110,.08);
+    width:46px;height:46px;flex:none;border:none;border-radius:13px;
+    background:var(--gold);display:grid;place-items:center;position:relative;
+    box-shadow:0 0 0 4px var(--gold-soft);
   }
-  .mark .p1{color:var(--gold);position:absolute;transform:translate(-2px,-2px)}
-  .mark .p2{color:var(--ink);position:relative}
+  .mark svg{width:26px;height:26px;display:block}
   .byline{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-top:6px}
   .brand h1{font-size:27px;font-weight:800;letter-spacing:-.03em;line-height:1}
   .brand .tag{font-family:Georgia,serif;font-style:italic;font-size:15px;color:var(--ink-60);margin-top:4px}
@@ -282,7 +280,13 @@
 <header class="masthead">
   <div class="masthead-in">
     <div class="brand" id="brand-home" role="button" tabindex="0" title="Back to all tools" aria-label="PDF Editor home — all tools">
-      <div class="mark" aria-hidden="true"><span class="p1">✦</span><span class="p2">✦</span></div>
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 3.5h6.2L18 8.3V19a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z"/>
+          <path d="M13 3.6V8.5H17.9"/>
+          <path d="M8.6 12.5h6.8M8.6 15.4h6.8M8.6 18.2h4.2"/>
+        </svg>
+      </div>
       <div>
         <h1>PDF Editor</h1>
         <div class="tag">every PDF tool, on one sheet</div>
@@ -292,7 +296,12 @@
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <button type="button" id="apps-switch" title="Switch app"
         style="display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer">
-        <span style="font-size:14px;line-height:1">⊞</span> Apps
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="display:block">
+          <rect x="4" y="4" width="7" height="7" rx="1.6"/>
+          <rect x="13" y="4" width="7" height="7" rx="1.6"/>
+          <rect x="4" y="13" width="7" height="7" rx="1.6"/>
+          <rect x="13" y="13" width="7" height="7" rx="1.6"/>
+        </svg> Apps
       </button>
       <div class="specline"><span class="dot"></span>100% local · files never leave this device</div>
     </div>
