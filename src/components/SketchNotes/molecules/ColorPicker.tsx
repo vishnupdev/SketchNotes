@@ -4,7 +4,7 @@ import { useState } from "react";
 import { COLORS, mapColor } from "@/engine/constants";
 import { cx, randColor } from "@/lib/utils";
 import { useEditorStore } from "@/store/useEditorStore";
-import { DiceIcon } from "@/components/atoms/icons";
+import { DiceIcon } from "@/components/SketchNotes/atoms/icons";
 
 /** Palette grid + custom picker + random, matching the original colour popover. */
 export function ColorPicker() {

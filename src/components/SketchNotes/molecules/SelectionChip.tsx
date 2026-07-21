@@ -2,7 +2,7 @@
 
 import { useEditorStore } from "@/store/useEditorStore";
 import { useEditorCommands } from "@/context/editor-context";
-import { CloseIcon, DuplicateIcon, TrashSmallIcon } from "@/components/atoms/icons";
+import { CloseIcon, DuplicateIcon, TrashSmallIcon } from "@/components/SketchNotes/atoms/icons";
 
 /** Floating actions for the current selection (duplicate / delete / deselect). */
 export function SelectionChip() {

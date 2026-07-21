@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { NoteMeta } from "@/engine/types";
 import { cx, timeAgo } from "@/lib/utils";
-import { TrashSmallIcon } from "@/components/atoms/icons";
+import { TrashSmallIcon } from "@/components/SketchNotes/atoms/icons";
 
 interface NoteListItemProps {
   note: NoteMeta;

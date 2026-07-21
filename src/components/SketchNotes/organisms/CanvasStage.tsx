@@ -2,7 +2,7 @@
 
 import type { RefObject } from "react";
 import { useEditorStore } from "@/store/useEditorStore";
-import { TextEditor } from "@/components/molecules/TextEditor";
+import { TextEditor } from "@/components/SketchNotes/molecules/TextEditor";
 
 interface CanvasStageProps {
   stageRef: RefObject<HTMLElement | null>;

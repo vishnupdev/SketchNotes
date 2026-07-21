@@ -6,14 +6,14 @@ import { FONTS, mapColor } from "@/engine/constants";
 import type { FontKey } from "@/engine/constants";
 import { isShape } from "@/engine/shapes";
 import { useEditorStore } from "@/store/useEditorStore";
-import { ToolButton } from "@/components/atoms/ToolButton";
-import { Popover } from "@/components/atoms/Popover";
-import { ColorPicker } from "@/components/molecules/ColorPicker";
-import { WidthPicker } from "@/components/molecules/WidthPicker";
-import { ShapePicker } from "@/components/molecules/ShapePicker";
-import { EmojiPicker } from "@/components/molecules/EmojiPicker";
-import { FontPicker } from "@/components/molecules/FontPicker";
-import { TextSizePicker } from "@/components/molecules/TextSizePicker";
+import { ToolButton } from "@/components/SketchNotes/atoms/ToolButton";
+import { Popover } from "@/components/SketchNotes/atoms/Popover";
+import { ColorPicker } from "@/components/SketchNotes/molecules/ColorPicker";
+import { WidthPicker } from "@/components/SketchNotes/molecules/WidthPicker";
+import { ShapePicker } from "@/components/SketchNotes/molecules/ShapePicker";
+import { EmojiPicker } from "@/components/SketchNotes/molecules/EmojiPicker";
+import { FontPicker } from "@/components/SketchNotes/molecules/FontPicker";
+import { TextSizePicker } from "@/components/SketchNotes/molecules/TextSizePicker";
 import {
   ArrowIcon,
   EmojiIcon,
@@ -23,7 +23,7 @@ import {
   SelectIcon,
   ShapesIcon,
   TextIcon,
-} from "@/components/atoms/icons";
+} from "@/components/SketchNotes/atoms/icons";
 
 interface DirectTool {
   tool: Tool;

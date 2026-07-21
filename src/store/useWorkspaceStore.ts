@@ -8,28 +8,24 @@ export type AppId = "sketchnotes" | "pdf";
 interface WorkspaceState {
   /** Which app fills the workspace. Defaults to the sketch canvas. */
   activeApp: AppId;
+  /** Active PDF-editor section id (null = its home/tool grid). */
+  pdfTool: string | null;
   /** Whether the app-switcher launcher overlay is open. */
   launcherOpen: boolean;
-  /** True once the PDF editor iframe has been opened at least once, so we can
-   *  keep it mounted afterwards and preserve any loaded document. */
-  pdfMounted: boolean;
 
   setActiveApp: (app: AppId) => void;
+  setPdfTool: (tool: string | null) => void;
   openLauncher: () => void;
   closeLauncher: () => void;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set) => ({
   activeApp: "sketchnotes",
+  pdfTool: null,
   launcherOpen: false,
-  pdfMounted: false,
 
-  setActiveApp: (app) =>
-    set((s) => ({
-      activeApp: app,
-      launcherOpen: false,
-      pdfMounted: s.pdfMounted || app === "pdf",
-    })),
+  setActiveApp: (app) => set({ activeApp: app, launcherOpen: false }),
+  setPdfTool: (pdfTool) => set({ pdfTool }),
   openLauncher: () => set({ launcherOpen: true }),
   closeLauncher: () => set({ launcherOpen: false }),
 }));

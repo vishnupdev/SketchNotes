@@ -1,4 +1,4 @@
-import { Workspace } from "@/components/templates/Workspace";
+import { Workspace } from "@/components/Workspace";
 
 /**
  * Single client-driven workspace served for every path: `/` (Sketchnotes),

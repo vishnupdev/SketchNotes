@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useWorkspaceStore, type AppId } from "@/store/useWorkspaceStore";
 import { cx } from "@/lib/utils";
-import { CloseIcon } from "@/components/atoms/icons";
+import { CloseIcon } from "@/components/SketchNotes/atoms/icons";
 
 interface AppEntry {
   id: AppId;

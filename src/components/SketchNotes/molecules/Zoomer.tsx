@@ -2,7 +2,7 @@
 
 import { useEditorStore } from "@/store/useEditorStore";
 import { useEditorCommands } from "@/context/editor-context";
-import { MinusIcon, PlusIcon } from "@/components/atoms/icons";
+import { MinusIcon, PlusIcon } from "@/components/SketchNotes/atoms/icons";
 
 /** Zoom controls, shown on wider viewports (matches the original ≥800px rule). */
 export function Zoomer() {

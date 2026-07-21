@@ -5,10 +5,10 @@ import { cx } from "@/lib/utils";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useEditorCommands } from "@/context/editor-context";
 import { useNotesIndex } from "@/hooks/useNotes";
-import { IconButton } from "@/components/atoms/IconButton";
-import { PrimaryButton } from "@/components/atoms/PrimaryButton";
-import { NoteListItem } from "@/components/molecules/NoteListItem";
-import { CloseIcon, ImportIcon, PlusIcon } from "@/components/atoms/icons";
+import { IconButton } from "@/components/SketchNotes/atoms/IconButton";
+import { PrimaryButton } from "@/components/SketchNotes/atoms/PrimaryButton";
+import { NoteListItem } from "@/components/SketchNotes/molecules/NoteListItem";
+import { CloseIcon, ImportIcon, PlusIcon } from "@/components/SketchNotes/atoms/icons";
 
 /** Slide-in notes panel: list, create, import and delete. */
 export function NotesDrawer() {

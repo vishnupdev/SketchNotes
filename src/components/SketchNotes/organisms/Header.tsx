@@ -5,10 +5,10 @@ import { useEditorStore } from "@/store/useEditorStore";
 import { useEditorCommands } from "@/context/editor-context";
 import { useTheme } from "@/hooks/useTheme";
 import { cx } from "@/lib/utils";
-import { IconButton } from "@/components/atoms/IconButton";
-import { PrimaryButton } from "@/components/atoms/PrimaryButton";
-import { Popover } from "@/components/atoms/Popover";
-import { DownloadMenu } from "@/components/molecules/DownloadMenu";
+import { IconButton } from "@/components/SketchNotes/atoms/IconButton";
+import { PrimaryButton } from "@/components/SketchNotes/atoms/PrimaryButton";
+import { Popover } from "@/components/SketchNotes/atoms/Popover";
+import { DownloadMenu } from "@/components/SketchNotes/molecules/DownloadMenu";
 import {
   AppsIcon,
   DownloadIcon,
@@ -18,7 +18,7 @@ import {
   SunIcon,
   TrashIcon,
   UndoIcon,
-} from "@/components/atoms/icons";
+} from "@/components/SketchNotes/atoms/icons";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 
 const STATUS_LABEL: Record<string, string> = { saving: "Saving…", saved: "Saved ✓" };
