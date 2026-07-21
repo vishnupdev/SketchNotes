@@ -35,7 +35,7 @@ export function OrganizeTool() {
   const [pages, setPages] = useState<PageItem[]>([]);
   const uidRef = useRef(0);
   const dragUid = useRef<string | null>(null);
-  const pjRef = useRef<import("pdfjs-dist").PDFDocumentProxy | null>(null);
+  const pjRef = useRef<import("pdfjs-dist").PDFDocumentLoadingTask | null>(null);
 
   const buildThumbs = async (item: LoadedPdf) => {
     if (pjRef.current) {
@@ -43,8 +43,9 @@ export function OrganizeTool() {
       pjRef.current = null;
     }
     const pdfjs = await getPdfjs();
-    const pj = await pdfjs.getDocument({ data: item.bytes.slice() }).promise;
-    pjRef.current = pj;
+    const task = pdfjs.getDocument({ data: item.bytes.slice() });
+    pjRef.current = task;
+    const pj = await task.promise;
     const out: PageItem[] = [];
     for (let i = 0; i < item.pageCount; i++) {
       setStatus("Rendering page " + (i + 1) + " / " + item.pageCount + "…", "busy");
@@ -55,7 +56,7 @@ export function OrganizeTool() {
       const canvas = document.createElement("canvas");
       canvas.width = vp.width;
       canvas.height = vp.height;
-      await page.render({ canvasContext: canvas.getContext("2d")!, viewport: vp }).promise;
+      await page.render({ canvas, canvasContext: canvas.getContext("2d")!, viewport: vp }).promise;
       out.push({
         uid: String(uidRef.current++),
         src: i,

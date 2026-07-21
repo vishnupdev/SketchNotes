@@ -4,21 +4,28 @@ import { useCallback, useEffect, useRef } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { EditorShell } from "@/components/SketchNotes/EditorShell";
 import { AppLauncher } from "@/components/AppLauncher";
+import { SettingsPanel } from "@/components/Settings/SettingsPanel";
 import { PdfApp } from "@/components/PdfEditor/PdfApp";
+import { ImageStudio } from "@/components/ImageStudio/ImageStudio";
 import { TOOL_IDS } from "@/components/PdfEditor/catalog";
+import type { AppId } from "@/store/useWorkspaceStore";
 
 const PDF_BASE = "/pdfeditor";
+const IMAGE_BASE = "/image";
 
-/** Split the path into { isPdf, tool }. `tool` is null for the PDF home. */
-function parsePath(pathname: string): { isPdf: boolean; tool: string | null } {
-  if (pathname === PDF_BASE || pathname === PDF_BASE + "/") return { isPdf: true, tool: null };
+/** Derive the app + PDF section from a path. */
+function parsePath(pathname: string): { app: AppId; tool: string | null } {
+  if (pathname === PDF_BASE || pathname === PDF_BASE + "/") return { app: "pdf", tool: null };
   if (pathname.startsWith(PDF_BASE + "/")) {
     const t = pathname.slice(PDF_BASE.length + 1).replace(/\/+$/, "");
-    return { isPdf: true, tool: t && TOOL_IDS.includes(t) ? t : null };
+    return { app: "pdf", tool: t && TOOL_IDS.includes(t) ? t : null };
   }
-  return { isPdf: false, tool: null };
+  if (pathname === IMAGE_BASE || pathname === IMAGE_BASE + "/") return { app: "image", tool: null };
+  return { app: "sketchnotes", tool: null };
 }
 const pdfPath = (tool: string | null) => (tool ? `${PDF_BASE}/${tool}` : PDF_BASE);
+const pathForApp = (app: AppId, tool: string | null) =>
+  app === "pdf" ? pdfPath(tool) : app === "image" ? IMAGE_BASE : "/";
 
 /**
  * Top-level workspace hosting both apps natively (no iframe) and keeping the
@@ -43,10 +50,10 @@ export function Workspace() {
 
   // Adopt the app/section encoded in the URL on first load.
   useEffect(() => {
-    const { isPdf, tool } = parsePath(window.location.pathname);
-    if (isPdf) {
-      setActiveApp("pdf");
-      setPdfTool(tool);
+    const { app, tool } = parsePath(window.location.pathname);
+    if (app !== "sketchnotes") {
+      setActiveApp(app);
+      if (app === "pdf") setPdfTool(tool);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -58,42 +65,42 @@ export function Workspace() {
       appSynced.current = true;
       return;
     }
-    setUrl(activeApp === "pdf" ? pdfPath(pdfTool) : "/");
+    setUrl(pathForApp(activeApp, pdfTool));
   }, [activeApp, pdfTool, setUrl]);
 
   // Browser back/forward.
   useEffect(() => {
     const onPop = () => {
-      const { isPdf, tool } = parsePath(window.location.pathname);
-      if (isPdf) {
-        if (activeRef.current !== "pdf") setActiveApp("pdf");
-        setPdfTool(tool);
-      } else if (activeRef.current !== "sketchnotes") {
-        setActiveApp("sketchnotes");
-      }
+      const { app, tool } = parsePath(window.location.pathname);
+      if (activeRef.current !== app) setActiveApp(app);
+      if (app === "pdf") setPdfTool(tool);
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, [setActiveApp, setPdfTool]);
 
   const pdfActive = activeApp === "pdf";
+  const imageActive = activeApp === "image";
 
   return (
     <>
       {/* Sketchnotes — always mounted, hidden while another app is active. */}
-      <div hidden={pdfActive}>
+      <div hidden={pdfActive || imageActive}>
         <EditorShell />
       </div>
 
       {/* PDF editor — native React, its own scroll container. */}
-      <div
-        hidden={!pdfActive}
-        className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text"
-      >
+      <div hidden={!pdfActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
         {pdfActive && <PdfApp />}
       </div>
 
+      {/* Image Studio. */}
+      <div hidden={!imageActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {imageActive && <ImageStudio />}
+      </div>
+
       <AppLauncher />
+      <SettingsPanel />
     </>
   );
 }

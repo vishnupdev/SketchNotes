@@ -9,7 +9,7 @@ let pdfjsPromise: Promise<PdfjsModule> | null = null;
 export function getPdfjs(): Promise<PdfjsModule> {
   if (!pdfjsPromise) {
     pdfjsPromise = import("pdfjs-dist").then((lib) => {
-      lib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+      lib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
       return lib;
     });
   }

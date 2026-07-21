@@ -94,6 +94,8 @@ export class SketchEngine {
   private widthIdx = 1;
   private width: number = WIDTHS[1];
   private dark: boolean;
+  /** Themed selection-highlight colour; falls back to the default accent. */
+  private accent: string | null = null;
   private currentEmoji = "😀";
   /** Font + size applied to new text (and to a selected text element). */
   private fontKey: string = DEFAULT_FONT;
@@ -226,8 +228,9 @@ export class SketchEngine {
     }
   }
 
-  setTheme(dark: boolean): void {
+  setTheme(dark: boolean, accent?: string): void {
     this.dark = dark;
+    this.accent = accent && accent.trim() ? accent.trim() : null;
     if (this.editing) this.refreshEditor();
     this.drawGridLayer();
     this.drawAll();
@@ -480,7 +483,7 @@ export class SketchEngine {
     const p = 6 / this.view.s;
     const { ctx } = this;
     ctx.save();
-    ctx.strokeStyle = accentColor(this.dark);
+    ctx.strokeStyle = this.accent ?? accentColor(this.dark);
     ctx.lineWidth = 1.6 / this.view.s;
     ctx.setLineDash([6 / this.view.s, 4 / this.view.s]);
     ctx.strokeRect(b.x - p, b.y - p, b.w + p * 2, b.h + p * 2);

@@ -1,4 +1,5 @@
-import type { NoteDocument, NoteMeta, Theme } from "@/engine/types";
+import type { NoteDocument, NoteMeta } from "@/engine/types";
+import { isThemeId, type ThemeId } from "@/lib/themes";
 import { sDel, sGet, sSet } from "./storage";
 
 /** Storage-key helpers keep the key scheme in one place. */
@@ -49,11 +50,11 @@ export async function deleteNote(id: string): Promise<void> {
 
 /* ============ theme ============ */
 
-export async function fetchTheme(): Promise<Theme | null> {
+export async function fetchTheme(): Promise<ThemeId | null> {
   const v = await sGet(KEY.theme);
-  return v === "light" || v === "dark" ? v : null;
+  return isThemeId(v) ? v : null;
 }
 
-export async function saveTheme(theme: Theme): Promise<void> {
+export async function saveTheme(theme: ThemeId): Promise<void> {
   await sSet(KEY.theme, theme);
 }

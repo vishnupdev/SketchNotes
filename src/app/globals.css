@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
-/* Dark mode is driven by <body data-theme="dark">, not media/class. */
-@custom-variant dark (&:where([data-theme="dark"] *));
+/* Dark mode is driven by the `data-dark` flag on <body> (set for every dark
+   palette, e.g. "dark" and "midnight"), not media/class. */
+@custom-variant dark (&:where([data-dark] *));
 
 /* ---------------- theme tokens (flip on [data-theme]) ---------------- */
 :root {
@@ -33,6 +34,78 @@
   --accent-soft: rgba(27, 163, 142, 0.18);
   --dock-ink: #8b99a6;
   --ed-bg: rgba(20, 26, 33, 0.6);
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* -------- colour-accented themes (light base; only hue tokens differ) ------- */
+[data-theme="ocean"] {
+  --paper: #f3f7fc;
+  --grid: #cddcee;
+  --ink-soft: #5b6b7d;
+  --panel: #ffffff;
+  --border: #dbe6f2;
+  --accent: #1f74e0;
+  --accent-soft: #dcebfb;
+  --ed-bg: rgba(243, 247, 252, 0.6);
+}
+
+[data-theme="sunset"] {
+  --paper: #fdf6f2;
+  --grid: #ecd9cd;
+  --ink-soft: #7d6a60;
+  --panel: #fffdfc;
+  --border: #f2e3da;
+  --accent: #ef5a3c;
+  --accent-soft: #ffe3d8;
+  --ed-bg: rgba(253, 246, 242, 0.6);
+}
+
+[data-theme="grape"] {
+  --paper: #f8f6fd;
+  --grid: #ddd3ef;
+  --ink-soft: #6b6383;
+  --panel: #ffffff;
+  --border: #e7e0f4;
+  --accent: #8b5cf6;
+  --accent-soft: #ece3fe;
+  --ed-bg: rgba(248, 246, 253, 0.6);
+}
+
+[data-theme="rose"] {
+  --paper: #fdf5f8;
+  --grid: #eecdd9;
+  --ink-soft: #7d616b;
+  --panel: #ffffff;
+  --border: #f2dde5;
+  --accent: #e14d82;
+  --accent-soft: #fde0ea;
+  --ed-bg: rgba(253, 245, 248, 0.6);
+}
+
+[data-theme="forest"] {
+  --paper: #f4f9f4;
+  --grid: #cee5d1;
+  --ink-soft: #5d6f60;
+  --panel: #ffffff;
+  --border: #dbebdd;
+  --accent: #2f9e44;
+  --accent-soft: #d8f3dd;
+  --ed-bg: rgba(244, 249, 244, 0.6);
+}
+
+/* -------- colour-accented dark theme (full dark palette + indigo hue) ------- */
+[data-theme="midnight"] {
+  --paper: #12151f;
+  --grid: #262b3d;
+  --text: #e7e9f5;
+  --ink: #0b0d15;
+  --ink-soft: #8b8fb0;
+  --panel: #1a1e2e;
+  --border: #2a2f45;
+  --accent: #6d8bff;
+  --accent-soft: rgba(109, 139, 255, 0.18);
+  --dock-ink: #8b8fb0;
+  --ed-bg: rgba(18, 21, 31, 0.6);
   --shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
@@ -86,7 +159,7 @@ svg {
     background: rgba(31, 42, 51, 0.06);
   }
 }
-[data-theme="dark"] .tint:hover {
+[data-dark] .tint:hover {
   background: rgba(230, 236, 241, 0.08);
 }
 

@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useEditorCommands } from "@/context/editor-context";
-import { useTheme } from "@/hooks/useTheme";
 import { cx } from "@/lib/utils";
 import { IconButton } from "@/components/SketchNotes/atoms/IconButton";
 import { PrimaryButton } from "@/components/SketchNotes/atoms/PrimaryButton";
@@ -13,9 +12,8 @@ import {
   AppsIcon,
   DownloadIcon,
   MenuIcon,
-  MoonIcon,
   RedoIcon,
-  SunIcon,
+  SettingsIcon,
   TrashIcon,
   UndoIcon,
 } from "@/components/SketchNotes/atoms/icons";
@@ -37,8 +35,8 @@ export function Header() {
   const closePopovers = useEditorStore((s) => s.closePopovers);
 
   const { undo, redo, clear, markDirty } = useEditorCommands();
-  const { dark, toggle } = useTheme();
   const openLauncher = useWorkspaceStore((s) => s.openLauncher);
+  const openSettings = useWorkspaceStore((s) => s.openSettings);
   const dlRef = useRef<HTMLButtonElement>(null);
 
   return (
@@ -87,8 +85,8 @@ export function Header() {
         {STATUS_LABEL[saveStatus] ?? ""}
       </span>
 
-      <IconButton aria-label="Toggle dark mode" title="Toggle dark mode" onClick={toggle}>
-        {dark ? <SunIcon size={19} /> : <MoonIcon size={19} />}
+      <IconButton aria-label="Settings" title="Settings" onClick={openSettings}>
+        <SettingsIcon size={19} />
       </IconButton>
 
       <IconButton aria-label="Clear canvas" title="Clear canvas" onClick={clear} disabled={isEmpty}>

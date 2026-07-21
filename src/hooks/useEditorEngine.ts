@@ -6,6 +6,7 @@ import type { ExportFormat, NoteDocument, SketchBackup } from "@/engine/types";
 import { saveBlob } from "@/engine/export";
 import { storageAvailable } from "@/lib/storage";
 import { fetchTheme } from "@/lib/notes-api";
+import { themeById } from "@/lib/themes";
 import { uid } from "@/lib/utils";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useLoadNote, useNoteMutations } from "./useNotes";
@@ -124,7 +125,7 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
   const currentEmoji = useEditorStore((s) => s.currentEmoji);
   const fontKey = useEditorStore((s) => s.fontKey);
   const fontSize = useEditorStore((s) => s.fontSize);
-  const dark = useEditorStore((s) => s.dark);
+  const themeId = useEditorStore((s) => s.themeId);
 
   useEffect(() => {
     engineRef.current?.setTool(tool);
@@ -145,13 +146,23 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
     engineRef.current?.setTextSize(fontSize);
   }, [fontSize]);
   useEffect(() => {
-    engineRef.current?.setTheme(dark);
-    if (typeof document !== "undefined") {
-      document.body.dataset.theme = dark ? "dark" : "light";
-      const m = document.querySelector('meta[name="theme-color"]');
-      if (m) m.setAttribute("content", dark ? "#141a21" : "#f7f8f6");
-    }
-  }, [dark]);
+    if (typeof document === "undefined") return;
+    const theme = themeById(themeId);
+    const body = document.body;
+    // Apply the palette: `data-theme` selects the token block, `data-dark`
+    // flips every `dark:` utility for any dark palette.
+    body.dataset.theme = theme.id;
+    if (theme.dark) body.dataset.dark = "";
+    else delete body.dataset.dark;
+    // Read the resolved tokens back from CSS (single source of truth) so the
+    // canvas selection highlight and the address-bar colour follow the theme.
+    const cs = getComputedStyle(body);
+    const accent = cs.getPropertyValue("--accent").trim();
+    const paper = cs.getPropertyValue("--paper").trim();
+    engineRef.current?.setTheme(theme.dark, accent || undefined);
+    const m = document.querySelector('meta[name="theme-color"]');
+    if (m && paper) m.setAttribute("content", paper);
+  }, [themeId]);
 
   /* ----------------------------- bootstrap ----------------------------- */
 
@@ -195,7 +206,7 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
       st.setStorageOK(available);
 
       const savedTheme = await fetchTheme();
-      st.setDark(savedTheme !== "light");
+      if (savedTheme) st.setTheme(savedTheme);
 
       const index = (await refetchIndex()).data ?? [];
       if (index.length) {

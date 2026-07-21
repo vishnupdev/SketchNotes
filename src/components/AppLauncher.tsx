@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useWorkspaceStore, type AppId } from "@/store/useWorkspaceStore";
 import { cx } from "@/lib/utils";
-import { CloseIcon } from "@/components/SketchNotes/atoms/icons";
+import { CloseIcon, SettingsIcon } from "@/components/SketchNotes/atoms/icons";
 
 interface AppEntry {
   id: AppId;
@@ -43,6 +43,22 @@ const PdfGlyph = (
   </svg>
 );
 
+const ImageGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
+    <circle cx="8.5" cy="9.5" r="1.6" />
+    <path d="M4 17l4.5-4.5a2 2 0 0 1 2.8 0L17 18" />
+  </svg>
+);
+
 const APPS: AppEntry[] = [
   {
     id: "sketchnotes",
@@ -56,6 +72,12 @@ const APPS: AppEntry[] = [
     tagline: "Edit, merge, split & sign — every PDF tool, zero uploads.",
     icon: PdfGlyph,
   },
+  {
+    id: "image",
+    name: "Image Studio",
+    tagline: "Crop, resize & compress images to any size or upload preset.",
+    icon: ImageGlyph,
+  },
 ];
 
 /**
@@ -67,6 +89,7 @@ export function AppLauncher() {
   const activeApp = useWorkspaceStore((s) => s.activeApp);
   const setActiveApp = useWorkspaceStore((s) => s.setActiveApp);
   const closeLauncher = useWorkspaceStore((s) => s.closeLauncher);
+  const openSettings = useWorkspaceStore((s) => s.openSettings);
 
   useEffect(() => {
     if (!open) return;
@@ -143,6 +166,21 @@ export function AppLauncher() {
               </button>
             );
           })}
+        </div>
+
+        <div className="mt-5 border-t border-border pt-4">
+          <button
+            onClick={openSettings}
+            className="tint flex w-full items-center gap-3 rounded-xl border border-border bg-paper px-4 py-3 text-left transition-colors hover:border-accent"
+          >
+            <span className="grid size-9 place-items-center rounded-[11px] bg-accent-soft text-accent">
+              <SettingsIcon size={18} />
+            </span>
+            <span className="flex flex-col">
+              <span className="text-[14px] font-bold tracking-[.1px]">Settings</span>
+              <span className="text-[12px] text-ink-soft">Theme and workspace preferences.</span>
+            </span>
+          </button>
         </div>
       </div>
     </div>

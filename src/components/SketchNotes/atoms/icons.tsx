@@ -133,6 +133,17 @@ export const SunIcon = (p: IconProps) => (
   </Svg>
 );
 
+export const CheckIcon = (p: IconProps) => (
+  <Svg strokeWidth={2.2} {...p}><path d="M5 12.5 10 17.5 19 6.5" /></Svg>
+);
+
+export const SettingsIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+    <path d="M19.4 12.9a7.7 7.7 0 0 0 0-1.8l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-1.5-.9l-.3-2.5h-4l-.3 2.5a7.6 7.6 0 0 0-1.5.9l-2.4-1-2 3.4 2 1.6a7.7 7.7 0 0 0 0 1.8l-2 1.6 2 3.4 2.4-1c.5.4 1 .6 1.5.9l.3 2.5h4l.3-2.5c.5-.3 1-.5 1.5-.9l2.4 1 2-3.4-2-1.6Z" />
+  </Svg>
+);
+
 export const DiceIcon = (p: IconProps) => (
   <Svg strokeWidth={1.9} {...p}>
     <rect x="4" y="4" width="16" height="16" rx="4" />

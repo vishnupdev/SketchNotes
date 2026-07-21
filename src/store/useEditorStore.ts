@@ -2,8 +2,9 @@
 
 import { create } from "zustand";
 import type { EditorState as OverlayState } from "@/engine/SketchEngine";
-import type { Theme, Tool } from "@/engine/types";
-import { DEFAULT_FONT, DEFAULT_TEXT_SIZE, DEFAULT_THEME, WIDTHS } from "@/engine/constants";
+import type { Tool } from "@/engine/types";
+import { DEFAULT_FONT, DEFAULT_TEXT_SIZE, WIDTHS } from "@/engine/constants";
+import { DEFAULT_THEME_ID, themeById, type ThemeId } from "@/lib/themes";
 
 /** Which single popover (if any) is open in the dock/header. */
 export type PopoverId =
@@ -26,6 +27,9 @@ interface EditorState {
   currentEmoji: string;
   fontKey: string;
   fontSize: number;
+  /** Active theme id (source of truth). See `@/lib/themes`. */
+  themeId: ThemeId;
+  /** Derived from {@link themeId}: whether the active palette is dark. */
   dark: boolean;
 
   /* --- current note --- */
@@ -56,8 +60,8 @@ interface EditorState {
   setCurrentEmoji: (ch: string) => void;
   setFontKey: (k: string) => void;
   setFontSize: (px: number) => void;
-  setDark: (d: boolean) => void;
-  setTheme: (t: Theme) => void;
+  /** Switch to a named theme; keeps {@link dark} in sync. */
+  setTheme: (id: ThemeId) => void;
 
   setCurId: (id: string | null) => void;
   setTitle: (t: string) => void;
@@ -84,7 +88,8 @@ export const useEditorStore = create<EditorState>((set) => ({
   currentEmoji: "😀",
   fontKey: DEFAULT_FONT,
   fontSize: DEFAULT_TEXT_SIZE,
-  dark: DEFAULT_THEME === "dark",
+  themeId: DEFAULT_THEME_ID,
+  dark: themeById(DEFAULT_THEME_ID).dark,
 
   curId: null,
   title: "",
@@ -109,8 +114,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   setCurrentEmoji: (currentEmoji) => set({ currentEmoji }),
   setFontKey: (fontKey) => set({ fontKey }),
   setFontSize: (fontSize) => set({ fontSize }),
-  setDark: (dark) => set({ dark }),
-  setTheme: (t) => set({ dark: t === "dark" }),
+  setTheme: (themeId) => set({ themeId, dark: themeById(themeId).dark }),
 
   setCurId: (curId) => set({ curId }),
   setTitle: (title) => set({ title }),

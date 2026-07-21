@@ -41,11 +41,11 @@ export function ExportImagesTool() {
     const mime = format === "jpeg" ? "image/jpeg" : "image/png";
     const ext = format === "jpeg" ? "jpg" : "png";
     const sc = parseInt(scale, 10) || 2;
-    let pj: import("pdfjs-dist").PDFDocumentProxy | null = null;
+    let task: import("pdfjs-dist").PDFDocumentLoadingTask | null = null;
     try {
       const pdfjs = await getPdfjs();
-      const doc = await pdfjs.getDocument({ data: file.bytes.slice() }).promise;
-      pj = doc;
+      task = pdfjs.getDocument({ data: file.bytes.slice() });
+      const doc = await task.promise;
       const n = doc.numPages;
       const base = baseName(file.name);
       const blobs: Blob[] = [];
@@ -59,7 +59,7 @@ export function ExportImagesTool() {
         const ctx = c.getContext("2d")!;
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, c.width, c.height);
-        await page.render({ canvasContext: ctx, viewport: vp }).promise;
+        await page.render({ canvas: c, canvasContext: ctx, viewport: vp }).promise;
         blobs.push(await new Promise<Blob>((res) => c.toBlob((b) => res(b!), mime, 0.92)));
       }
       if (n === 1) {
@@ -76,7 +76,7 @@ export function ExportImagesTool() {
     } catch (e) {
       setStatus(friendly(e), "err");
     } finally {
-      if (pj) pj.destroy();
+      if (task) task.destroy();
     }
   };
 

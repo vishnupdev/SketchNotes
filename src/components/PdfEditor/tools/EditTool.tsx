@@ -265,7 +265,7 @@ export function EditTool() {
           anno = $("edit-anno") as HTMLCanvasElement;
         base.width = anno.width = Math.round(vp.width);
         base.height = anno.height = Math.round(vp.height);
-        await page.render({ canvasContext: base.getContext("2d")!, viewport: vp }).promise;
+        await page.render({ canvas: base, canvasContext: base.getContext("2d")!, viewport: vp }).promise;
         if (!ED.items[ED.page]) {
           try {
             ED.items[ED.page] = await loadTextItems(page);
