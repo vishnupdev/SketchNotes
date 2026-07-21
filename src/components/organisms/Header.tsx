@@ -10,6 +10,7 @@ import { PrimaryButton } from "@/components/atoms/PrimaryButton";
 import { Popover } from "@/components/atoms/Popover";
 import { DownloadMenu } from "@/components/molecules/DownloadMenu";
 import {
+  AppsIcon,
   DownloadIcon,
   MenuIcon,
   MoonIcon,
@@ -18,6 +19,7 @@ import {
   TrashIcon,
   UndoIcon,
 } from "@/components/atoms/icons";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 
 const STATUS_LABEL: Record<string, string> = { saving: "Saving…", saved: "Saved ✓" };
 
@@ -36,6 +38,7 @@ export function Header() {
 
   const { undo, redo, clear, markDirty } = useEditorCommands();
   const { dark, toggle } = useTheme();
+  const openLauncher = useWorkspaceStore((s) => s.openLauncher);
   const dlRef = useRef<HTMLButtonElement>(null);
 
   return (
@@ -48,6 +51,10 @@ export function Header() {
     >
       <IconButton aria-label="Open notes" onClick={() => setDrawerOpen(true)}>
         <MenuIcon />
+      </IconButton>
+
+      <IconButton aria-label="Switch app" title="Apps" onClick={openLauncher}>
+        <AppsIcon />
       </IconButton>
 
       <span className="whitespace-nowrap px-1.5 pl-0.5 font-hand text-[17px] font-bold tracking-[.2px] max-[520px]:hidden">

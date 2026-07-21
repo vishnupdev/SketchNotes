@@ -1,5 +1,5 @@
-import { EditorShell } from "@/components/templates/EditorShell";
+import { Workspace } from "@/components/templates/Workspace";
 
 export default function Page() {
-  return <EditorShell />;
+  return <Workspace />;
 }

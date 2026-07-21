@@ -102,6 +102,15 @@ export const CloseIcon = (p: IconProps) => (
   <Svg strokeWidth={2} strokeLinejoin="round" {...p}><path d="M6 6l12 12M18 6 6 18" /></Svg>
 );
 
+export const AppsIcon = (p: IconProps) => (
+  <Svg strokeWidth={1.9} {...p}>
+    <rect x="4" y="4" width="7" height="7" rx="1.6" />
+    <rect x="13" y="4" width="7" height="7" rx="1.6" />
+    <rect x="4" y="13" width="7" height="7" rx="1.6" />
+    <rect x="13" y="13" width="7" height="7" rx="1.6" />
+  </Svg>
+);
+
 export const DuplicateIcon = (p: IconProps) => (
   <Svg strokeWidth={1.9} {...p}>
     <rect x="9" y="9" width="11" height="11" rx="2" />
