@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#f7f8f6">
+<meta name="theme-color" content="#141a21">
 <title>Sketchnotes — draw &amp; jot</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%230f7b6c%22%2F%3E%3Ccircle%20cx%3D%2215%22%20cy%3D%2249%22%20r%3D%223%22%20fill%3D%22%23ffffff%22%2F%3E%3Cpath%20d%3D%22M14%2045%20L40%2019%20a4.2%204.2%200%200%201%206%206%20L20%2051%20L11%2054%20Z%22%20fill%3D%22%23ffffff%22%2F%3E%3Cpath%20d%3D%22M37%2022%20l5%205%22%20stroke%3D%22%230f7b6c%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%230f7b6c%22%2F%3E%3Ccircle%20cx%3D%2215%22%20cy%3D%2249%22%20r%3D%223%22%20fill%3D%22%23ffffff%22%2F%3E%3Cpath%20d%3D%22M14%2045%20L40%2019%20a4.2%204.2%200%200%201%206%206%20L20%2051%20L11%2054%20Z%22%20fill%3D%22%23ffffff%22%2F%3E%3Cpath%20d%3D%22M37%2022%20l5%205%22%20stroke%3D%22%230f7b6c%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E">
@@ -163,6 +163,25 @@ body[data-theme="dark"] .ccwrap:hover{background:rgba(230,236,241,.14)}
 .ccwrap input[type=color]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 .ccrand{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:10px;font-size:12.5px;font-weight:600;color:var(--accent);background:var(--accent-soft)}
 .ccrand:hover{filter:brightness(1.05)}
+#shapePop,#emojiPop{max-width:min(92vw,300px)}
+.shead{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--ink-soft);padding:2px 4px 8px}
+.sgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.sbtn{aspect-ratio:1;border-radius:10px;display:grid;place-items:center;color:var(--text)}
+.sbtn:hover{background:rgba(31,42,51,.06)}
+.sbtn.active{background:var(--accent-soft);color:var(--accent);outline:2px solid var(--accent);outline-offset:-2px}
+body[data-theme="dark"] .sbtn:hover{background:rgba(230,236,241,.08)}
+.sbtn svg{width:24px;height:24px}
+.etabs{display:flex;gap:3px;margin-bottom:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.etabs::-webkit-scrollbar{display:none}
+.etab{flex:0 0 auto;font-size:17px;line-height:1;padding:6px 8px;border-radius:9px}
+.etab:hover{background:rgba(31,42,51,.06)}
+.etab.active{background:var(--accent-soft)}
+body[data-theme="dark"] .etab:hover{background:rgba(230,236,241,.08)}
+.egrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;max-height:min(46vh,260px);overflow-y:auto}
+.ebtn{aspect-ratio:1;border-radius:8px;font-size:22px;line-height:1;display:grid;place-items:center}
+.ebtn:hover{background:rgba(31,42,51,.06)}
+body[data-theme="dark"] .ebtn:hover{background:rgba(230,236,241,.08)}
+.ehint{font-size:11px;color:var(--ink-soft);text-align:center;padding:6px 4px 0}
 #widthPop{display:none}
 #widthPop.open{display:flex;gap:6px}
 .wb{width:52px;height:46px;border-radius:12px;display:grid;place-items:center;color:var(--text)}
@@ -252,7 +271,7 @@ body[data-theme="dark"] .ccwrap:hover{background:rgba(230,236,241,.14)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
-<body>
+<body data-theme="dark">
 
 <header>
   <button class="iconbtn" id="menuBtn" aria-label="Open notes">
@@ -318,11 +337,11 @@ body[data-theme="dark"] .ccwrap:hover{background:rgba(230,236,241,.14)}
     <button class="tbtn" data-tool="arrow" aria-label="Arrow" title="Arrow (A)">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 18.5 18 6M10.5 6H18v7.5"/></svg>
     </button>
-    <button class="tbtn" data-tool="rect" aria-label="Rectangle" title="Rectangle (R)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="6.5" width="15" height="12" rx="2.5"/></svg>
+    <button class="tbtn" id="shapeBtn" aria-label="Shapes" title="Shapes">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="12.5" width="8" height="8" rx="1.5"/><circle cx="16.5" cy="16.5" r="4"/><path d="M12 3.5 15.5 10h-7z"/></svg>
     </button>
-    <button class="tbtn" data-tool="ellipse" aria-label="Ellipse" title="Ellipse (O)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="12" rx="8" ry="6"/></svg>
+    <button class="tbtn" id="emojiBtn" aria-label="Emojis and stickers" title="Emojis & stickers">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1" fill="currentColor" stroke="none"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0" stroke-linecap="round"/></svg>
     </button>
     <button class="tbtn" data-tool="text" aria-label="Text" title="Text (T)">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5.5 6.5h13M12 6.5V19"/></svg>
@@ -350,6 +369,11 @@ body[data-theme="dark"] .ccwrap:hover{background:rgba(230,236,241,.14)}
   </div>
 </div>
 <div class="pop" id="widthPop"></div>
+<div class="pop" id="shapePop"><div class="shead">Shapes</div><div class="sgrid" id="shapeGrid"></div></div>
+<div class="pop" id="emojiPop">
+  <div class="etabs" id="emojiTabs"></div>
+  <div class="egrid" id="emojiGrid"></div>
+</div>
 <div class="pop" id="dlPop">
   <button class="dlopt" data-fmt="png"><span class="fbadge">PNG</span><span><span class="fname">PNG image</span><small>Crisp raster, matches theme</small></span></button>
   <button class="dlopt" data-fmt="jpg"><span class="fbadge">JPG</span><span><span class="fname">JPG image</span><small>Smaller file size</small></span></button>
@@ -399,7 +423,33 @@ const FONT="'Segoe Print','Bradley Hand','Comic Sans MS','Chalkboard SE',cursive
 const COLORS=['auto','#e23b2e','#f06400','#f5a300','#e8c400','#7bb800','#1e9e6a',
   '#12b0a8','#2d7ff0','#3b4cc4','#8b5cf6','#c94db0','#e0567f','#8a5a3c','#6b7684','#ffffff'];
 const WIDTHS=[2,4,7], TEXTSIZES=[16,24,34];
-const CURSORS={select:'default',pen:'crosshair',eraser:'crosshair',line:'crosshair',arrow:'crosshair',rect:'crosshair',ellipse:'crosshair',text:'text'};
+const CURSORS={select:'default',pen:'crosshair',eraser:'crosshair',line:'crosshair',arrow:'crosshair',rect:'crosshair',ellipse:'crosshair',text:'text',emoji:'copy'};
+// Poly shapes: unit coords in a 0..1 box, mapped onto the drag rectangle.
+// {pts:[[x,y]...], closed:bool}. 'ellipse'/'rect' stay special-cased.
+function starPts(n,inner){const a=[];for(let i=0;i<n*2;i++){const r=i%2?inner:0.5;const ang=-Math.PI/2+i*Math.PI/n;a.push([0.5+r*Math.cos(ang),0.5+r*Math.sin(ang)]);}return a;}
+function regPts(n,rot){const a=[];for(let i=0;i<n;i++){const ang=rot+i*2*Math.PI/n;a.push([0.5+0.5*Math.cos(ang),0.5+0.5*Math.sin(ang)]);}return a;}
+const SHAPES={
+  triangle:{pts:[[0.5,0],[1,1],[0,1]],closed:true},
+  diamond:{pts:[[0.5,0],[1,0.5],[0.5,1],[0,0.5]],closed:true},
+  pentagon:{pts:regPts(5,-Math.PI/2),closed:true},
+  hexagon:{pts:regPts(6,-Math.PI/2),closed:true},
+  star:{pts:starPts(5,0.21),closed:true},
+  star6:{pts:starPts(6,0.28),closed:true},
+  rtriangle:{pts:[[0,0],[0,1],[1,1]],closed:true},
+  trapezoid:{pts:[[0.22,0],[0.78,0],[1,1],[0,1]],closed:true},
+  parallelogram:{pts:[[0.25,0],[1,0],[0.75,1],[0,1]],closed:true},
+  chevron:{pts:[[0,0],[0.55,0],[1,0.5],[0.55,1],[0,1],[0.45,0.5]],closed:true},
+  arrowR:{pts:[[0,0.3],[0.6,0.3],[0.6,0.05],[1,0.5],[0.6,0.95],[0.6,0.7],[0,0.7]],closed:true},
+  arrowL:{pts:[[1,0.3],[0.4,0.3],[0.4,0.05],[0,0.5],[0.4,0.95],[0.4,0.7],[1,0.7]],closed:true},
+  arrowU:{pts:[[0.3,1],[0.3,0.4],[0.05,0.4],[0.5,0],[0.95,0.4],[0.7,0.4],[0.7,1]],closed:true},
+  heart:{pts:(()=>{const a=[];for(let i=0;i<=28;i++){const t=Math.PI*2*i/28;const x=16*Math.pow(Math.sin(t),3);const y=13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);a.push([0.5+x/34,0.5-y/34]);}return a;})(),closed:true},
+  cloud:{pts:(()=>{const bumps=[[0.2,0.68,0.2],[0.42,0.5,0.26],[0.68,0.52,0.24],[0.83,0.7,0.18]];const a=[];a.push([0.12,0.85]);for(const[cx,cy,r]of bumps)for(let k=0;k<=8;k++){const ang=Math.PI*(1+ -0.15 +1.2*k/8);a.push([cx+r*Math.cos(ang),cy+r*Math.sin(ang)]);}a.push([0.9,0.85]);return a;})(),closed:true},
+  speech:{pts:[[0.05,0.05],[0.95,0.05],[0.95,0.72],[0.4,0.72],[0.2,0.98],[0.24,0.72],[0.05,0.72]],closed:true},
+  cross:{pts:[[0.35,0],[0.65,0],[0.65,0.35],[1,0.35],[1,0.65],[0.65,0.65],[0.65,1],[0.35,1],[0.35,0.65],[0,0.65],[0,0.35],[0.35,0.35]],closed:true},
+  plus:{pts:[[0.42,0],[0.58,0],[0.58,0.42],[1,0.42],[1,0.58],[0.58,0.58],[0.58,1],[0.42,1],[0.42,0.58],[0,0.58],[0,0.42],[0.42,0.42]],closed:true}
+};
+const SHAPE_KEYS=Object.keys(SHAPES);
+function shapeAbs(el){const n=norm(el),sp=SHAPES[el.shape];return sp.pts.map(([x,y])=>[n.x+x*Math.max(1,n.w),n.y+y*Math.max(1,n.h)]);}
 const ICON_TRASH='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></svg>';
 
 let els=[], cur=null, sel=null;
@@ -526,6 +576,16 @@ function drawEl(g,el){
     g.beginPath();
     g.ellipse(n.x+n.w/2,n.y+n.h/2,Math.max(1,n.w/2),Math.max(1,n.h/2),0,0,Math.PI*2);
     g.stroke();
+  }else if(el.type==='shape'){
+    const pts=shapeAbs(el),sp=SHAPES[el.shape];
+    g.beginPath();g.moveTo(pts[0][0],pts[0][1]);
+    for(let i=1;i<pts.length;i++)g.lineTo(pts[i][0],pts[i][1]);
+    if(sp.closed!==false)g.closePath();
+    g.stroke();
+  }else if(el.type==='emoji'){
+    g.font=el.size+'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+    g.textBaseline='top';g.textAlign='left';
+    g.fillText(el.ch,el.x,el.y);
   }else if(el.type==='text'){
     g.font=el.size+'px '+FONT;g.textBaseline='top';
     el.text.split('\n').forEach((ln,i)=>g.fillText(ln,el.x,el.y+i*el.size*1.3));
@@ -561,6 +621,9 @@ function bboxOf(el){
     let w=0;for(const ln of lines)w=Math.max(w,mctx.measureText(ln).width);
     return{x:el.x-2,y:el.y-2,w:w+4,h:lines.length*el.size*1.3+4};
   }
+  if(el.type==='emoji'){
+    return{x:el.x-2,y:el.y-2,w:el.size+4,h:el.size+4};
+  }
   const n=norm(el),pd=(el.w||2)/2+2;
   return{x:n.x-pd,y:n.y-pd,w:n.w+pd*2,h:n.h+pd*2};
 }
@@ -585,11 +648,29 @@ function hitEl(el,p,tol){
     const dx=(p.x-(n.x+rx))/rx,dy=(p.y-(n.y+ry))/ry;
     return Math.abs(Math.hypot(dx,dy)-1)*Math.min(rx,ry)<w2;
   }
-  if(el.type==='text'){
+  if(el.type==='shape'){
+    const pts=shapeAbs(el),sp=SHAPES[el.shape],lim=(sp.closed!==false)?pts.length:pts.length-1;
+    for(let i=0;i<lim;i++){
+      const a=pts[i],b=pts[(i+1)%pts.length];
+      if(dSeg(p,{x:a[0],y:a[1]},{x:b[0],y:b[1]})<w2)return true;
+    }
+    // also allow grabbing by the filled interior for easier selection
+    if(pointInPoly(p,pts))return true;
+    return false;
+  }
+  if(el.type==='text'||el.type==='emoji'){
     const b=bboxOf(el);
     return p.x>=b.x-tol&&p.x<=b.x+b.w+tol&&p.y>=b.y-tol&&p.y<=b.y+b.h+tol;
   }
   return false;
+}
+function pointInPoly(p,pts){
+  let inside=false;
+  for(let i=0,j=pts.length-1;i<pts.length;j=i++){
+    const xi=pts[i][0],yi=pts[i][1],xj=pts[j][0],yj=pts[j][1];
+    if(((yi>p.y)!==(yj>p.y))&&(p.x<(xj-xi)*(p.y-yi)/(yj-yi)+xi))inside=!inside;
+  }
+  return inside;
 }
 function hitTest(p){
   const tol=9/view.s;
@@ -606,7 +687,7 @@ function hitText(p){
 }
 function offsetEl(el,dx,dy){
   if(el.type==='pen')for(const p of el.points){p.x+=dx;p.y+=dy;}
-  else if(el.type==='text'){el.x+=dx;el.y+=dy;}
+  else if(el.type==='text'||el.type==='emoji'){el.x+=dx;el.y+=dy;}
   else{el.x1+=dx;el.y1+=dy;el.x2+=dx;el.y2+=dy;}
 }
 function contentBBox(){
@@ -664,6 +745,12 @@ cv.addEventListener('pointerdown',e=>{
   else if(tool==='line'||tool==='arrow'||tool==='rect'||tool==='ellipse'){
     mode='draw';cur={type:tool,x1:p.x,y1:p.y,x2:p.x,y2:p.y,color,w:width};
   }
+  else if(SHAPES[tool]){
+    mode='draw';cur={type:'shape',shape:tool,x1:p.x,y1:p.y,x2:p.x,y2:p.y,color,w:width};
+  }
+  else if(tool==='emoji'){
+    mode='stamp';stampAt(p);
+  }
   else if(tool==='eraser'){mode='erase';eraseHit=false;eraseAt(p);}
   else if(tool==='text'){mode='texttap';}
   else{ /* select */
@@ -691,7 +778,7 @@ cv.addEventListener('pointermove',e=>{
       const p=toWorld(loc);cur.x2=p.x;cur.y2=p.y;
       if(e.shiftKey){
         const dx=cur.x2-cur.x1,dy=cur.y2-cur.y1;
-        if(cur.type==='rect'||cur.type==='ellipse'){
+        if(cur.type==='rect'||cur.type==='ellipse'||cur.type==='shape'){
           const s=Math.max(Math.abs(dx),Math.abs(dy));
           cur.x2=cur.x1+(dx<0?-s:s);cur.y2=cur.y1+(dy<0?-s:s);
         }else{
@@ -721,10 +808,16 @@ function endPointer(e){
     let keep=true;
     if(cur.type!=='pen'){
       const dx=Math.abs(cur.x2-cur.x1),dy=Math.abs(cur.y2-cur.y1);
-      if(dx<3/view.s&&dy<3/view.s)keep=false;
+      if(dx<3/view.s&&dy<3/view.s){
+        if(cur.type==='shape'){ // tap = drop a default-sized shape
+          const d=90;cur.x1=cur.x1-d/2;cur.y1=cur.y1-d/2;cur.x2=cur.x1+d;cur.y2=cur.y1+d;
+        }else keep=false;
+      }
     }
     if(keep){els.push(cur);pushHistory();markDirty();}
     cur=null;
+  }else if(mode==='stamp'){
+    /* placed on down; nothing more */
   }else if(mode==='move'){
     if(movedAmt>4){pushHistory();markDirty();}
     else tapCheck(loc);
@@ -748,6 +841,12 @@ cv.addEventListener('pointercancel',e=>{
 });
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 
+let emojiSize=44;
+function stampAt(p){
+  if(!curEmoji)return;
+  els.push({type:'emoji',ch:curEmoji,x:p.x-emojiSize/2,y:p.y-emojiSize/2,size:emojiSize});
+  pushHistory();markDirty();drawAll();
+}
 function tapCheck(loc){
   const now=performance.now();
   if(lastTap&&now-lastTap.t<350&&Math.hypot(loc.x-lastTap.x,loc.y-lastTap.y)<28){
@@ -865,10 +964,74 @@ function setTool(t){
   tool=t;
   if(t!=='select'&&sel){sel=null;updateChip();}
   toolBtns.forEach(b=>b.classList.toggle('active',b.dataset.tool===t));
+  shapeBtn.classList.toggle('active',!!SHAPES[t]);
+  emojiBtn.classList.toggle('active',t==='emoji');
   cv.style.cursor=CURSORS[t]||'crosshair';
   closePops();drawAll();
 }
 toolBtns.forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
+
+/* ============ shapes & emoji pickers ============ */
+const shapeBtn=$('#shapeBtn'), emojiBtn=$('#emojiBtn');
+const shapePop=$('#shapePop'), emojiPop=$('#emojiPop');
+const shapeGrid=$('#shapeGrid'), emojiGrid=$('#emojiGrid'), emojiTabs=$('#emojiTabs');
+let curEmoji='\uD83D\uDE00';
+
+// tiny SVG preview for each shape button, drawn from the same unit paths (rect/ellipse special)
+const SHAPE_ORDER=['rect','ellipse','triangle','rtriangle','diamond','pentagon','hexagon','trapezoid','parallelogram','chevron','star','star6','heart','cloud','speech','arrowR','arrowL','arrowU','plus','cross'];
+const SHAPE_LABEL={rect:'Rectangle',ellipse:'Ellipse',triangle:'Triangle',rtriangle:'Right triangle',diamond:'Diamond',pentagon:'Pentagon',hexagon:'Hexagon',trapezoid:'Trapezoid',parallelogram:'Parallelogram',chevron:'Chevron',star:'Star',star6:'6-point star',heart:'Heart',cloud:'Cloud',speech:'Speech bubble',arrowR:'Arrow right',arrowL:'Arrow left',arrowU:'Arrow up',plus:'Plus',cross:'Cross'};
+function shapeIcon(key){
+  if(key==='rect')return '<rect x="3" y="6" width="18" height="12" rx="2"/>';
+  if(key==='ellipse')return '<ellipse cx="12" cy="12" rx="9" ry="7"/>';
+  const pts=SHAPES[key].pts,sp=SHAPES[key];
+  const P=pts.map(([x,y])=>(3+x*18).toFixed(1)+','+(3+y*18).toFixed(1)).join(' ');
+  return sp.closed!==false?'<polygon points="'+P+'"/>':'<polyline points="'+P+'"/>';
+}
+function renderShapes(){
+  shapeGrid.innerHTML=SHAPE_ORDER.map(k=>
+    '<button class="sbtn '+(tool===k?'active':'')+'" data-shape="'+k+'" title="'+SHAPE_LABEL[k]+'" aria-label="'+SHAPE_LABEL[k]+'">'+
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">'+shapeIcon(k)+'</svg>'+
+    '</button>').join('');
+}
+shapeGrid.addEventListener('click',e=>{
+  const b=e.target.closest('[data-shape]');
+  if(b){setTool(b.dataset.shape);}
+});
+
+const EMOJI={
+  '\uD83D\uDE00':['\uD83D\uDE00','\uD83D\uDE03','\uD83D\uDE04','\uD83D\uDE01','\uD83D\uDE06','\uD83D\uDE05','\uD83E\uDD23','\uD83D\uDE02','\uD83D\uDE42','\uD83D\uDE09','\uD83D\uDE0A','\uD83D\uDE07','\uD83D\uDE0D','\uD83E\uDD70','\uD83D\uDE18','\uD83D\uDE1B','\uD83D\uDE1C','\uD83E\uDD29','\uD83E\uDD11','\uD83E\uDD17','\uD83E\uDD14','\uD83E\uDD10','\uD83D\uDE10','\uD83D\uDE0E','\uD83E\uDD73','\uD83D\uDE22','\uD83D\uDE2D','\uD83D\uDE20','\uD83D\uDE21','\uD83D\uDE31','\uD83E\uDD2F','\uD83D\uDE33','\uD83D\uDE34','\uD83E\uDD71','\uD83D\uDE07'],
+  '\uD83D\uDC4D':['\uD83D\uDC4D','\uD83D\uDC4E','\uD83D\uDC4C','\u270C\uFE0F','\uD83E\uDD1E','\uD83D\uDC4A','\u270A','\uD83D\uDC4B','\uD83D\uDE4C','\uD83D\uDC4F','\uD83D\uDE4F','\uD83D\uDCAA','\uD83E\uDD1D','\u2764\uFE0F','\uD83E\uDDE1','\uD83D\uDC9B','\uD83D\uDC9A','\uD83D\uDC99','\uD83D\uDC9C','\uD83D\uDDA4','\uD83D\uDC94','\uD83D\uDC95','\u2728','\u2B50','\uD83C\uDF1F','\uD83D\uDCA5','\uD83D\uDD25','\uD83C\uDF89','\uD83C\uDF8A','\u2705','\u274C','\u2757','\u2753','\uD83D\uDCAF'],
+  '\uD83D\uDC36':['\uD83D\uDC36','\uD83D\uDC31','\uD83D\uDC2D','\uD83D\uDC39','\uD83D\uDC30','\uD83E\uDD8A','\uD83D\uDC3B','\uD83D\uDC3C','\uD83D\uDC28','\uD83D\uDC2F','\uD83E\uDD81','\uD83D\uDC2E','\uD83D\uDC37','\uD83D\uDC38','\uD83D\uDC35','\uD83D\uDC14','\uD83D\uDC27','\uD83D\uDC26','\uD83E\uDD86','\uD83E\uDD89','\uD83D\uDC1D','\uD83E\uDD8B','\uD83D\uDC1E','\uD83D\uDC22','\uD83D\uDC0D','\uD83D\uDC19','\uD83D\uDC1F','\uD83D\uDC33','\uD83D\uDC2C','\uD83E\uDD84','\uD83C\uDF3B','\uD83C\uDF38','\uD83C\uDF3A','\uD83C\uDF3F'],
+  '\uD83C\uDF55':['\uD83C\uDF55','\uD83C\uDF54','\uD83C\uDF5F','\uD83C\uDF2D','\uD83C\uDF2E','\uD83C\uDF57','\uD83E\uDD57','\uD83C\uDF5C','\uD83C\uDF71','\uD83C\uDF63','\uD83C\uDF69','\uD83C\uDF70','\uD83C\uDF66','\uD83C\uDF6A','\uD83C\uDF6B','\uD83C\uDF6D','\uD83C\uDF4E','\uD83C\uDF4C','\uD83C\uDF53','\uD83C\uDF47','\uD83C\uDF49','\uD83C\uDF51','\u2615','\uD83C\uDF75','\uD83E\uDD64','\uD83C\uDF7A','\uD83C\uDF77','\uD83E\uDD82','\uD83C\uDF7F','\uD83E\uDDC0'],
+  '\u26BD':['\u26BD','\uD83C\uDFC0','\uD83C\uDFC8','\u26BE','\uD83C\uDFBE','\uD83C\uDFD0','\uD83C\uDFB1','\uD83C\uDFD3','\uD83C\uDFF8','\uD83E\uDD4A','\uD83C\uDFAF','\uD83C\uDFB2','\uD83C\uDFAE','\uD83C\uDFB8','\uD83C\uDFB9','\uD83C\uDFB7','\uD83C\uDFBA','\uD83C\uDFBB','\uD83C\uDFA8','\uD83C\uDFAD','\uD83C\uDFAC','\uD83C\uDFA4','\uD83C\uDFA7','\uD83C\uDFC6','\uD83C\uDFC5','\uD83E\uDD47','\uD83C\uDF9F\uFE0F','\uD83C\uDFAB','\uD83E\uDDE9'],
+  '\uD83D\uDE97':['\uD83D\uDE97','\uD83D\uDE95','\uD83D\uDE8C','\uD83D\uDEB2','\u2708\uFE0F','\uD83D\uDE80','\uD83D\uDEF8','\u2693','\uD83D\uDEA2','\uD83C\uDFE0','\uD83C\uDFE2','\uD83D\uDDFC','\uD83C\uDF0D','\uD83D\uDDFA\uFE0F','\uD83E\uDDED','\u23F0','\u231A','\uD83D\uDCA1','\uD83D\uDD26','\uD83D\uDD0B','\uD83D\uDCBB','\uD83D\uDCF1','\uD83D\uDCF7','\uD83C\uDFA5','\uD83D\uDD0D','\uD83D\uDD11','\uD83D\uDD12','\uD83D\uDCCC','\uD83D\uDCCE','\u2702\uFE0F','\uD83D\uDCDA','\u270F\uFE0F','\uD83D\uDCDD','\uD83C\uDF88']
+};
+const EMOJI_CATS=Object.keys(EMOJI);
+let emojiCat=EMOJI_CATS[0];
+function renderEmojiTabs(){
+  emojiTabs.innerHTML=EMOJI_CATS.map(c=>
+    '<button class="etab '+(c===emojiCat?'active':'')+'" data-cat="'+c+'">'+c+'</button>').join('');
+}
+function renderEmojiGrid(){
+  emojiGrid.innerHTML=EMOJI[emojiCat].map(e=>
+    '<button class="ebtn" data-emoji="'+e+'">'+e+'</button>').join('');
+}
+emojiTabs.addEventListener('click',e=>{
+  const b=e.target.closest('[data-cat]');
+  if(b){emojiCat=b.dataset.cat;renderEmojiTabs();renderEmojiGrid();}
+});
+emojiGrid.addEventListener('click',e=>{
+  const b=e.target.closest('[data-emoji]');
+  if(b){curEmoji=b.dataset.emoji;setTool('emoji');toast('Tap the canvas to place '+curEmoji);}
+});
+shapeBtn.addEventListener('click',()=>{
+  if(shapePop.classList.contains('open')){closePops();return;}
+  renderShapes();openPop(shapePop,shapeBtn);
+});
+emojiBtn.addEventListener('click',()=>{
+  if(emojiPop.classList.contains('open')){closePops();return;}
+  renderEmojiTabs();renderEmojiGrid();openPop(emojiPop,emojiBtn);
+});
 
 function renderSwatches(){
   colorPop.querySelector('.grid').innerHTML=COLORS.map(c=>{
@@ -941,11 +1104,11 @@ function openPop(pop,btn){
   pop.style.left=clamp(r.left+r.width/2-pw/2,8,innerWidth-pw-8)+'px';
   pop.style.bottom=(innerHeight-r.top+10)+'px';
 }
-function closePops(){colorPop.classList.remove('open');widthPop.classList.remove('open');dlPop.classList.remove('open');}
+function closePops(){colorPop.classList.remove('open');widthPop.classList.remove('open');dlPop.classList.remove('open');shapePop.classList.remove('open');emojiPop.classList.remove('open');}
 colorBtn.addEventListener('click',()=>colorPop.classList.contains('open')?closePops():openPop(colorPop,colorBtn));
 widthBtn.addEventListener('click',()=>widthPop.classList.contains('open')?closePops():openPop(widthPop,widthBtn));
 document.addEventListener('pointerdown',e=>{
-  if(!e.target.closest('.pop')&&!e.target.closest('#colorBtn')&&!e.target.closest('#widthBtn')&&!e.target.closest('#dlBtn'))closePops();
+  if(!e.target.closest('.pop')&&!e.target.closest('#colorBtn')&&!e.target.closest('#widthBtn')&&!e.target.closest('#dlBtn')&&!e.target.closest('#shapeBtn')&&!e.target.closest('#emojiBtn'))closePops();
 },true);
 
 /* ============ zoom controls ============ */
@@ -1245,6 +1408,16 @@ function svgOf(el){
     const n=norm(el);
     return '<ellipse cx="'+r2(n.x+n.w/2)+'" cy="'+r2(n.y+n.h/2)+'" rx="'+r2(Math.max(1,n.w/2))+'" ry="'+r2(Math.max(1,n.h/2))+'" '+st+'/>';
   }
+  if(el.type==='shape'){
+    const pts=shapeAbs(el),sp=SHAPES[el.shape];
+    let d='M'+r2(pts[0][0])+' '+r2(pts[0][1]);
+    for(let i=1;i<pts.length;i++)d+=' L'+r2(pts[i][0])+' '+r2(pts[i][1]);
+    if(sp.closed!==false)d+=' Z';
+    return '<path d="'+d+'" '+st+'/>';
+  }
+  if(el.type==='emoji'){
+    return '<text x="'+r2(el.x)+'" y="'+r2(el.y)+'" font-size="'+el.size+'" dominant-baseline="text-before-edge">'+escX(el.ch)+'</text>';
+  }
   if(el.type==='text'){
     return el.text.split('\n').map((ln,i)=>
       '<text x="'+r2(el.x)+'" y="'+r2(el.y+i*el.size*1.3)+'" font-family="Segoe Print, Bradley Hand, Comic Sans MS, Chalkboard SE, cursive" font-size="'+el.size+'" fill="'+c+'" dominant-baseline="text-before-edge">'+escX(ln)+'</text>'
@@ -1296,7 +1469,7 @@ document.addEventListener('visibilitychange',()=>{
   try{storageOK=!!(window.storage&&typeof window.storage.get==='function');}catch(e){storageOK=false;}
   let savedTheme=null;
   try{savedTheme=await sGet('sknotes:theme');}catch(e){}
-  applyTheme(savedTheme==='dark',false);
+  applyTheme(savedTheme!=='light',false);
   renderWidths();setTool('pen');syncZoom();resize();
   try{
     const raw=await sGet('sknotes:index');
