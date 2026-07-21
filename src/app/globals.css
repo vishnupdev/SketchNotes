@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* Dark mode is driven by <body data-theme="dark">, not media/class. */
+@custom-variant dark (&:where([data-theme="dark"] *));
+
+/* ---------------- theme tokens (flip on [data-theme]) ---------------- */
+:root {
+  --paper: #f7f8f6;
+  --grid: #d5dbe3;
+  --ink: #1f2a33;
+  --ink-soft: #66727d;
+  --panel: #ffffff;
+  --border: #e4e9ee;
+  --accent: #0f7b6c;
+  --accent-soft: #ddf0ec;
+  --danger: #d6482f;
+  --dock-ink: #9fb0bc;
+  --text: #1f2a33;
+  --ed-bg: rgba(255, 255, 255, 0.55);
+  --shadow: 0 8px 28px rgba(31, 42, 51, 0.16), 0 1px 3px rgba(31, 42, 51, 0.1);
+  --hand: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Chalkboard SE", cursive;
+}
+
+[data-theme="dark"] {
+  --paper: #141a21;
+  --grid: #2b3541;
+  --text: #e6ecf1;
+  --ink: #0d1319;
+  --ink-soft: #8b99a6;
+  --panel: #1d2530;
+  --border: #2c3743;
+  --accent: #1ba38e;
+  --accent-soft: rgba(27, 163, 142, 0.18);
+  --dock-ink: #8b99a6;
+  --ed-bg: rgba(20, 26, 33, 0.6);
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------------- expose tokens to Tailwind utilities ---------------- */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-grid: var(--grid);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-panel: var(--panel);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-dock-ink: var(--dock-ink);
+  --color-text: var(--text);
+  --color-ed-bg: var(--ed-bg);
+  --font-hand: var(--hand);
+  --shadow-panel: var(--shadow);
+}
+
+/* --------------------------- base reset ------------------------------ */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--text);
+  font: 14px/1.45 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+svg {
+  display: block;
+}
+
+/* Reusable interactive tint that adapts to the theme. */
+@utility tint {
+  &:hover {
+    background: rgba(31, 42, 51, 0.06);
+  }
+}
+[data-theme="dark"] .tint:hover {
+  background: rgba(230, 236, 241, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
