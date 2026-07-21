@@ -2,7 +2,8 @@
 
 import { useRef } from "react";
 import type { Tool } from "@/engine/types";
-import { mapColor } from "@/engine/constants";
+import { FONTS, mapColor } from "@/engine/constants";
+import type { FontKey } from "@/engine/constants";
 import { isShape } from "@/engine/shapes";
 import { useEditorStore } from "@/store/useEditorStore";
 import { ToolButton } from "@/components/atoms/ToolButton";
@@ -11,6 +12,8 @@ import { ColorPicker } from "@/components/molecules/ColorPicker";
 import { WidthPicker } from "@/components/molecules/WidthPicker";
 import { ShapePicker } from "@/components/molecules/ShapePicker";
 import { EmojiPicker } from "@/components/molecules/EmojiPicker";
+import { FontPicker } from "@/components/molecules/FontPicker";
+import { TextSizePicker } from "@/components/molecules/TextSizePicker";
 import {
   ArrowIcon,
   EmojiIcon,
@@ -42,6 +45,8 @@ export function Dock() {
   const tool = useEditorStore((s) => s.tool);
   const color = useEditorStore((s) => s.color);
   const dark = useEditorStore((s) => s.dark);
+  const fontKey = useEditorStore((s) => s.fontKey);
+  const fontSize = useEditorStore((s) => s.fontSize);
   const setTool = useEditorStore((s) => s.setTool);
   const activePopover = useEditorStore((s) => s.activePopover);
   const togglePopover = useEditorStore((s) => s.togglePopover);
@@ -51,6 +56,8 @@ export function Dock() {
   const emojiRef = useRef<HTMLButtonElement>(null);
   const colorRef = useRef<HTMLButtonElement>(null);
   const widthRef = useRef<HTMLButtonElement>(null);
+  const fontRef = useRef<HTMLButtonElement>(null);
+  const sizeRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
@@ -100,6 +107,35 @@ export function Dock() {
           >
             <TextIcon size={20} />
           </ToolButton>
+
+          <ToolButton
+            ref={fontRef}
+            aria-label="Font"
+            title="Font"
+            data-text-style
+            onPointerDown={(e) => e.preventDefault()}
+            active={activePopover === "font"}
+            onClick={() => togglePopover("font")}
+          >
+            <span
+              className="text-[16px] font-bold leading-none"
+              style={{ fontFamily: FONTS[fontKey as FontKey]?.stack ?? FONTS.hand.stack }}
+            >
+              Aa
+            </span>
+          </ToolButton>
+
+          <ToolButton
+            ref={sizeRef}
+            aria-label="Text size"
+            title="Text size"
+            data-text-style
+            onPointerDown={(e) => e.preventDefault()}
+            active={activePopover === "textsize"}
+            onClick={() => togglePopover("textsize")}
+          >
+            <span className="text-[12px] font-bold leading-none tabular-nums">{fontSize}</span>
+          </ToolButton>
         </div>
 
         <div className="mx-[3px] my-[5px] w-px flex-none self-stretch bg-white/15" />
@@ -131,6 +167,12 @@ export function Dock() {
       </Popover>
       <Popover open={activePopover === "width"} anchorRef={widthRef} onClose={closePopovers}>
         <WidthPicker />
+      </Popover>
+      <Popover open={activePopover === "font"} anchorRef={fontRef} onClose={closePopovers}>
+        <FontPicker />
+      </Popover>
+      <Popover open={activePopover === "textsize"} anchorRef={sizeRef} onClose={closePopovers}>
+        <TextSizePicker />
       </Popover>
     </>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef } from "react";
-import { FONT } from "@/engine/constants";
 import { clamp } from "@/engine/geometry";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useEditorCommands } from "@/context/editor-context";
@@ -57,7 +56,13 @@ export function TextEditor() {
       placeholder="Type…"
       value={value}
       onChange={(e) => setEditValue(e.target.value)}
-      onBlur={() => commitText(false)}
+      onBlur={(e) => {
+        // Keep the edit alive when focus moves into a font/size control, so
+        // restyling mid-edit doesn't commit and drop the session.
+        const next = e.relatedTarget;
+        if (next instanceof HTMLElement && next.closest("[data-text-style]")) return;
+        commitText(false);
+      }}
       onKeyDown={(e) => {
         if (e.key === "Escape") {
           e.preventDefault();
@@ -71,7 +76,7 @@ export function TextEditor() {
         top: overlay.top,
         fontSize: overlay.fontSize,
         color: overlay.color,
-        fontFamily: FONT,
+        fontFamily: overlay.fontFamily,
         caretColor: "var(--accent)",
         maxWidth: "78vw",
         minWidth: 60,

@@ -9,13 +9,17 @@ import type {
 import {
   AUTO_LIGHT,
   CURSORS,
+  DEFAULT_FONT,
+  DEFAULT_TEXT_SIZE,
   EMOJI_SIZE,
   HISTORY_LIMIT,
+  MAX_TEXT_SIZE,
   MAX_ZOOM,
+  MIN_TEXT_SIZE,
   MIN_ZOOM,
-  TEXTSIZES,
   WIDTHS,
   accentColor,
+  fontStack,
   mapColor,
 } from "./constants";
 import { clamp, bboxOf, contentBBox, hitEl, offsetEl } from "./geometry";
@@ -28,6 +32,7 @@ export interface EditorState {
   left: number;
   top: number;
   fontSize: number;
+  fontFamily: string;
   color: string;
   value: string;
   maxWidth: number;
@@ -40,6 +45,8 @@ export interface EngineCallbacks {
   onEmptyChange?(isEmpty: boolean): void;
   onDirty?(): void;
   onEdit?(state: EditorState | null): void;
+  /** Fires when a text element is selected/edited so the pickers can track it. */
+  onTextStyle?(font: string, size: number): void;
   onToast?(message: string): void;
   /** Supplies the live text-overlay value when the engine commits internally. */
   getEditValue?(): string;
@@ -88,6 +95,9 @@ export class SketchEngine {
   private width: number = WIDTHS[1];
   private dark: boolean;
   private currentEmoji = "😀";
+  /** Font + size applied to new text (and to a selected text element). */
+  private fontKey: string = DEFAULT_FONT;
+  private textSize = DEFAULT_TEXT_SIZE;
 
   private view: View = { x: 0, y: 0, s: 1 };
 
@@ -117,6 +127,7 @@ export class SketchEngine {
   private editPos: Point = { x: 0, y: 0 };
   private editSize = 24;
   private editColor = "auto";
+  private editFont: string = DEFAULT_FONT;
   private editInitialValue = "";
 
   private lastEmpty = true;
@@ -182,13 +193,35 @@ export class SketchEngine {
   setWidthIndex(i: number): void {
     this.widthIdx = i;
     this.width = WIDTHS[i];
+    if (this.sel && this.sel.type !== "text") {
+      this.sel.w = this.width;
+      this.commit();
+    }
+  }
+
+  /** Set the font family for new text, the active edit, and any selected text. */
+  setFont(key: string): void {
+    this.fontKey = key;
     if (this.editing) {
-      this.editSize = TEXTSIZES[i];
+      this.editFont = key;
       this.refreshEditor();
     }
-    if (this.sel) {
-      if (this.sel.type === "text") this.sel.size = TEXTSIZES[i];
-      else this.sel.w = this.width;
+    if (this.sel && this.sel.type === "text" && (this.sel.font || DEFAULT_FONT) !== key) {
+      this.sel.font = key;
+      this.commit();
+    }
+  }
+
+  /** Set the text size (world px) for new text, the active edit, and selection. */
+  setTextSize(px: number): void {
+    const size = clamp(px, MIN_TEXT_SIZE, MAX_TEXT_SIZE);
+    this.textSize = size;
+    if (this.editing) {
+      this.editSize = size;
+      this.refreshEditor();
+    }
+    if (this.sel && this.sel.type === "text" && this.sel.size !== size) {
+      this.sel.size = size;
       this.commit();
     }
   }
@@ -466,6 +499,15 @@ export class SketchEngine {
     this.cb.onHistoryChange?.(this.undoStack.length > 0, this.redoStack.length > 0);
   }
 
+  /** Surface the font/size of the text being edited or selected to the UI. */
+  private emitTextStyle(): void {
+    if (this.editing) {
+      this.cb.onTextStyle?.(this.editFont, this.editSize);
+    } else if (this.sel && this.sel.type === "text") {
+      this.cb.onTextStyle?.(this.sel.font || DEFAULT_FONT, this.sel.size);
+    }
+  }
+
   /* ============ hit testing ============ */
 
   private hitTest(p: Point): SketchElement | null {
@@ -538,6 +580,7 @@ export class SketchEngine {
         this.sel = hit;
         this.mode = "move";
         this.moveLast = p;
+        if (hit.type === "text") this.emitTextStyle();
       } else {
         this.sel = null;
         this.mode = "pan";
@@ -782,12 +825,14 @@ export class SketchEngine {
     this.editing = true;
     this.editingEl = el && el.type === "text" ? el : null;
     const textEl = this.editingEl && this.editingEl.type === "text" ? this.editingEl : null;
-    this.editSize = textEl ? textEl.size : TEXTSIZES[this.widthIdx] || 24;
+    this.editSize = textEl ? textEl.size : this.textSize;
     this.editColor = textEl ? textEl.color : this.color;
+    this.editFont = textEl ? textEl.font || DEFAULT_FONT : this.fontKey;
     this.editPos = textEl ? { x: textEl.x, y: textEl.y } : worldP || { x: 0, y: 0 };
     this.editInitialValue = textEl ? textEl.text : "";
     this.drawAll();
     this.refreshEditor();
+    this.emitTextStyle();
   }
 
   /**
@@ -802,6 +847,7 @@ export class SketchEngine {
       left: this.editPos.x * this.view.s + this.view.x - 6,
       top: this.editPos.y * this.view.s + this.view.y - 4,
       fontSize: this.editSize * this.view.s,
+      fontFamily: fontStack(this.editFont),
       color: mapColor(this.editColor, this.dark),
       value: this.editInitialValue,
       maxWidth: this.W * 0.8,
@@ -825,8 +871,13 @@ export class SketchEngine {
       return;
     }
     if (this.editingEl && this.editingEl.type === "text") {
-      if (val) this.editingEl.text = val;
-      else this.els = this.els.filter((x) => x !== this.editingEl);
+      if (val) {
+        this.editingEl.text = val;
+        // Persist any font/size/colour changes made while editing.
+        this.editingEl.size = this.editSize;
+        this.editingEl.font = this.editFont;
+        this.editingEl.color = this.editColor;
+      } else this.els = this.els.filter((x) => x !== this.editingEl);
       this.pushHistory();
       this.cb.onDirty?.();
     } else if (val) {
@@ -836,6 +887,7 @@ export class SketchEngine {
         y: this.editPos.y,
         text: val,
         size: this.editSize,
+        font: this.editFont,
         color: this.editColor,
         w: 2,
       });

@@ -90,6 +90,11 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
         onEmptyChange: (empty) => store.getState().setIsEmpty(empty),
         onDirty: () => scheduleSave(),
         onEdit: (state) => store.getState().setEditorOverlay(state),
+        onTextStyle: (font, size) => {
+          const st = store.getState();
+          st.setFontKey(font);
+          st.setFontSize(size);
+        },
         onToast: (msg) => store.getState().showToast(msg),
         getEditValue: () => store.getState().editValue,
       },
@@ -99,6 +104,8 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
     engine.setColor(s.color);
     engine.setWidthIndex(s.widthIdx);
     engine.setCurrentEmoji(s.currentEmoji);
+    engine.setFont(s.fontKey);
+    engine.setTextSize(s.fontSize);
     engineRef.current = engine;
 
     return () => {
@@ -115,6 +122,8 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
   const color = useEditorStore((s) => s.color);
   const widthIdx = useEditorStore((s) => s.widthIdx);
   const currentEmoji = useEditorStore((s) => s.currentEmoji);
+  const fontKey = useEditorStore((s) => s.fontKey);
+  const fontSize = useEditorStore((s) => s.fontSize);
   const dark = useEditorStore((s) => s.dark);
 
   useEffect(() => {
@@ -129,6 +138,12 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
   useEffect(() => {
     engineRef.current?.setCurrentEmoji(currentEmoji);
   }, [currentEmoji]);
+  useEffect(() => {
+    engineRef.current?.setFont(fontKey);
+  }, [fontKey]);
+  useEffect(() => {
+    engineRef.current?.setTextSize(fontSize);
+  }, [fontSize]);
   useEffect(() => {
     engineRef.current?.setTheme(dark);
     if (typeof document !== "undefined") {

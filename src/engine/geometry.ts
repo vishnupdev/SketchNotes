@@ -1,5 +1,5 @@
 import type { Bounds, CornerElement, Point, SketchElement } from "./types";
-import { FONT } from "./constants";
+import { fontStack } from "./constants";
 
 /** Clamp a value into [a, b]. */
 export const clamp = (v: number, a: number, b: number): number =>
@@ -72,7 +72,7 @@ export function bboxOf(
     const lines = el.text.split("\n");
     let w = 0;
     if (ctx) {
-      ctx.font = `${el.size}px ${FONT}`;
+      ctx.font = `${el.size}px ${fontStack(el.font)}`;
       for (const ln of lines) w = Math.max(w, ctx.measureText(ln).width);
     } else {
       for (const ln of lines) w = Math.max(w, ln.length * el.size * 0.5);

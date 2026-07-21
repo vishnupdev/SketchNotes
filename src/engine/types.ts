@@ -65,13 +65,15 @@ export interface EmojiElement extends BaseElement {
   size: number;
 }
 
-/** Multi-line hand-lettered text. */
+/** Multi-line text. `font` is a key into the font registry (default "hand"). */
 export interface TextElement extends BaseElement {
   type: "text";
   x: number;
   y: number;
   text: string;
   size: number;
+  /** Font-family key; omitted on legacy notes, treated as the hand font. */
+  font?: string;
 }
 
 export type SketchElement =

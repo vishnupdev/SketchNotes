@@ -4,6 +4,49 @@ import type { Theme, Tool } from "./types";
 export const FONT =
   "'Segoe Print','Bradley Hand','Comic Sans MS','Chalkboard SE',cursive";
 
+/**
+ * Selectable text-element font families, keyed by the value stored on the
+ * element. Stacks lean on fonts commonly installed on Windows/macOS so text
+ * renders correctly fully offline (no web fonts are loaded).
+ */
+export type FontKey =
+  | "hand"
+  | "marker"
+  | "script"
+  | "sans"
+  | "soft"
+  | "serif"
+  | "slab"
+  | "condensed"
+  | "display"
+  | "mono";
+export const FONTS: Record<FontKey, { label: string; stack: string }> = {
+  hand: { label: "Hand", stack: FONT },
+  marker: { label: "Marker", stack: "'Ink Free','Marker Felt','Comic Sans MS','Chalkboard SE',cursive" },
+  script: { label: "Script", stack: "'Segoe Script','Brush Script MT','Snell Roundhand','Apple Chancery',cursive" },
+  sans: { label: "Sans", stack: "ui-sans-serif,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" },
+  soft: { label: "Soft", stack: "'Trebuchet MS',Verdana,'Segoe UI',sans-serif" },
+  serif: { label: "Serif", stack: "Georgia,'Times New Roman',Times,serif" },
+  slab: { label: "Slab", stack: "Rockwell,'Roboto Slab','Courier New',Georgia,serif" },
+  condensed: { label: "Narrow", stack: "'Arial Narrow','Roboto Condensed','Segoe UI',sans-serif" },
+  display: { label: "Display", stack: "Impact,Haettenschweiler,'Arial Black','Franklin Gothic Bold',sans-serif" },
+  mono: { label: "Mono", stack: "ui-monospace,'SF Mono',Menlo,Consolas,'Courier New',monospace" },
+};
+export const FONT_KEYS = Object.keys(FONTS) as FontKey[];
+/** Default font family for new text. */
+export const DEFAULT_FONT: FontKey = "hand";
+/** Resolve an element's font key to a CSS font stack (falls back to Hand). */
+export const fontStack = (f?: string): string =>
+  (f && FONTS[f as FontKey] ? FONTS[f as FontKey] : FONTS[DEFAULT_FONT]).stack;
+
+/** Text-size presets (world px) offered in the text-style picker. */
+export const TEXT_SIZES = [14, 18, 24, 32, 48, 64] as const;
+/** Default text size (world px) for new text. */
+export const DEFAULT_TEXT_SIZE = 21;
+/** Bounds for the text size, guarding manual/edge values. */
+export const MIN_TEXT_SIZE = 8;
+export const MAX_TEXT_SIZE = 160;
+
 /** The colour palette shown in the colour popover. `auto` = theme ink. */
 export const COLORS: readonly string[] = [
   "auto",
@@ -26,8 +69,6 @@ export const COLORS: readonly string[] = [
 
 /** Stroke widths, indexed by the width picker. */
 export const WIDTHS = [2, 4, 7] as const;
-/** Text sizes, sharing the width picker's index. */
-export const TEXTSIZES = [16, 24, 34] as const;
 
 /** Default emoji glyph size in world units. */
 export const EMOJI_SIZE = 44;

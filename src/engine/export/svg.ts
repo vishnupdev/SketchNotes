@@ -1,5 +1,5 @@
 import type { SketchElement } from "../types";
-import { FONT, mapColor, themeBg } from "../constants";
+import { fontStack, mapColor, themeBg } from "../constants";
 import { clamp, norm } from "../geometry";
 import { shapeAbs, SHAPES } from "../shapes";
 
@@ -58,7 +58,7 @@ function svgOf(el: SketchElement, dark: boolean): string {
       .split("\n")
       .map(
         (ln, i) =>
-          `<text x="${r2(el.x)}" y="${r2(el.y + i * el.size * 1.3)}" font-family="${FONT}" font-size="${el.size}" fill="${c}" dominant-baseline="text-before-edge">${escX(ln)}</text>`,
+          `<text x="${r2(el.x)}" y="${r2(el.y + i * el.size * 1.3)}" font-family="${escX(fontStack(el.font))}" font-size="${el.size}" fill="${c}" dominant-baseline="text-before-edge">${escX(ln)}</text>`,
       )
       .join("");
   }

@@ -3,10 +3,18 @@
 import { create } from "zustand";
 import type { EditorState as OverlayState } from "@/engine/SketchEngine";
 import type { Theme, Tool } from "@/engine/types";
-import { DEFAULT_THEME, WIDTHS } from "@/engine/constants";
+import { DEFAULT_FONT, DEFAULT_TEXT_SIZE, DEFAULT_THEME, WIDTHS } from "@/engine/constants";
 
 /** Which single popover (if any) is open in the dock/header. */
-export type PopoverId = "color" | "width" | "shape" | "emoji" | "download" | null;
+export type PopoverId =
+  | "color"
+  | "width"
+  | "shape"
+  | "emoji"
+  | "font"
+  | "textsize"
+  | "download"
+  | null;
 
 export type SaveStatus = "" | "saving" | "saved";
 
@@ -16,6 +24,8 @@ interface EditorState {
   color: string;
   widthIdx: number;
   currentEmoji: string;
+  fontKey: string;
+  fontSize: number;
   dark: boolean;
 
   /* --- current note --- */
@@ -44,6 +54,8 @@ interface EditorState {
   setColor: (c: string) => void;
   setWidthIdx: (i: number) => void;
   setCurrentEmoji: (ch: string) => void;
+  setFontKey: (k: string) => void;
+  setFontSize: (px: number) => void;
   setDark: (d: boolean) => void;
   setTheme: (t: Theme) => void;
 
@@ -70,6 +82,8 @@ export const useEditorStore = create<EditorState>((set) => ({
   color: "auto",
   widthIdx: 1,
   currentEmoji: "😀",
+  fontKey: DEFAULT_FONT,
+  fontSize: DEFAULT_TEXT_SIZE,
   dark: DEFAULT_THEME === "dark",
 
   curId: null,
@@ -93,6 +107,8 @@ export const useEditorStore = create<EditorState>((set) => ({
   setColor: (color) => set({ color }),
   setWidthIdx: (widthIdx) => set({ widthIdx }),
   setCurrentEmoji: (currentEmoji) => set({ currentEmoji }),
+  setFontKey: (fontKey) => set({ fontKey }),
+  setFontSize: (fontSize) => set({ fontSize }),
   setDark: (dark) => set({ dark }),
   setTheme: (t) => set({ dark: t === "dark" }),
 

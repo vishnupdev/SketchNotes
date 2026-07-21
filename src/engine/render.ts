@@ -1,5 +1,5 @@
 import type { SketchElement, View } from "./types";
-import { FONT, gridColor, mapColor } from "./constants";
+import { fontStack, gridColor, mapColor } from "./constants";
 import { clamp, norm } from "./geometry";
 import { shapeAbs, SHAPES } from "./shapes";
 
@@ -76,7 +76,7 @@ export function drawEl(
     g.textAlign = "left";
     g.fillText(el.ch, el.x, el.y);
   } else if (el.type === "text") {
-    g.font = `${el.size}px ${FONT}`;
+    g.font = `${el.size}px ${fontStack(el.font)}`;
     g.textBaseline = "top";
     el.text
       .split("\n")
