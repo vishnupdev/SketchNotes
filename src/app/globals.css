@@ -24,6 +24,33 @@
   --ed-bg: rgba(255, 255, 255, 0.55);
   --shadow: 0 8px 28px rgba(31, 42, 51, 0.16), 0 1px 3px rgba(31, 42, 51, 0.1);
   --hand: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Chalkboard SE", cursive;
+
+  /* Modal / launcher backdrop scrim. */
+  --scrim: rgba(15, 20, 26, 0.55);
+
+  /* Per-app brand hues for the launcher (independent of the active theme). */
+  --app-sketchnotes: #0f7b6c;
+  --app-pdf: #e0533b;
+  --app-image: #8b5cf6;
+  --app-todos: #1f74e0;
+  --app-reminders: #e8930c;
+  --app-timer: #e14d82;
+  --app-system: #2f9e44;
+  --app-speed: #6d8bff;
+}
+
+/* Dark palettes: brighten the scrim + app hues so glyphs stay legible on
+   dark panels. Applies to every dark flag (`dark`, `midnight`, …). */
+[data-dark] {
+  --scrim: rgba(0, 0, 0, 0.6);
+  --app-sketchnotes: #1fb89f;
+  --app-pdf: #ff6f57;
+  --app-image: #a688ff;
+  --app-todos: #4d94ff;
+  --app-reminders: #ffb224;
+  --app-timer: #ff6f9c;
+  --app-system: #40c463;
+  --app-speed: #8ba4ff;
 }
 
 [data-theme="dark"] {

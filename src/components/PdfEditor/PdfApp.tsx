@@ -55,7 +55,7 @@ export function PdfApp() {
                 height="26"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth={1.8}
+                strokeWidth={1.75}
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -88,7 +88,7 @@ export function PdfApp() {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth={1.9}
+                strokeWidth={1.75}
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >

@@ -10,14 +10,30 @@ interface AppEntry {
   name: string;
   tagline: string;
   icon: ReactNode;
+  /** CSS custom-property name holding this app's brand hue (see globals.css). */
+  hue: string;
 }
+
+const ArrowIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2.2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-4"
+  >
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </svg>
+);
 
 const SketchGlyph = (
   <svg
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.9}
+    strokeWidth={1.75}
     strokeLinecap="round"
     strokeLinejoin="round"
     className="size-6"
@@ -32,7 +48,7 @@ const PdfGlyph = (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.8}
+    strokeWidth={1.75}
     strokeLinecap="round"
     strokeLinejoin="round"
     className="size-6"
@@ -48,7 +64,7 @@ const ImageGlyph = (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.8}
+    strokeWidth={1.75}
     strokeLinecap="round"
     strokeLinejoin="round"
     className="size-6"
@@ -64,7 +80,7 @@ const TodoGlyph = (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.8}
+    strokeWidth={1.75}
     strokeLinecap="round"
     strokeLinejoin="round"
     className="size-6"
@@ -81,7 +97,7 @@ const ReminderGlyph = (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.8}
+    strokeWidth={1.75}
     strokeLinecap="round"
     strokeLinejoin="round"
     className="size-6"
@@ -96,7 +112,7 @@ const TimerGlyph = (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.8}
+    strokeWidth={1.75}
     strokeLinecap="round"
     strokeLinejoin="round"
     className="size-6"
@@ -111,7 +127,7 @@ const SystemGlyph = (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.8}
+    strokeWidth={1.75}
     strokeLinecap="round"
     strokeLinejoin="round"
     className="size-6"
@@ -127,7 +143,7 @@ const SpeedGlyph = (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.8}
+    strokeWidth={1.75}
     strokeLinecap="round"
     strokeLinejoin="round"
     className="size-6"
@@ -144,48 +160,56 @@ const APPS: AppEntry[] = [
     name: "Sketchnotes",
     tagline: "Sketch ideas and jot notes on an infinite canvas.",
     icon: SketchGlyph,
+    hue: "--app-sketchnotes",
   },
   {
     id: "pdf",
     name: "PDF Editor",
     tagline: "Edit, merge, split & sign — every PDF tool, zero uploads.",
     icon: PdfGlyph,
+    hue: "--app-pdf",
   },
   {
     id: "image",
     name: "Image Studio",
     tagline: "Crop, resize & compress images to any size or upload preset.",
     icon: ImageGlyph,
+    hue: "--app-image",
   },
   {
     id: "todos",
     name: "Todos",
     tagline: "Plan & track tasks by day, week, month & year.",
     icon: TodoGlyph,
+    hue: "--app-todos",
   },
   {
     id: "reminders",
     name: "Reminders",
     tagline: "Timed alerts with a notification sound you pick.",
     icon: ReminderGlyph,
+    hue: "--app-reminders",
   },
   {
     id: "timer",
     name: "Timer",
     tagline: "Countdown timers, a lap stopwatch & pomodoro focus cycles.",
     icon: TimerGlyph,
+    hue: "--app-timer",
   },
   {
     id: "system",
     name: "System Info",
     tagline: "Analyze this device & browser — full hardware & capability report.",
     icon: SystemGlyph,
+    hue: "--app-system",
   },
   {
     id: "speed",
     name: "Network Speed",
     tagline: "Measure download, upload, ping & jitter on your connection.",
     icon: SpeedGlyph,
+    hue: "--app-speed",
   },
 ];
 
@@ -221,7 +245,7 @@ export function AppLauncher() {
       <button
         aria-label="Close app switcher"
         onClick={closeLauncher}
-        className="absolute inset-0 cursor-default bg-[rgba(15,20,26,.55)] backdrop-blur-sm"
+        className="absolute inset-0 cursor-default bg-(--scrim) backdrop-blur-sm"
       />
 
       <div
@@ -235,7 +259,12 @@ export function AppLauncher() {
       >
         <div className="flex shrink-0 items-start justify-between px-6 pb-4 pt-6">
           <div>
-            <h2 className="text-[18px] font-bold tracking-[.2px]">Apps</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-[18px] font-bold tracking-[.2px]">Apps</h2>
+              <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent">
+                {APPS.length}
+              </span>
+            </div>
             <p className="mt-1 text-[13px] text-ink-soft">Pick a workspace to open.</p>
           </div>
           <button
@@ -251,28 +280,47 @@ export function AppLauncher() {
         <div className="grid grid-cols-1 gap-3 min-[440px]:grid-cols-2">
           {APPS.map((app) => {
             const active = app.id === activeApp;
+            const hue = `var(${app.hue})`;
             return (
               <button
                 key={app.id}
                 onClick={() => setActiveApp(app.id)}
                 aria-current={active}
                 className={cx(
-                  "group relative flex flex-col items-start gap-3 rounded-2xl border p-4 text-left transition-all",
+                  "group relative flex flex-col items-start gap-3 overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                   active
                     ? "border-accent bg-accent-soft ring-1 ring-accent"
                     : "border-border bg-paper hover:-translate-y-0.5 hover:border-accent hover:shadow-panel",
                 )}
               >
                 {active && (
-                  <span className="absolute right-3 top-3 rounded-full bg-accent px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-white">
+                  <span className="absolute right-3 top-3 z-10 rounded-full bg-accent px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-white">
                     Current
                   </span>
                 )}
-                <span className="grid size-12 place-items-center rounded-[14px] bg-accent text-white shadow-[0_4px_12px_rgba(15,123,108,.35)]">
+                <span
+                  className="grid size-12 place-items-center rounded-[14px] text-white transition-transform duration-200 group-hover:scale-105"
+                  style={{
+                    background: `linear-gradient(140deg, ${hue}, color-mix(in srgb, ${hue} 78%, black))`,
+                    boxShadow: `0 8px 18px -6px color-mix(in srgb, ${hue} 60%, transparent)`,
+                  }}
+                >
                   {app.icon}
                 </span>
                 <span className="text-[15.5px] font-bold tracking-[.1px]">{app.name}</span>
                 <span className="text-[12.5px] leading-snug text-ink-soft">{app.tagline}</span>
+                <span
+                  aria-hidden
+                  className={cx(
+                    "absolute bottom-3 right-3 grid size-6 place-items-center rounded-full text-white transition-all duration-200",
+                    active
+                      ? "opacity-0"
+                      : "translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
+                  )}
+                  style={{ background: hue }}
+                >
+                  {ArrowIcon}
+                </span>
               </button>
             );
           })}

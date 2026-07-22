@@ -2,7 +2,8 @@ import type { SVGProps } from "react";
 
 /**
  * Icons used only by the live dashboard (IP / health / performance). Kept local
- * to the System Info app so it stays decoupled from the shared icon set.
+ * to the System Info app so it stays decoupled from the shared icon set, but
+ * drawn to the same 24×24 grid and 1.75 stroke weight for a consistent look.
  */
 type IconProps = SVGProps<SVGSVGElement> & { size?: number };
 
@@ -14,7 +15,7 @@ function Svg({ size = 20, children, ...rest }: IconProps & { children: React.Rea
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.8}
+      strokeWidth={1.75}
       strokeLinecap="round"
       strokeLinejoin="round"
       {...rest}
@@ -39,7 +40,7 @@ export const PulseIcon = (p: IconProps) => (
 export const WifiIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d="M4 8.5a13 13 0 0 1 16 0M6.7 11.7a9 9 0 0 1 10.6 0M9.4 15a5 5 0 0 1 5.2 0" />
-    <circle cx="12" cy="18.3" r="1" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="18.3" r="0.7" fill="currentColor" stroke="none" />
   </Svg>
 );
 
@@ -61,7 +62,7 @@ export const DriveIcon = (p: IconProps) => (
   <Svg {...p}>
     <rect x="3.5" y="5" width="17" height="14" rx="2.2" />
     <path d="M3.5 13h17" />
-    <circle cx="16.5" cy="16" r="1" fill="currentColor" stroke="none" />
+    <circle cx="16.5" cy="16" r="0.8" fill="currentColor" stroke="none" />
   </Svg>
 );
 
@@ -94,5 +95,5 @@ export const CopyIcon = (p: IconProps) => (
 );
 
 export const CheckMiniIcon = (p: IconProps) => (
-  <Svg strokeWidth={2.4} {...p}><path d="M5 12.5 10 17.5 19 6.5" /></Svg>
+  <Svg strokeWidth={2.2} {...p}><path d="M5 12.5 10 17.5 19 6.5" /></Svg>
 );

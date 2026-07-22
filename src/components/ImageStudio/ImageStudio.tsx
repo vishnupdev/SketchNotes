@@ -14,7 +14,7 @@ export function ImageStudio() {
         <div className="mx-auto flex max-w-[1080px] flex-wrap items-end justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <span className="grid size-[46px] flex-none place-items-center rounded-[13px] bg-accent text-white shadow-[0_0_0_4px_var(--accent-soft)]">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
                 <circle cx="8.5" cy="9.5" r="1.6" />
                 <path d="M4 17l4.5-4.5a2 2 0 0 1 2.8 0L17 18" />
@@ -37,7 +37,7 @@ export function ImageStudio() {
               title="Switch app"
               className="inline-flex items-center gap-2 rounded-full border border-border bg-panel px-3.5 py-2 font-mono text-[11px] uppercase tracking-[.1em] hover:border-accent hover:text-accent"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
                 <rect x="4" y="4" width="7" height="7" rx="1.6" />
                 <rect x="13" y="4" width="7" height="7" rx="1.6" />
                 <rect x="4" y="13" width="7" height="7" rx="1.6" />
