@@ -59,6 +59,7 @@ export function ReminderApp() {
 
   const enableNotifications = async () => {
     ensureAudioContext(); // unlock sound on the same gesture
+    // requestNotifyPermission registers the notification service worker on grant.
     setPerm(await requestNotifyPermission());
   };
 
@@ -97,8 +98,8 @@ export function ReminderApp() {
             <div className="flex flex-col gap-2 rounded-xl border border-border bg-panel p-3.5 min-[480px]:flex-row min-[480px]:items-center min-[480px]:justify-between">
               <p className="text-[12.5px] text-ink-soft">
                 {perm === "denied"
-                  ? "System notifications are blocked — in-app alerts and sounds still work. Enable notifications in your browser to get alerts when this tab is in the background."
-                  : "Turn on notifications to get alerts even when this tab isn't focused."}
+                  ? "System notifications are blocked — in-app alerts still ring and vibrate while this tab is open. Enable notifications in your browser settings to also get alerts in the background (recommended on mobile)."
+                  : "Turn on notifications to get alerts — with sound and vibration on mobile — even when this tab isn't focused. Alerts ring for up to 30 seconds until you dismiss them."}
               </p>
               {perm === "default" && (
                 <button

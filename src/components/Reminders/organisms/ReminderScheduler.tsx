@@ -6,7 +6,7 @@ import { useReminders, useReminderMutations } from "@/hooks/useReminders";
 import { useReminderStore } from "@/store/useReminderStore";
 import { advanceRepeat, type Reminder } from "@/lib/Reminders/types";
 import { ensureAudioContext } from "@/lib/Reminders/sounds";
-import { showNotification } from "@/lib/Reminders/notify";
+import { registerNotifier, showNotification } from "@/lib/Reminders/notify";
 import { queryKeys } from "@/lib/query-keys";
 
 const TICK_MS = 15_000;
@@ -24,6 +24,11 @@ export function ReminderScheduler() {
   const qc = useQueryClient();
   const { replace } = useReminderMutations();
   const pushRinging = useReminderStore((s) => s.pushRinging);
+
+  // Register the notification service worker so alerts can show on mobile.
+  useEffect(() => {
+    void registerNotifier();
+  }, []);
 
   // Unlock audio on the first user gesture (autoplay policy).
   useEffect(() => {
@@ -61,8 +66,8 @@ export function ReminderScheduler() {
 
       if (!changed) return;
       replace.mutate(next);
-      fired.forEach((r) => showNotification(r.title, body(r)));
-      pushRinging(fired); // the alert plays the sound
+      fired.forEach((r) => void showNotification(r.title, body(r), `reminder-${r.id}`));
+      pushRinging(fired); // the alert rings + vibrates until dismissed (max 30s)
     };
 
     check();

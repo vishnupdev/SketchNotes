@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useReminderStore } from "@/store/useReminderStore";
 import { useReminderMutations } from "@/hooks/useReminders";
-import { playSound } from "@/lib/Reminders/sounds";
+import { startRingLoop, stopRingLoop } from "@/lib/Reminders/sounds";
+import { startVibrate, stopVibrate } from "@/lib/Reminders/notify";
 import { clockTime } from "@/lib/Reminders/format";
 import { PrimaryButton } from "@/components/SketchNotes/atoms/PrimaryButton";
 import { BellIcon } from "@/components/SketchNotes/atoms/icons";
@@ -23,16 +24,20 @@ export function ReminderAlert() {
 
   const current = ringing[0] ?? null;
   const currentId = current?.id;
-  const playedFor = useRef<string | null>(null);
+  const currentSound = current?.sound;
 
-  // Play the sound once each time a new reminder reaches the front.
+  // Ring + buzz continuously while a reminder is at the front, restarting for
+  // each new one. Both self-stop after 30s (see MAX_RING_MS); dismissing early
+  // runs the cleanup. The alert dialog stays until the user acts.
   useEffect(() => {
-    if (currentId && playedFor.current !== currentId) {
-      playedFor.current = currentId;
-      if (current) playSound(current.sound);
-    }
-    if (!currentId) playedFor.current = null;
-  }, [currentId, current]);
+    if (!currentId || !currentSound) return;
+    startRingLoop(currentSound);
+    startVibrate();
+    return () => {
+      stopRingLoop();
+      stopVibrate();
+    };
+  }, [currentId, currentSound]);
 
   if (!current) return null;
 

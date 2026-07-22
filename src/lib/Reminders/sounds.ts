@@ -92,3 +92,36 @@ export function playSound(id: SoundId): void {
   if (!ac) return;
   (RECIPES[id] ?? RECIPES.chime)(ac, ac.currentTime + 0.02);
 }
+
+/* ----------------------------- ring loop ----------------------------- */
+
+/** How long to keep ringing before auto-stopping if nobody dismisses it. */
+export const MAX_RING_MS = 30_000;
+/** Gap between repeats — long enough that a sound finishes before the next. */
+const RING_INTERVAL_MS = 1_800;
+
+let ringTimer: ReturnType<typeof setInterval> | null = null;
+let ringStopTimer: ReturnType<typeof setTimeout> | null = null;
+
+/**
+ * Ring a sound on repeat until {@link stopRingLoop} or the {@link MAX_RING_MS}
+ * safety cap (default 30s) — so an unattended alert doesn't ring forever.
+ */
+export function startRingLoop(id: SoundId, maxMs: number = MAX_RING_MS): void {
+  stopRingLoop();
+  playSound(id);
+  ringTimer = setInterval(() => playSound(id), RING_INTERVAL_MS);
+  ringStopTimer = setTimeout(stopRingLoop, maxMs);
+}
+
+/** Stop any active ring loop. */
+export function stopRingLoop(): void {
+  if (ringTimer !== null) {
+    clearInterval(ringTimer);
+    ringTimer = null;
+  }
+  if (ringStopTimer !== null) {
+    clearTimeout(ringStopTimer);
+    ringStopTimer = null;
+  }
+}
