@@ -261,3 +261,124 @@ export const SkipIcon = (p: IconProps) => (
     <path d="M17 6v12" />
   </Svg>
 );
+
+export const GaugeIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 16a8 8 0 1 1 16 0" />
+    <path d="M12 16 15.5 9.5" />
+    <circle cx="12" cy="16" r="1.3" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+export const DownloadSpeedIcon = (p: IconProps) => (
+  <Svg strokeWidth={2} {...p}><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14" /></Svg>
+);
+
+export const UploadSpeedIcon = (p: IconProps) => (
+  <Svg strokeWidth={2} {...p}><path d="M12 20V9M7.5 13.5 12 9l4.5 4.5M5 4.5h14" /></Svg>
+);
+
+export const LatencyIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3 12h4l2.5 6 5-13 2.5 7h4" />
+  </Svg>
+);
+
+/* ---- System Info app ---- */
+
+export const HardwareIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="3" width="18" height="18" rx="2.5" />
+    <rect x="7" y="7" width="6" height="6" rx="1" />
+    <path d="M16 7.5h1.5M16 10.5h1.5M7 16.5h1.5M11 16.5h1.5" />
+    <circle cx="16.5" cy="15.5" r="1.2" />
+  </Svg>
+);
+
+export const CpuIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="7" y="7" width="10" height="10" rx="1.5" />
+    <path d="M10 10.5h4v4h-4z" />
+    <path d="M9 3.5v2M15 3.5v2M9 18.5v2M15 18.5v2M3.5 9h2M3.5 15h2M18.5 9h2M18.5 15h2" />
+  </Svg>
+);
+
+export const MemoryIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="7.5" width="18" height="9" rx="1.5" />
+    <path d="M7 16.5v2M11 16.5v2M15 16.5v2M7.5 11v2M12 11v2M16.5 11v2" />
+  </Svg>
+);
+
+export const GpuIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="2.5" y="8" width="19" height="10" rx="2" />
+    <circle cx="8" cy="13" r="2.2" />
+    <path d="M13 11h5M13 14.5h5M6 18v2.5M12 18v2.5" />
+  </Svg>
+);
+
+export const MonitorIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="4.5" width="18" height="12" rx="2" />
+    <path d="M8.5 20h7M12 16.5V20" />
+  </Svg>
+);
+
+export const BatteryIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="8" width="16" height="8" rx="2" />
+    <path d="M21 11v2" />
+    <path d="M6.5 11v2M9.5 11v2" />
+  </Svg>
+);
+
+export const WifiIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 9a13 13 0 0 1 16 0M6.5 12.2a9 9 0 0 1 11 0M9 15.4a5 5 0 0 1 6 0" />
+    <circle cx="12" cy="18.5" r="0.6" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+export const DriveIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="M3 13h18" />
+    <circle cx="16.5" cy="16" r="0.7" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+export const GlobeIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M3.5 12h17M12 3.5c2.5 2.3 3.8 5.3 3.8 8.5S14.5 18.2 12 20.5C9.5 18.2 8.2 15.2 8.2 12S9.5 5.8 12 3.5Z" />
+  </Svg>
+);
+
+export const WindowIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.5" y="5" width="17" height="14" rx="2" />
+    <path d="M3.5 9h17M6.5 7h.01M9 7h.01" />
+  </Svg>
+);
+
+export const ChipIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="4.5" y="4.5" width="15" height="15" rx="2.5" />
+    <path d="M9 9h6v6H9z" />
+  </Svg>
+);
+
+export const LayersIcon = (p: IconProps) => (
+  <Svg strokeLinejoin="round" {...p}>
+    <path d="M12 3.5 21 8l-9 4.5L3 8z" />
+    <path d="M3 12.5 12 17l9-4.5M3 16.5 12 21l9-4.5" />
+  </Svg>
+);
+
+export const CopyIcon = (p: IconProps) => (
+  <Svg strokeWidth={1.9} {...p}>
+    <rect x="9" y="9" width="11" height="11" rx="2" />
+    <path d="M15 5H7a2 2 0 0 0-2 2v8" />
+  </Svg>
+);

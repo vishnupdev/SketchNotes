@@ -12,6 +12,8 @@ import { ReminderApp } from "@/components/Reminders/ReminderApp";
 import { ReminderScheduler } from "@/components/Reminders/organisms/ReminderScheduler";
 import { ReminderAlert } from "@/components/Reminders/organisms/ReminderAlert";
 import { TimerApp } from "@/components/Timer/TimerApp";
+import { SystemInfoApp } from "@/components/SystemInfo/SystemInfoApp";
+import { NetworkSpeedApp } from "@/components/NetworkSpeed/NetworkSpeedApp";
 import { TOOL_IDS } from "@/components/PdfEditor/catalog";
 import type { AppId } from "@/store/useWorkspaceStore";
 
@@ -20,6 +22,8 @@ const IMAGE_BASE = "/image";
 const TODOS_BASE = "/todos";
 const REMINDERS_BASE = "/reminders";
 const TIMER_BASE = "/timer";
+const SYSTEM_BASE = "/system";
+const SPEED_BASE = "/speedtest";
 
 /** Derive the app + PDF section from a path. */
 function parsePath(pathname: string): { app: AppId; tool: string | null } {
@@ -32,6 +36,8 @@ function parsePath(pathname: string): { app: AppId; tool: string | null } {
   if (pathname === TODOS_BASE || pathname === TODOS_BASE + "/") return { app: "todos", tool: null };
   if (pathname === REMINDERS_BASE || pathname === REMINDERS_BASE + "/") return { app: "reminders", tool: null };
   if (pathname === TIMER_BASE || pathname === TIMER_BASE + "/") return { app: "timer", tool: null };
+  if (pathname === SYSTEM_BASE || pathname === SYSTEM_BASE + "/") return { app: "system", tool: null };
+  if (pathname === SPEED_BASE || pathname === SPEED_BASE + "/") return { app: "speed", tool: null };
   return { app: "sketchnotes", tool: null };
 }
 const pdfPath = (tool: string | null) => (tool ? `${PDF_BASE}/${tool}` : PDF_BASE);
@@ -46,7 +52,11 @@ const pathForApp = (app: AppId, tool: string | null) =>
           ? REMINDERS_BASE
           : app === "timer"
             ? TIMER_BASE
-            : "/";
+            : app === "system"
+              ? SYSTEM_BASE
+              : app === "speed"
+                ? SPEED_BASE
+                : "/";
 
 /**
  * Top-level workspace hosting both apps natively (no iframe) and keeping the
@@ -105,11 +115,13 @@ export function Workspace() {
   const todosActive = activeApp === "todos";
   const remindersActive = activeApp === "reminders";
   const timerActive = activeApp === "timer";
+  const systemActive = activeApp === "system";
+  const speedActive = activeApp === "speed";
 
   return (
     <>
       {/* Sketchnotes — always mounted, hidden while another app is active. */}
-      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive}>
+      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive || systemActive || speedActive}>
         <EditorShell />
       </div>
 
@@ -136,6 +148,16 @@ export function Workspace() {
       {/* Timer. */}
       <div hidden={!timerActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
         {timerActive && <TimerApp />}
+      </div>
+
+      {/* System Info. */}
+      <div hidden={!systemActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {systemActive && <SystemInfoApp />}
+      </div>
+
+      {/* Network Speed. */}
+      <div hidden={!speedActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {speedActive && <NetworkSpeedApp />}
       </div>
 
       <AppLauncher />

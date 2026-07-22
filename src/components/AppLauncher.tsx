@@ -106,6 +106,38 @@ const TimerGlyph = (
   </svg>
 );
 
+const SystemGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <rect x="4.5" y="4.5" width="15" height="15" rx="2.5" />
+    <rect x="9" y="9" width="6" height="6" rx="1" />
+    <path d="M9 2.8v1.7M15 2.8v1.7M9 19.5v1.7M15 19.5v1.7M2.8 9h1.7M2.8 15h1.7M19.5 9h1.7M19.5 15h1.7" />
+  </svg>
+);
+
+const SpeedGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <path d="M4 16a8 8 0 1 1 16 0" />
+    <path d="M12 16 15.5 9.5" />
+    <circle cx="12" cy="16" r="1.3" fill="currentColor" stroke="none" />
+  </svg>
+);
+
 const APPS: AppEntry[] = [
   {
     id: "sketchnotes",
@@ -142,6 +174,18 @@ const APPS: AppEntry[] = [
     name: "Timer",
     tagline: "Countdown timers, a lap stopwatch & pomodoro focus cycles.",
     icon: TimerGlyph,
+  },
+  {
+    id: "system",
+    name: "System Info",
+    tagline: "Analyze this device & browser — full hardware & capability report.",
+    icon: SystemGlyph,
+  },
+  {
+    id: "speed",
+    name: "Network Speed",
+    tagline: "Measure download, upload, ping & jitter on your connection.",
+    icon: SpeedGlyph,
   },
 ];
 
@@ -185,11 +229,11 @@ export function AppLauncher() {
         aria-modal="true"
         aria-label="Choose an app"
         className={cx(
-          "relative w-[min(92vw,540px)] rounded-2xl border border-border bg-panel p-6 shadow-panel transition-transform duration-200",
+          "relative flex max-h-[min(88dvh,680px)] w-[min(92vw,540px)] flex-col rounded-2xl border border-border bg-panel shadow-panel transition-transform duration-200",
           open ? "translate-y-0" : "translate-y-3",
         )}
       >
-        <div className="mb-5 flex items-start justify-between">
+        <div className="flex shrink-0 items-start justify-between px-6 pb-4 pt-6">
           <div>
             <h2 className="text-[18px] font-bold tracking-[.2px]">Apps</h2>
             <p className="mt-1 text-[13px] text-ink-soft">Pick a workspace to open.</p>
@@ -203,6 +247,7 @@ export function AppLauncher() {
           </button>
         </div>
 
+        <div className="scroll-slim min-h-0 flex-1 overflow-y-auto px-6 pb-6">
         <div className="grid grid-cols-1 gap-3 min-[440px]:grid-cols-2">
           {APPS.map((app) => {
             const active = app.id === activeApp;
@@ -246,6 +291,7 @@ export function AppLauncher() {
               <span className="text-[12px] text-ink-soft">Theme and workspace preferences.</span>
             </span>
           </button>
+        </div>
         </div>
       </div>
     </div>
