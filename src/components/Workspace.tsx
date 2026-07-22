@@ -8,12 +8,18 @@ import { SettingsPanel } from "@/components/Settings/SettingsPanel";
 import { PdfApp } from "@/components/PdfEditor/PdfApp";
 import { ImageStudio } from "@/components/ImageStudio/ImageStudio";
 import { TodoApp } from "@/components/Todos/TodoApp";
+import { ReminderApp } from "@/components/Reminders/ReminderApp";
+import { ReminderScheduler } from "@/components/Reminders/organisms/ReminderScheduler";
+import { ReminderAlert } from "@/components/Reminders/organisms/ReminderAlert";
+import { TimerApp } from "@/components/Timer/TimerApp";
 import { TOOL_IDS } from "@/components/PdfEditor/catalog";
 import type { AppId } from "@/store/useWorkspaceStore";
 
 const PDF_BASE = "/pdfeditor";
 const IMAGE_BASE = "/image";
 const TODOS_BASE = "/todos";
+const REMINDERS_BASE = "/reminders";
+const TIMER_BASE = "/timer";
 
 /** Derive the app + PDF section from a path. */
 function parsePath(pathname: string): { app: AppId; tool: string | null } {
@@ -24,11 +30,23 @@ function parsePath(pathname: string): { app: AppId; tool: string | null } {
   }
   if (pathname === IMAGE_BASE || pathname === IMAGE_BASE + "/") return { app: "image", tool: null };
   if (pathname === TODOS_BASE || pathname === TODOS_BASE + "/") return { app: "todos", tool: null };
+  if (pathname === REMINDERS_BASE || pathname === REMINDERS_BASE + "/") return { app: "reminders", tool: null };
+  if (pathname === TIMER_BASE || pathname === TIMER_BASE + "/") return { app: "timer", tool: null };
   return { app: "sketchnotes", tool: null };
 }
 const pdfPath = (tool: string | null) => (tool ? `${PDF_BASE}/${tool}` : PDF_BASE);
 const pathForApp = (app: AppId, tool: string | null) =>
-  app === "pdf" ? pdfPath(tool) : app === "image" ? IMAGE_BASE : app === "todos" ? TODOS_BASE : "/";
+  app === "pdf"
+    ? pdfPath(tool)
+    : app === "image"
+      ? IMAGE_BASE
+      : app === "todos"
+        ? TODOS_BASE
+        : app === "reminders"
+          ? REMINDERS_BASE
+          : app === "timer"
+            ? TIMER_BASE
+            : "/";
 
 /**
  * Top-level workspace hosting both apps natively (no iframe) and keeping the
@@ -85,11 +103,13 @@ export function Workspace() {
   const pdfActive = activeApp === "pdf";
   const imageActive = activeApp === "image";
   const todosActive = activeApp === "todos";
+  const remindersActive = activeApp === "reminders";
+  const timerActive = activeApp === "timer";
 
   return (
     <>
       {/* Sketchnotes — always mounted, hidden while another app is active. */}
-      <div hidden={pdfActive || imageActive || todosActive}>
+      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive}>
         <EditorShell />
       </div>
 
@@ -108,8 +128,22 @@ export function Workspace() {
         {todosActive && <TodoApp />}
       </div>
 
+      {/* Reminders. */}
+      <div hidden={!remindersActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {remindersActive && <ReminderApp />}
+      </div>
+
+      {/* Timer. */}
+      <div hidden={!timerActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {timerActive && <TimerApp />}
+      </div>
+
       <AppLauncher />
       <SettingsPanel />
+
+      {/* Reminders fire app-wide, regardless of which app is on screen. */}
+      <ReminderScheduler />
+      <ReminderAlert />
     </>
   );
 }

@@ -181,6 +181,17 @@ export const InboxIcon = (p: IconProps) => (
   </Svg>
 );
 
+export const ClockIcon = (p: IconProps) => (
+  <Svg {...p}><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></Svg>
+);
+
+export const VolumeIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4.5 9.5h3l4-3v11l-4-3h-3z" />
+    <path d="M15 9a4 4 0 0 1 0 6M17.5 6.8a7 7 0 0 1 0 10.4" />
+  </Svg>
+);
+
 export const DiceIcon = (p: IconProps) => (
   <Svg strokeWidth={1.9} {...p}>
     <rect x="4" y="4" width="16" height="16" rx="4" />
@@ -188,5 +199,65 @@ export const DiceIcon = (p: IconProps) => (
     <circle cx="15" cy="15" r="1.3" fill="currentColor" stroke="none" />
     <circle cx="15" cy="9" r="1.3" fill="currentColor" stroke="none" />
     <circle cx="9" cy="15" r="1.3" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+export const TimerIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="13.5" r="7.5" />
+    <path d="M12 13.5V9M9.5 2.5h5M12 2.5V6M18.5 7l1.4-1.4" />
+  </Svg>
+);
+
+export const StopwatchIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="13.5" r="7.5" />
+    <path d="M12 13.5 15 10.5M9.5 2.5h5M12 2.5V6" />
+  </Svg>
+);
+
+export const PomodoroIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 6.5c-4 0-7 2.8-7 7a7 7 0 0 0 14 0c0-4.2-3-7-7-7Z" />
+    <path d="M9 4.5c1.2 1 4.8 1 6 0" />
+    <path d="M12 6.5c-1-1.4-3-2-4.2-1.6" />
+  </Svg>
+);
+
+export const PlayIcon = (p: IconProps) => (
+  <Svg strokeLinejoin="round" {...p}>
+    <path d="M7 5.5 18 12 7 18.5z" fill="currentColor" />
+  </Svg>
+);
+
+export const PauseIcon = (p: IconProps) => (
+  <Svg strokeWidth={2} {...p}><path d="M8.5 5.5v13M15.5 5.5v13" /></Svg>
+);
+
+export const RotateIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M5 12a7 7 0 1 1 2.1 5" />
+    <path d="M4.5 18.5 6.8 17l.6 2.4" />
+  </Svg>
+);
+
+export const BellIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M6.5 17V11a5.5 5.5 0 0 1 11 0v6l1.5 2h-14z" />
+    <path d="M10 20a2 2 0 0 0 4 0" />
+  </Svg>
+);
+
+export const RepeatIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 9.5 6.5 7h11L20 9.5M20 14.5 17.5 17h-11L4 14.5" />
+    <path d="M17.5 4.5 20 7l-2.5 2.5M6.5 19.5 4 17l2.5-2.5" />
+  </Svg>
+);
+
+export const SkipIcon = (p: IconProps) => (
+  <Svg strokeLinejoin="round" {...p}>
+    <path d="M6 6.5 14 12 6 17.5z" fill="currentColor" />
+    <path d="M17 6v12" />
   </Svg>
 );

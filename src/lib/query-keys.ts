@@ -4,5 +4,6 @@ export const queryKeys = {
   notesIndex: ["notes", "index"] as const,
   noteDetail: (id: string) => ["notes", "detail", id] as const,
   todos: ["todos"] as const,
+  reminders: ["reminders"] as const,
   theme: ["theme"] as const,
 };

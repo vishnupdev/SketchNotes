@@ -76,6 +76,36 @@ const TodoGlyph = (
   </svg>
 );
 
+const ReminderGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2H4.5z" />
+    <path d="M9.5 19.5a2.5 2.5 0 0 0 5 0" />
+  </svg>
+);
+
+const TimerGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <circle cx="12" cy="13.5" r="7.5" />
+    <path d="M12 13.5V9M9.5 2.5h5M12 2.5V6M18.5 7l1.4-1.4" />
+  </svg>
+);
+
 const APPS: AppEntry[] = [
   {
     id: "sketchnotes",
@@ -100,6 +130,18 @@ const APPS: AppEntry[] = [
     name: "Todos",
     tagline: "Plan & track tasks by day, week, month & year.",
     icon: TodoGlyph,
+  },
+  {
+    id: "reminders",
+    name: "Reminders",
+    tagline: "Timed alerts with a notification sound you pick.",
+    icon: ReminderGlyph,
+  },
+  {
+    id: "timer",
+    name: "Timer",
+    tagline: "Countdown timers, a lap stopwatch & pomodoro focus cycles.",
+    icon: TimerGlyph,
   },
 ];
 

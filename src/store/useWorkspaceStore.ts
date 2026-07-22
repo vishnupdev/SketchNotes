@@ -3,7 +3,7 @@
 import { create } from "zustand";
 
 /** Apps available in the workspace launcher. Sketchnotes is the default. */
-export type AppId = "sketchnotes" | "pdf" | "image" | "todos";
+export type AppId = "sketchnotes" | "pdf" | "image" | "todos" | "reminders" | "timer";
 
 interface WorkspaceState {
   /** Which app fills the workspace. Defaults to the sketch canvas. */
