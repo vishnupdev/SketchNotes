@@ -7,11 +7,13 @@ import { AppLauncher } from "@/components/AppLauncher";
 import { SettingsPanel } from "@/components/Settings/SettingsPanel";
 import { PdfApp } from "@/components/PdfEditor/PdfApp";
 import { ImageStudio } from "@/components/ImageStudio/ImageStudio";
+import { TodoApp } from "@/components/Todos/TodoApp";
 import { TOOL_IDS } from "@/components/PdfEditor/catalog";
 import type { AppId } from "@/store/useWorkspaceStore";
 
 const PDF_BASE = "/pdfeditor";
 const IMAGE_BASE = "/image";
+const TODOS_BASE = "/todos";
 
 /** Derive the app + PDF section from a path. */
 function parsePath(pathname: string): { app: AppId; tool: string | null } {
@@ -21,11 +23,12 @@ function parsePath(pathname: string): { app: AppId; tool: string | null } {
     return { app: "pdf", tool: t && TOOL_IDS.includes(t) ? t : null };
   }
   if (pathname === IMAGE_BASE || pathname === IMAGE_BASE + "/") return { app: "image", tool: null };
+  if (pathname === TODOS_BASE || pathname === TODOS_BASE + "/") return { app: "todos", tool: null };
   return { app: "sketchnotes", tool: null };
 }
 const pdfPath = (tool: string | null) => (tool ? `${PDF_BASE}/${tool}` : PDF_BASE);
 const pathForApp = (app: AppId, tool: string | null) =>
-  app === "pdf" ? pdfPath(tool) : app === "image" ? IMAGE_BASE : "/";
+  app === "pdf" ? pdfPath(tool) : app === "image" ? IMAGE_BASE : app === "todos" ? TODOS_BASE : "/";
 
 /**
  * Top-level workspace hosting both apps natively (no iframe) and keeping the
@@ -81,11 +84,12 @@ export function Workspace() {
 
   const pdfActive = activeApp === "pdf";
   const imageActive = activeApp === "image";
+  const todosActive = activeApp === "todos";
 
   return (
     <>
       {/* Sketchnotes — always mounted, hidden while another app is active. */}
-      <div hidden={pdfActive || imageActive}>
+      <div hidden={pdfActive || imageActive || todosActive}>
         <EditorShell />
       </div>
 
@@ -97,6 +101,11 @@ export function Workspace() {
       {/* Image Studio. */}
       <div hidden={!imageActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
         {imageActive && <ImageStudio />}
+      </div>
+
+      {/* Todos. */}
+      <div hidden={!todosActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {todosActive && <TodoApp />}
       </div>
 
       <AppLauncher />

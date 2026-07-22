@@ -144,6 +144,43 @@ export const SettingsIcon = (p: IconProps) => (
   </Svg>
 );
 
+export const ChevronLeftIcon = (p: IconProps) => (
+  <Svg strokeWidth={2} {...p}><path d="M14.5 6 9 12l5.5 6" /></Svg>
+);
+
+export const ChevronRightIcon = (p: IconProps) => (
+  <Svg strokeWidth={2} {...p}><path d="M9.5 6 15 12l-5.5 6" /></Svg>
+);
+
+export const CalendarIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="4" y="5.5" width="16" height="14.5" rx="2.2" />
+    <path d="M4 9.5h16M8 3.5v4M16 3.5v4" />
+  </Svg>
+);
+
+export const FlagIcon = (p: IconProps) => (
+  <Svg {...p}><path d="M6 21V4M6 4.5h11l-2 4 2 4H6" /></Svg>
+);
+
+export const SearchIcon = (p: IconProps) => (
+  <Svg {...p}><circle cx="11" cy="11" r="6.5" /><path d="M20 20l-3.8-3.8" /></Svg>
+);
+
+export const ListChecksIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 6.5 5.5 8 8.5 5M4 12.5 5.5 14 8.5 11M4 18.5 5.5 20 8.5 17" />
+    <path d="M12 6.5h8M12 12.5h8M12 18.5h8" />
+  </Svg>
+);
+
+export const InboxIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 13.5 6.5 5.5h11L20 13.5V18a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18z" />
+    <path d="M4 13.5h4l1.5 2.5h5l1.5-2.5h4" />
+  </Svg>
+);
+
 export const DiceIcon = (p: IconProps) => (
   <Svg strokeWidth={1.9} {...p}>
     <rect x="4" y="4" width="16" height="16" rx="4" />

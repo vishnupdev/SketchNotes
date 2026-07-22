@@ -59,6 +59,23 @@ const ImageGlyph = (
   </svg>
 );
 
+const TodoGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <rect x="4" y="4.5" width="16" height="15.5" rx="2.4" />
+    <path d="M8 3v3M16 3v3" />
+    <path d="M7.5 12l1.6 1.6 3-3.4" />
+    <path d="M13.5 12.5h4M7.5 16.4l1.6 1.6 3-3.4M13.5 16h4" />
+  </svg>
+);
+
 const APPS: AppEntry[] = [
   {
     id: "sketchnotes",
@@ -77,6 +94,12 @@ const APPS: AppEntry[] = [
     name: "Image Studio",
     tagline: "Crop, resize & compress images to any size or upload preset.",
     icon: ImageGlyph,
+  },
+  {
+    id: "todos",
+    name: "Todos",
+    tagline: "Plan & track tasks by day, week, month & year.",
+    icon: TodoGlyph,
   },
 ];
 
