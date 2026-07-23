@@ -1,0 +1,22 @@
+{
+  "name": "OneApp — every tool in one place",
+  "short_name": "OneApp",
+  "description": "OneApp — every tool in one place. Sketch notes, a full PDF editor, image studio, todos, reminders, timer and more, in a single free offline-first web workspace.",
+  "categories": ["productivity", "utilities"],
+  "lang": "en",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#141a21",
+  "theme_color": "#141a21",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

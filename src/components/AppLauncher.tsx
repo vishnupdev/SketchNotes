@@ -154,6 +154,22 @@ const SpeedGlyph = (
   </svg>
 );
 
+const NewsGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <path d="M4 5.5h11.5v13H6a2 2 0 0 1-2-2z" />
+    <path d="M15.5 8.5H18a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2" />
+    <path d="M7 9h5.5M7 12h5.5M7 15h3.5" />
+  </svg>
+);
+
 const APPS: AppEntry[] = [
   {
     id: "sketchnotes",
@@ -211,6 +227,13 @@ const APPS: AppEntry[] = [
     icon: SpeedGlyph,
     hue: "--app-speed",
   },
+  {
+    id: "news",
+    name: "News",
+    tagline: "Latest headlines — tech, sports, India, Kerala, world & more.",
+    icon: NewsGlyph,
+    hue: "--app-news",
+  },
 ];
 
 /**
@@ -240,6 +263,7 @@ export function AppLauncher() {
         open ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       aria-hidden={!open}
+      inert={!open}
     >
       {/* backdrop */}
       <button

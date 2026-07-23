@@ -10,7 +10,7 @@ export const PrimaryButton = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<
         type={type ?? "button"}
         className={cx(
           "flex h-9 flex-none items-center gap-1.5 rounded-[10px] bg-accent px-3",
-          "font-semibold text-white hover:brightness-110",
+          "font-semibold text-on-accent hover:brightness-110",
           className,
         )}
         {...rest}

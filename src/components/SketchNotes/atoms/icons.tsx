@@ -389,3 +389,26 @@ export const CopyIcon = (p: IconProps) => (
     <path d="M15 5H7a2 2 0 0 0-2 2v8" />
   </Svg>
 );
+
+export const NewsIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 5.5h11.5v13H6a2 2 0 0 1-2-2z" />
+    <path d="M15.5 8.5H18a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2" />
+    <path d="M7 9h5.5M7 12h5.5M7 15h3.5" />
+  </Svg>
+);
+
+export const RefreshIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M20 11a8 8 0 1 0-.5 4" />
+    <path d="M20 5v6h-6" />
+  </Svg>
+);
+
+export const ExternalLinkIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M14 5h5v5" />
+    <path d="M19 5l-8 8" />
+    <path d="M18 13.5V18a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h4.5" />
+  </Svg>
+);

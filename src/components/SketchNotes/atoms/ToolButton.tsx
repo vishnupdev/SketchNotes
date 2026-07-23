@@ -15,7 +15,7 @@ export const ToolButton = forwardRef<HTMLButtonElement, ToolButtonProps>(
         className={cx(
           "grid size-[42px] flex-none place-items-center rounded-xl transition-colors",
           active
-            ? "bg-accent text-white"
+            ? "bg-accent text-on-accent"
             : "text-dock-ink hover:bg-white/[.09] hover:text-[#e8eef2]",
           className,
         )}

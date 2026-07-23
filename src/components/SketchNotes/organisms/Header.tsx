@@ -61,6 +61,7 @@ export function Header() {
 
       <input
         id="titleInput"
+        aria-label="Note title"
         placeholder="Untitled note"
         maxLength={60}
         autoComplete="off"

@@ -1,0 +1,19 @@
+# OneApp (also known as "One App")
+
+> OneApp — every tool in one place. Sketch notes, a full PDF editor, image studio, todos, reminders, timer and more. A single free offline-first (PWA) web workspace at https://oneappready.vercel.app; all data stays local in the browser, no sign-up.
+
+## Apps
+
+- [Sketch Notes](/): freehand drawing and note canvas
+- [PDF Editor](/pdfeditor): view, edit, annotate and organize PDFs
+- [Image Studio](/image): image editing and adjustments
+- [Todos](/todos): task and week planner
+- [Reminders](/reminders): scheduled reminders with notifications
+- [Timer](/timer): pomodoro and countdown timer
+- [System Info](/system): live device and system dashboard
+- [Speed Test](/speedtest): network speed measurement
+
+## Notes
+
+- Works 100% offline after the first visit (service worker at /sw.js).
+- No accounts, no server storage — data is kept in the browser's localStorage.

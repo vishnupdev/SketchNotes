@@ -42,6 +42,8 @@ export function NotesDrawer() {
       />
 
       <aside
+        aria-label="Notes"
+        inert={!open}
         className={cx(
           "fixed inset-y-0 left-0 z-[60] flex w-[min(84vw,320px)] flex-col bg-panel transition-transform duration-200 ease-out",
           open ? "translate-x-0 shadow-panel" : "-translate-x-[103%]",

@@ -51,5 +51,29 @@ Image Studio) share one Next.js shell. The rules below are mandatory for all wor
 - Dark mode is driven by `[data-theme="dark"]`. Every new token must define both light and dark values so
   theming stays consistent across all apps.
 
+## 7. Maintain quality scores — Performance, Accessibility, Best Practices, SEO, Agentic Browsing
+Every code change must **preserve or improve** these audit scores. Treat them as acceptance criteria,
+not afterthoughts. Current baseline to hold at or above: **Performance 99, Accessibility 94,
+Best Practices 100, SEO 91, Agentic Browsing 2/3** (goal: 3/3).
+
+- **Performance (Core Web Vitals):** Ship minimal client JS — keep components server-side unless they need
+  `"use client"`. Lazy-load / `dynamic()` heavy or below-the-fold pieces. Use `next/image` (or sized,
+  `loading="lazy"` images) with explicit `width`/`height` to avoid CLS. No layout-shifting async inserts;
+  no blocking scripts. Prefer CSS/transform animations over JS. Watch bundle size when adding deps (rule #1).
+- **Accessibility:** Semantic HTML first; ARIA only to fill gaps. Every interactive element is keyboard-
+  reachable with a visible focus state. Label all controls/icon-buttons (`aria-label`), associate inputs
+  with `<label>`, give images meaningful `alt`. Maintain WCAG AA contrast using theme tokens (rule #6).
+  Respect `prefers-reduced-motion`. Correct heading order; one `<h1>` per page.
+- **Best Practices:** No console errors/warnings. HTTPS-only assets. Valid, non-deprecated HTML/APIs.
+  Correct `rel="noopener"` on `target="_blank"`. No hardcoded secrets. Keep dependencies current (rule #1).
+- **SEO:** Provide per-route `metadata` (title, description, canonical, Open Graph). Keep
+  `src/app/sitemap.ts`, `src/app/robots.ts`, and structured data (`src/components/StructuredData.tsx`)
+  accurate when routes/content change. Descriptive link text; crawlable, mobile-friendly markup (rule #3).
+- **Agentic Browsing:** Keep `public/llms.txt` and machine-readable metadata
+  (`src/components/SeoContent.tsx`, JSON-LD in `StructuredData.tsx`, `public/manifest.webmanifest`) current
+  so agents can parse the app. When adding a route/app/feature, update these so they describe it.
+
 ## Verify before finishing
 Run and pass: `npm run typecheck`, `npm run lint`, and (for non-trivial changes) `npm run build`.
+For UI/route/content changes, also confirm the rule #7 scores are not regressed (Performance,
+Accessibility, Best Practices, SEO, Agentic Browsing).

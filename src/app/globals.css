@@ -14,6 +14,11 @@
   --border: #e4e9ee;
   --accent: #0f7b6c;
   --accent-soft: #ddf0ec;
+  /* Foreground for text/icons on an accent-filled surface. Light themes use a
+     dark-enough accent, so white clears AA (≥4.5:1). Dark themes brighten the
+     accent for legibility on dark panels, so white would fail — they flip this
+     to near-black in the [data-dark] block below. */
+  --on-accent: #ffffff;
   --danger: #d6482f;
   --prio-high: #e5484d;
   --prio-med: #e8930c;
@@ -37,12 +42,16 @@
   --app-timer: #e14d82;
   --app-system: #2f9e44;
   --app-speed: #6d8bff;
+  --app-news: #c2410c;
 }
 
 /* Dark palettes: brighten the scrim + app hues so glyphs stay legible on
    dark panels. Applies to every dark flag (`dark`, `midnight`, …). */
 [data-dark] {
   --scrim: rgba(0, 0, 0, 0.6);
+  /* Bright accents on dark themes need a dark foreground to clear AA contrast
+     (white on #1ba38e is only ~3.1:1; near-black is ~5.8:1). */
+  --on-accent: #0d1319;
   --app-sketchnotes: #1fb89f;
   --app-pdf: #ff6f57;
   --app-image: #a688ff;
@@ -51,6 +60,7 @@
   --app-timer: #ff6f9c;
   --app-system: #40c463;
   --app-speed: #8ba4ff;
+  --app-news: #fb7141;
 }
 
 [data-theme="dark"] {
@@ -158,6 +168,7 @@
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
   --color-danger: var(--danger);
   --color-prio-high: var(--prio-high);
   --color-prio-med: var(--prio-med);

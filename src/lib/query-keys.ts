@@ -6,5 +6,6 @@ export const queryKeys = {
   todos: ["todos"] as const,
   reminders: ["reminders"] as const,
   systemInfo: ["system-info"] as const,
+  news: (tab: string) => ["news", tab] as const,
   theme: ["theme"] as const,
 };

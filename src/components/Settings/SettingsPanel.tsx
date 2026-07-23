@@ -103,6 +103,7 @@ export function SettingsPanel() {
         open ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       aria-hidden={!open}
+      inert={!open}
     >
       {/* backdrop */}
       <button

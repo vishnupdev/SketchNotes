@@ -1,21 +1,30 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { EditorShell } from "@/components/SketchNotes/EditorShell";
 import { AppLauncher } from "@/components/AppLauncher";
 import { SettingsPanel } from "@/components/Settings/SettingsPanel";
-import { PdfApp } from "@/components/PdfEditor/PdfApp";
-import { ImageStudio } from "@/components/ImageStudio/ImageStudio";
-import { TodoApp } from "@/components/Todos/TodoApp";
-import { ReminderApp } from "@/components/Reminders/ReminderApp";
 import { ReminderScheduler } from "@/components/Reminders/organisms/ReminderScheduler";
 import { ReminderAlert } from "@/components/Reminders/organisms/ReminderAlert";
-import { TimerApp } from "@/components/Timer/TimerApp";
-import { SystemInfoApp } from "@/components/SystemInfo/SystemInfoApp";
-import { NetworkSpeedApp } from "@/components/NetworkSpeed/NetworkSpeedApp";
 import { TOOL_IDS } from "@/components/PdfEditor/catalog";
 import type { AppId } from "@/store/useWorkspaceStore";
+
+// Sketchnotes (EditorShell) is the default `/` route and stays statically
+// imported. Every other app is code-split with next/dynamic so its JS — most
+// notably the PDF editor's pdf.js bundle — is kept out of the initial payload
+// and fetched only when that app is first opened. They're client-only, so SSR
+// is skipped; each renders inside a `hidden` div, so lazy mounting causes no
+// layout shift on first paint.
+const PdfApp = dynamic(() => import("@/components/PdfEditor/PdfApp").then((m) => m.PdfApp), { ssr: false });
+const ImageStudio = dynamic(() => import("@/components/ImageStudio/ImageStudio").then((m) => m.ImageStudio), { ssr: false });
+const TodoApp = dynamic(() => import("@/components/Todos/TodoApp").then((m) => m.TodoApp), { ssr: false });
+const ReminderApp = dynamic(() => import("@/components/Reminders/ReminderApp").then((m) => m.ReminderApp), { ssr: false });
+const TimerApp = dynamic(() => import("@/components/Timer/TimerApp").then((m) => m.TimerApp), { ssr: false });
+const SystemInfoApp = dynamic(() => import("@/components/SystemInfo/SystemInfoApp").then((m) => m.SystemInfoApp), { ssr: false });
+const NetworkSpeedApp = dynamic(() => import("@/components/NetworkSpeed/NetworkSpeedApp").then((m) => m.NetworkSpeedApp), { ssr: false });
+const NewsApp = dynamic(() => import("@/components/News/NewsApp").then((m) => m.NewsApp), { ssr: false });
 
 const PDF_BASE = "/pdfeditor";
 const IMAGE_BASE = "/image";
@@ -24,6 +33,7 @@ const REMINDERS_BASE = "/reminders";
 const TIMER_BASE = "/timer";
 const SYSTEM_BASE = "/system";
 const SPEED_BASE = "/speedtest";
+const NEWS_BASE = "/news";
 
 /** Derive the app + PDF section from a path. */
 function parsePath(pathname: string): { app: AppId; tool: string | null } {
@@ -38,6 +48,7 @@ function parsePath(pathname: string): { app: AppId; tool: string | null } {
   if (pathname === TIMER_BASE || pathname === TIMER_BASE + "/") return { app: "timer", tool: null };
   if (pathname === SYSTEM_BASE || pathname === SYSTEM_BASE + "/") return { app: "system", tool: null };
   if (pathname === SPEED_BASE || pathname === SPEED_BASE + "/") return { app: "speed", tool: null };
+  if (pathname === NEWS_BASE || pathname === NEWS_BASE + "/") return { app: "news", tool: null };
   return { app: "sketchnotes", tool: null };
 }
 const pdfPath = (tool: string | null) => (tool ? `${PDF_BASE}/${tool}` : PDF_BASE);
@@ -56,7 +67,9 @@ const pathForApp = (app: AppId, tool: string | null) =>
               ? SYSTEM_BASE
               : app === "speed"
                 ? SPEED_BASE
-                : "/";
+                : app === "news"
+                  ? NEWS_BASE
+                  : "/";
 
 /**
  * Top-level workspace hosting both apps natively (no iframe) and keeping the
@@ -117,11 +130,12 @@ export function Workspace() {
   const timerActive = activeApp === "timer";
   const systemActive = activeApp === "system";
   const speedActive = activeApp === "speed";
+  const newsActive = activeApp === "news";
 
   return (
     <>
       {/* Sketchnotes — always mounted, hidden while another app is active. */}
-      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive || systemActive || speedActive}>
+      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive || systemActive || speedActive || newsActive}>
         <EditorShell />
       </div>
 
@@ -158,6 +172,11 @@ export function Workspace() {
       {/* Network Speed. */}
       <div hidden={!speedActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
         {speedActive && <NetworkSpeedApp />}
+      </div>
+
+      {/* News. */}
+      <div hidden={!newsActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {newsActive && <NewsApp />}
       </div>
 
       <AppLauncher />

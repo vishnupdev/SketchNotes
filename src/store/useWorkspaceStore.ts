@@ -11,7 +11,8 @@ export type AppId =
   | "reminders"
   | "timer"
   | "system"
-  | "speed";
+  | "speed"
+  | "news";
 
 interface WorkspaceState {
   /** Which app fills the workspace. Defaults to the sketch canvas. */
