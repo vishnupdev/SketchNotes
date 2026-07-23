@@ -1,3 +1,19 @@
+/**
+ * A publisher logo URL for a headline. The Google News feed carries no article
+ * images, but each item names its publisher's homepage — Google's favicon
+ * service turns that domain into a crisp, cached logo, giving every card a
+ * reliable related thumbnail. Returns null when the feed omits the source URL.
+ */
+export function sourceLogo(sourceUrl: string | null, size = 64): string | null {
+  if (!sourceUrl) return null;
+  try {
+    const { hostname } = new URL(sourceUrl);
+    return `https://www.google.com/s2/favicons?sz=${size}&domain=${hostname}`;
+  } catch {
+    return null;
+  }
+}
+
 /** "3h ago" / "just now" style relative time for a headline timestamp. */
 export function timeAgo(iso: string | null): string {
   if (!iso) return "";

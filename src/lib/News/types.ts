@@ -7,6 +7,10 @@ export interface NewsArticle {
   link: string;
   /** Publisher name, e.g. "The Hindu". */
   source: string;
+  /** Publisher homepage from the feed's `<source url>`, used to derive a logo. */
+  sourceUrl: string | null;
+  /** Short plain-text preview from the feed's description, or null when absent. */
+  summary: string | null;
   /** ISO timestamp of publication, or null when the feed omits it. */
   publishedAt: string | null;
 }

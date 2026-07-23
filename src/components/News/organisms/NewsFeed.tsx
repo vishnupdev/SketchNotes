@@ -11,11 +11,14 @@ function FeedSkeleton() {
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
-          className="flex flex-col gap-3 rounded-2xl border border-border bg-panel p-4"
+          className="flex gap-3 rounded-2xl border border-border bg-panel p-4"
         >
-          <div className="h-4 w-11/12 animate-pulse rounded bg-ink-soft/20" />
-          <div className="h-4 w-3/4 animate-pulse rounded bg-ink-soft/20" />
-          <div className="mt-2 h-3 w-1/3 animate-pulse rounded bg-ink-soft/15" />
+          <div className="size-11 shrink-0 animate-pulse rounded-xl bg-ink-soft/20" />
+          <div className="flex flex-1 flex-col gap-3">
+            <div className="h-4 w-11/12 animate-pulse rounded bg-ink-soft/20" />
+            <div className="h-4 w-3/4 animate-pulse rounded bg-ink-soft/20" />
+            <div className="mt-2 h-3 w-1/3 animate-pulse rounded bg-ink-soft/15" />
+          </div>
         </div>
       ))}
     </div>
