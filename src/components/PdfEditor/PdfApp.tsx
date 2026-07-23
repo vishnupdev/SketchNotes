@@ -40,7 +40,7 @@ export function PdfApp() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <header className="border-b border-border bg-paper px-[22px] pb-[18px] pt-[22px]">
+      <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-[18px] pt-[22px] md:static">
         <div className="mx-auto flex max-w-[1080px] flex-wrap items-end justify-between gap-4">
           <button
             type="button"

@@ -1,8 +1,26 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useNews } from "@/hooks/useNews";
 import { NewsCard } from "@/components/News/molecules/NewsCard";
+import { NewsPagination } from "@/components/News/molecules/NewsPagination";
 import { NewsIcon } from "@/components/SketchNotes/atoms/icons";
+
+/** Headlines shown per page — keeps the mobile feed to a short, tidy scroll. */
+const PAGE_SIZE = 8;
+
+/** Nearest scrollable ancestor, so paging can return the reader to the top. */
+function scrollableParent(el: HTMLElement | null): HTMLElement | null {
+  let node = el?.parentElement ?? null;
+  while (node) {
+    const overflowY = getComputedStyle(node).overflowY;
+    if ((overflowY === "auto" || overflowY === "scroll") && node.scrollHeight > node.clientHeight) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return null;
+}
 
 /** Placeholder cards shown while the first request for a tab is in flight. */
 function FeedSkeleton() {
@@ -32,6 +50,8 @@ function FeedSkeleton() {
  */
 export function NewsFeed({ tabId }: { tabId: string }) {
   const { data, isLoading, isError, refetch } = useNews(tabId);
+  const [page, setPage] = useState(1);
+  const topRef = useRef<HTMLDivElement>(null);
 
   if (isLoading) return <FeedSkeleton />;
 
@@ -64,11 +84,29 @@ export function NewsFeed({ tabId }: { tabId: string }) {
     );
   }
 
+  const pageCount = Math.ceil(data.length / PAGE_SIZE);
+  const safePage = Math.min(page, pageCount);
+  const start = (safePage - 1) * PAGE_SIZE;
+  const visible = data.slice(start, start + PAGE_SIZE);
+
+  function goToPage(next: number) {
+    setPage(next);
+    // Return the reader to the top of the feed so the new page starts fresh.
+    const scroller = scrollableParent(topRef.current);
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    scroller?.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  }
+
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {data.map((article) => (
-        <NewsCard key={article.id} article={article} />
-      ))}
+    <div ref={topRef}>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {visible.map((article) => (
+          <NewsCard key={article.id} article={article} />
+        ))}
+      </div>
+      <NewsPagination page={safePage} pageCount={pageCount} onPage={goToPage} />
     </div>
   );
 }
