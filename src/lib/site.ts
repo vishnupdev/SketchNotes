@@ -41,6 +41,17 @@ export const APPS: AppEntry[] = [
   { path: "/timer", name: "Timer", blurb: "pomodoro and countdown timer" },
   { path: "/system", name: "System Info", blurb: "live device and system dashboard" },
   { path: "/speedtest", name: "Speed Test", blurb: "measure your network speed" },
+  { path: "/news", name: "News", blurb: "latest headlines by category" },
+  {
+    path: "/malayalam",
+    name: "Malayalam Writer",
+    blurb: "write Malayalam by transliteration, on-screen keyboard or handwriting",
+  },
+  {
+    path: "/translate",
+    name: "Translate",
+    blurb: "translate text between languages online or fully offline on-device",
+  },
 ];
 
 /** Keywords targeting the brand plus each tool's search intent. */
@@ -57,6 +68,14 @@ export const SITE_KEYWORDS = [
   "todo app",
   "reminders app",
   "pomodoro timer",
+  "malayalam typing",
+  "manglish to malayalam",
+  "malayalam keyboard online",
+  "malayalam handwriting",
+  "language translator",
+  "offline translator",
+  "translate text online",
+  "on-device translation",
   "offline PWA",
   "free online tools no signup",
 ];

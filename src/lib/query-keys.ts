@@ -7,5 +7,7 @@ export const queryKeys = {
   reminders: ["reminders"] as const,
   systemInfo: ["system-info"] as const,
   news: (tab: string) => ["news", tab] as const,
+  translation: (mode: string, source: string, target: string, text: string) =>
+    ["translation", mode, source, target, text] as const,
   theme: ["theme"] as const,
 };

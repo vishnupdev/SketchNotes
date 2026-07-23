@@ -13,6 +13,7 @@ import { WatermarkTool } from "@/components/PdfEditor/tools/WatermarkTool";
 import { PageNumbersTool } from "@/components/PdfEditor/tools/PageNumbersTool";
 import { MetadataTool } from "@/components/PdfEditor/tools/MetadataTool";
 import { EditTool } from "@/components/PdfEditor/tools/EditTool";
+import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
 
 const TOOL_COMPONENTS: Record<string, ComponentType> = {
   edit: EditTool,
@@ -40,7 +41,7 @@ export function PdfApp() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-[18px] pt-[22px] md:static">
+      <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-[18px] pt-[22px]">
         <div className="mx-auto flex max-w-[1080px] flex-wrap items-end justify-between gap-4">
           <button
             type="button"
@@ -111,14 +112,7 @@ export function PdfApp() {
         {Active ? <Active /> : <PdfHome />}
       </main>
 
-      <footer className="border-t border-border px-5 py-[22px] text-center font-mono text-[10.5px] tracking-[.1em] text-ink-soft">
-        <div className="font-serif text-[14.5px] not-italic tracking-normal">
-          Crafted by <b className="font-semibold text-accent">Vishnu P</b> ·{" "}
-          <a href="tel:7510334431" className="font-mono text-accent no-underline hover:underline">
-            ☎ 7510334431
-          </a>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
   );
 }

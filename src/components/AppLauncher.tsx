@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useWorkspaceStore, type AppId } from "@/store/useWorkspaceStore";
 import { cx } from "@/lib/utils";
 import { CloseIcon, SettingsIcon } from "@/components/SketchNotes/atoms/icons";
@@ -170,6 +170,49 @@ const NewsGlyph = (
   </svg>
 );
 
+const MalayalamGlyph = (
+  <svg viewBox="0 0 24 24" fill="none" className="size-6">
+    <text
+      x="12"
+      y="13"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize="19"
+      fontWeight="700"
+      fill="currentColor"
+    >
+      അ
+    </text>
+  </svg>
+);
+
+const TranslateGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <path d="M4 5h7M7.5 5v1.5" />
+    <path d="M9.5 7c-.6 3.2-2.8 6-5.5 7.5M5.5 8.5c.7 2 2.4 3.8 4.5 4.7" />
+    <path d="M12.5 20l3.75-9h.5L20.5 20M13.9 16.5h5.2" />
+  </svg>
+);
+
+const GripGlyph = (
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className="size-4.5">
+    <circle cx="9" cy="6" r="1.5" />
+    <circle cx="15" cy="6" r="1.5" />
+    <circle cx="9" cy="12" r="1.5" />
+    <circle cx="15" cy="12" r="1.5" />
+    <circle cx="9" cy="18" r="1.5" />
+    <circle cx="15" cy="18" r="1.5" />
+  </svg>
+);
+
 const APPS: AppEntry[] = [
   {
     id: "sketchnotes",
@@ -234,11 +277,38 @@ const APPS: AppEntry[] = [
     icon: NewsGlyph,
     hue: "--app-news",
   },
+  {
+    id: "malayalam",
+    name: "Malayalam Writer",
+    tagline: "Type, tap or handwrite Malayalam — transliteration, keyboard & ink.",
+    icon: MalayalamGlyph,
+    hue: "--app-malayalam",
+  },
+  {
+    id: "translate",
+    name: "Translate",
+    tagline: "Convert text between languages — online, or fully offline on-device.",
+    icon: TranslateGlyph,
+    hue: "--app-translate",
+  },
 ];
+
+/** id → entry, so a persisted order (list of ids) can be resolved to tiles. */
+const APP_MAP = Object.fromEntries(APPS.map((a) => [a.id, a])) as Record<AppId, AppEntry>;
+
+/** Move the item at `from` to index `to`, returning a new array. */
+function moveItem<T>(list: T[], from: number, to: number): T[] {
+  const next = list.slice();
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
 
 /**
  * Full-screen app switcher. Opened from the header (Sketchnotes) or from the
- * embedded PDF editor's "Apps" button. Picking a tile swaps the active app.
+ * embedded PDF editor's "Apps" button. Picking a tile swaps the active app;
+ * dragging a tile's handle (or arrow-keying it) reorders the grid, and the
+ * order is persisted per browser.
  */
 export function AppLauncher() {
   const open = useWorkspaceStore((s) => s.launcherOpen);
@@ -246,6 +316,22 @@ export function AppLauncher() {
   const setActiveApp = useWorkspaceStore((s) => s.setActiveApp);
   const closeLauncher = useWorkspaceStore((s) => s.closeLauncher);
   const openSettings = useWorkspaceStore((s) => s.openSettings);
+  const appOrder = useWorkspaceStore((s) => s.appOrder);
+  const setAppOrder = useWorkspaceStore((s) => s.setAppOrder);
+  const hydrateAppOrder = useWorkspaceStore((s) => s.hydrateAppOrder);
+
+  // The tile currently picked up, and the tile the pointer is hovering over.
+  const [dragId, setDragId] = useState<AppId | null>(null);
+  const [overId, setOverId] = useState<AppId | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  // Edge auto-scroll: direction (-1/0/1) plus the active rAF handle.
+  const scrollDir = useRef(0);
+  const rafId = useRef<number | null>(null);
+
+  // Adopt the persisted order once, after mount.
+  useEffect(() => {
+    hydrateAppOrder();
+  }, [hydrateAppOrder]);
 
   useEffect(() => {
     if (!open) return;
@@ -255,6 +341,84 @@ export function AppLauncher() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, closeLauncher]);
+
+  const stopAutoScroll = useCallback(() => {
+    scrollDir.current = 0;
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+    }
+  }, []);
+
+  const stepScroll = useCallback(() => {
+    const sc = scrollRef.current;
+    if (sc && scrollDir.current !== 0) {
+      sc.scrollTop += scrollDir.current * 12;
+      rafId.current = requestAnimationFrame(stepScroll);
+    } else {
+      rafId.current = null;
+    }
+  }, []);
+
+  // Clean up any running scroll loop if the launcher unmounts mid-drag.
+  useEffect(() => stopAutoScroll, [stopAutoScroll]);
+
+  function startDrag(e: React.PointerEvent, id: AppId) {
+    // Primary button / touch / pen only; let other buttons pass through.
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setDragId(id);
+    setOverId(id);
+  }
+
+  function dragMove(e: React.PointerEvent) {
+    if (!dragId) return;
+    const target = document
+      .elementFromPoint(e.clientX, e.clientY)
+      ?.closest<HTMLElement>("[data-app-tile]");
+    const id = target?.dataset.appTile as AppId | undefined;
+    if (id && id !== overId) setOverId(id);
+
+    // Nudge the scroll container when dragging near its top/bottom edge.
+    const sc = scrollRef.current;
+    if (sc) {
+      const r = sc.getBoundingClientRect();
+      const EDGE = 56;
+      const dir = e.clientY < r.top + EDGE ? -1 : e.clientY > r.bottom - EDGE ? 1 : 0;
+      if (dir !== scrollDir.current) {
+        scrollDir.current = dir;
+        if (dir !== 0 && rafId.current === null) rafId.current = requestAnimationFrame(stepScroll);
+      }
+    }
+  }
+
+  function endDrag(e: React.PointerEvent) {
+    stopAutoScroll();
+    if (dragId && overId && overId !== dragId) {
+      const from = appOrder.indexOf(dragId);
+      const to = appOrder.indexOf(overId);
+      if (from !== -1 && to !== -1) setAppOrder(moveItem(appOrder, from, to));
+    }
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    setDragId(null);
+    setOverId(null);
+  }
+
+  function reorderByKey(e: React.KeyboardEvent, id: AppId) {
+    const dir = e.key === "ArrowUp" || e.key === "ArrowLeft" ? -1 : e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : 0;
+    if (dir === 0) return;
+    const from = appOrder.indexOf(id);
+    const to = from + dir;
+    if (to < 0 || to >= appOrder.length) return;
+    e.preventDefault();
+    // The handle keeps focus across the reorder because tiles are keyed by id.
+    setAppOrder(moveItem(appOrder, from, to));
+  }
+
+  const ordered = appOrder.map((id) => APP_MAP[id]).filter(Boolean) as AppEntry[];
 
   return (
     <div
@@ -289,7 +453,9 @@ export function AppLauncher() {
                 {APPS.length}
               </span>
             </div>
-            <p className="mt-1 text-[13px] text-ink-soft">Pick a workspace to open.</p>
+            <p className="mt-1 text-[13px] text-ink-soft">
+              Pick a workspace to open — drag <span aria-hidden>⠿</span> to reorder.
+            </p>
           </div>
           <button
             aria-label="Close"
@@ -300,55 +466,86 @@ export function AppLauncher() {
           </button>
         </div>
 
-        <div className="scroll-slim min-h-0 flex-1 overflow-y-auto px-6 pb-6">
-        <div className="grid grid-cols-1 gap-3 min-[440px]:grid-cols-2">
-          {APPS.map((app) => {
+        <div ref={scrollRef} className="scroll-slim min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+        <ul role="list" className="grid grid-cols-1 gap-3 min-[440px]:grid-cols-2">
+          {ordered.map((app) => {
             const active = app.id === activeApp;
             const hue = `var(${app.hue})`;
+            const dragging = app.id === dragId;
+            const dropTarget = dragId !== null && app.id === overId && overId !== dragId;
             return (
-              <button
+              <li
                 key={app.id}
-                onClick={() => setActiveApp(app.id)}
-                aria-current={active}
+                data-app-tile={app.id}
                 className={cx(
-                  "group relative flex flex-col items-start gap-3 overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
-                  active
-                    ? "border-accent bg-accent-soft ring-1 ring-accent"
-                    : "border-border bg-paper hover:-translate-y-0.5 hover:border-accent hover:shadow-panel",
+                  "group relative rounded-2xl transition-transform duration-150",
+                  dragging && "scale-[.97] opacity-60",
                 )}
               >
-                {active && (
-                  <span className="absolute right-3 top-3 z-10 rounded-full bg-accent px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-white">
-                    Current
-                  </span>
-                )}
-                <span
-                  className="grid size-12 place-items-center rounded-[14px] text-white transition-transform duration-200 group-hover:scale-105"
-                  style={{
-                    background: `linear-gradient(140deg, ${hue}, color-mix(in srgb, ${hue} 78%, black))`,
-                    boxShadow: `0 8px 18px -6px color-mix(in srgb, ${hue} 60%, transparent)`,
-                  }}
-                >
-                  {app.icon}
-                </span>
-                <span className="text-[15.5px] font-bold tracking-[.1px]">{app.name}</span>
-                <span className="text-[12.5px] leading-snug text-ink-soft">{app.tagline}</span>
-                <span
-                  aria-hidden
+                <button
+                  onClick={() => setActiveApp(app.id)}
+                  aria-current={active}
                   className={cx(
-                    "absolute bottom-3 right-3 grid size-6 place-items-center rounded-full text-white transition-all duration-200",
+                    "flex w-full flex-col items-start gap-3 overflow-hidden rounded-2xl border p-4 pr-11 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                     active
-                      ? "opacity-0"
-                      : "translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
+                      ? "border-accent bg-accent-soft ring-1 ring-accent"
+                      : "border-border bg-paper hover:-translate-y-0.5 hover:border-accent hover:shadow-panel",
+                    dropTarget && "border-accent ring-2 ring-accent",
                   )}
-                  style={{ background: hue }}
                 >
-                  {ArrowIcon}
-                </span>
-              </button>
+                  <span
+                    className="grid size-12 place-items-center rounded-[14px] text-white transition-transform duration-200 group-hover:scale-105"
+                    style={{
+                      background: `linear-gradient(140deg, ${hue}, color-mix(in srgb, ${hue} 78%, black))`,
+                      boxShadow: `0 8px 18px -6px color-mix(in srgb, ${hue} 60%, transparent)`,
+                    }}
+                  >
+                    {app.icon}
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-[15.5px] font-bold tracking-[.1px]">{app.name}</span>
+                    {active && (
+                      <span className="rounded-full bg-accent px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-on-accent">
+                        Current
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-[12.5px] leading-snug text-ink-soft">{app.tagline}</span>
+                  <span
+                    aria-hidden
+                    className={cx(
+                      "absolute bottom-3 right-3 grid size-6 place-items-center rounded-full text-white transition-all duration-200",
+                      active
+                        ? "opacity-0"
+                        : "translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
+                    )}
+                    style={{ background: hue }}
+                  >
+                    {ArrowIcon}
+                  </span>
+                </button>
+
+                {/* Drag handle — a sibling of the tile button (never nested, so
+                    the markup stays valid) and the only reorder affordance. */}
+                <button
+                  type="button"
+                  aria-label={`Reorder ${app.name}. Drag, or press arrow keys to move.`}
+                  onPointerDown={(e) => startDrag(e, app.id)}
+                  onPointerMove={dragMove}
+                  onPointerUp={endDrag}
+                  onPointerCancel={endDrag}
+                  onKeyDown={(e) => reorderByKey(e, app.id)}
+                  className={cx(
+                    "absolute right-2 top-2 z-10 grid size-8 touch-none place-items-center rounded-lg text-ink-soft transition-colors hover:bg-panel hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                    dragging ? "cursor-grabbing" : "cursor-grab",
+                  )}
+                >
+                  {GripGlyph}
+                </button>
+              </li>
             );
           })}
-        </div>
+        </ul>
 
         <div className="mt-5 border-t border-border pt-4">
           <button

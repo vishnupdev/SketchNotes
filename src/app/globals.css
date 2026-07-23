@@ -43,6 +43,8 @@
   --app-system: #2f9e44;
   --app-speed: #6d8bff;
   --app-news: #c2410c;
+  --app-malayalam: #0891b2;
+  --app-translate: #4f46e5;
 }
 
 /* Dark palettes: brighten the scrim + app hues so glyphs stay legible on
@@ -61,6 +63,8 @@
   --app-system: #40c463;
   --app-speed: #8ba4ff;
   --app-news: #fb7141;
+  --app-malayalam: #22c3dd;
+  --app-translate: #818cf8;
 }
 
 [data-theme="dark"] {

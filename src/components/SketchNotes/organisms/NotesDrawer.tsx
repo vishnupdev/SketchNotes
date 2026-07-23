@@ -111,10 +111,6 @@ export function NotesDrawer() {
 
         <div className="mt-2 border-t border-border px-1.5 pb-0.5 pt-2.5 text-[11.5px] leading-[1.6] text-ink-soft">
           Designed &amp; developed by <b className="font-semibold text-text">Vishnu&nbsp;P</b>
-          <br />
-          <a href="tel:7510334431" aria-label="Call Vishnu P" className="font-semibold text-accent hover:underline">
-            ☎ 7510334431
-          </a>
         </div>
       </aside>
     </>

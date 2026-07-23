@@ -25,6 +25,8 @@ const TimerApp = dynamic(() => import("@/components/Timer/TimerApp").then((m) =>
 const SystemInfoApp = dynamic(() => import("@/components/SystemInfo/SystemInfoApp").then((m) => m.SystemInfoApp), { ssr: false });
 const NetworkSpeedApp = dynamic(() => import("@/components/NetworkSpeed/NetworkSpeedApp").then((m) => m.NetworkSpeedApp), { ssr: false });
 const NewsApp = dynamic(() => import("@/components/News/NewsApp").then((m) => m.NewsApp), { ssr: false });
+const MalayalamWriterApp = dynamic(() => import("@/components/MalayalamWriter/MalayalamWriterApp").then((m) => m.MalayalamWriterApp), { ssr: false });
+const TranslateApp = dynamic(() => import("@/components/Translate/TranslateApp").then((m) => m.TranslateApp), { ssr: false });
 
 const PDF_BASE = "/pdfeditor";
 const IMAGE_BASE = "/image";
@@ -34,6 +36,8 @@ const TIMER_BASE = "/timer";
 const SYSTEM_BASE = "/system";
 const SPEED_BASE = "/speedtest";
 const NEWS_BASE = "/news";
+const MALAYALAM_BASE = "/malayalam";
+const TRANSLATE_BASE = "/translate";
 
 /** Derive the app + PDF section from a path. */
 function parsePath(pathname: string): { app: AppId; tool: string | null } {
@@ -49,6 +53,8 @@ function parsePath(pathname: string): { app: AppId; tool: string | null } {
   if (pathname === SYSTEM_BASE || pathname === SYSTEM_BASE + "/") return { app: "system", tool: null };
   if (pathname === SPEED_BASE || pathname === SPEED_BASE + "/") return { app: "speed", tool: null };
   if (pathname === NEWS_BASE || pathname === NEWS_BASE + "/") return { app: "news", tool: null };
+  if (pathname === MALAYALAM_BASE || pathname === MALAYALAM_BASE + "/") return { app: "malayalam", tool: null };
+  if (pathname === TRANSLATE_BASE || pathname === TRANSLATE_BASE + "/") return { app: "translate", tool: null };
   return { app: "sketchnotes", tool: null };
 }
 const pdfPath = (tool: string | null) => (tool ? `${PDF_BASE}/${tool}` : PDF_BASE);
@@ -69,7 +75,11 @@ const pathForApp = (app: AppId, tool: string | null) =>
                 ? SPEED_BASE
                 : app === "news"
                   ? NEWS_BASE
-                  : "/";
+                  : app === "malayalam"
+                    ? MALAYALAM_BASE
+                    : app === "translate"
+                      ? TRANSLATE_BASE
+                      : "/";
 
 /**
  * Top-level workspace hosting both apps natively (no iframe) and keeping the
@@ -131,11 +141,13 @@ export function Workspace() {
   const systemActive = activeApp === "system";
   const speedActive = activeApp === "speed";
   const newsActive = activeApp === "news";
+  const malayalamActive = activeApp === "malayalam";
+  const translateActive = activeApp === "translate";
 
   return (
     <>
       {/* Sketchnotes — always mounted, hidden while another app is active. */}
-      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive || systemActive || speedActive || newsActive}>
+      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive || systemActive || speedActive || newsActive || malayalamActive || translateActive}>
         <EditorShell />
       </div>
 
@@ -177,6 +189,16 @@ export function Workspace() {
       {/* News. */}
       <div hidden={!newsActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
         {newsActive && <NewsApp />}
+      </div>
+
+      {/* Malayalam Writer. */}
+      <div hidden={!malayalamActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {malayalamActive && <MalayalamWriterApp />}
+      </div>
+
+      {/* Translate. */}
+      <div hidden={!translateActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {translateActive && <TranslateApp />}
       </div>
 
       <AppLauncher />

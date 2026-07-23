@@ -8,6 +8,7 @@ import { NewsFeed } from "@/components/News/organisms/NewsFeed";
 import { newsTabById } from "@/lib/News/catalog";
 import { cx } from "@/lib/utils";
 import { AppsIcon, NewsIcon, RefreshIcon } from "@/components/SketchNotes/atoms/icons";
+import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
 
 /**
  * News — latest headlines by category (Tech, Sports, Global, International,
@@ -26,7 +27,7 @@ export function NewsApp() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-3.5 pt-[22px] md:static">
+      <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-3.5 pt-[22px]">
         <div className="mx-auto flex max-w-[900px] flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex items-center gap-3.5">
@@ -73,6 +74,8 @@ export function NewsApp() {
         {/* Keyed by tab so each category mounts its own cached feed. */}
         <NewsFeed key={activeTab} tabId={activeTab} />
       </main>
+
+      <AppFooter />
     </div>
   );
 }

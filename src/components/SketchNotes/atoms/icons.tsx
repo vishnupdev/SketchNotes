@@ -412,3 +412,48 @@ export const ExternalLinkIcon = (p: IconProps) => (
     <path d="M18 13.5V18a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h4.5" />
   </Svg>
 );
+
+export const KeyboardIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="6" width="18" height="12" rx="2" />
+    <path d="M7 9.5h.01M11 9.5h.01M15 9.5h.01M8.5 12.5h7" />
+  </Svg>
+);
+
+export const TranslateIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 5h7M7.5 5v1.5" />
+    <path d="M9.5 7c-.6 3.2-2.8 6-5.5 7.5M5.5 8.5c.7 2 2.4 3.8 4.5 4.7" />
+    <path d="M12.5 20l3.75-9h.5L20.5 20M13.9 16.5h5.2" />
+  </Svg>
+);
+
+export const SwapIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M7 4 3.5 7.5 7 11" />
+    <path d="M3.5 7.5H16a4 4 0 0 1 4 4" />
+    <path d="M17 20l3.5-3.5L17 13" />
+    <path d="M20.5 16.5H8a4 4 0 0 1-4-4" />
+  </Svg>
+);
+
+/**
+ * App glyph for the Malayalam writer — the letter "അ" set in the icon grid.
+ * Uses a filled text node (not the shared stroke paths) so the script reads
+ * cleanly at small sizes; `currentColor` keeps it themeable like the rest.
+ */
+export const MalayalamIcon = ({ size = 20, ...rest }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" {...rest}>
+    <text
+      x="12"
+      y="13"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize="20"
+      fontWeight="700"
+      fill="currentColor"
+    >
+      അ
+    </text>
+  </svg>
+);

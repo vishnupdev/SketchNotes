@@ -12,6 +12,9 @@
 - [Timer](/timer): pomodoro and countdown timer
 - [System Info](/system): live device and system dashboard
 - [Speed Test](/speedtest): network speed measurement
+- [News](/news): latest headlines by category
+- [Malayalam Writer](/malayalam): write Malayalam by transliteration (Manglish), an on-screen keyboard, or handwriting
+- [Translate](/translate): translate text between languages, online (auto-detects the source) or fully offline on-device via the browser's built-in AI — no text leaves the device
 
 ## Notes
 
