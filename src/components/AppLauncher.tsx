@@ -171,12 +171,21 @@ const NewsGlyph = (
 );
 
 const MalayalamGlyph = (
-  <span
-    aria-hidden
-    className="grid size-6 place-items-center text-[19px] font-bold leading-none"
-  >
-    അ
-  </span>
+  // Geometrically centered at (12,12) so the glyph sits dead-centre regardless
+  // of the font's line metrics; overflow-visible keeps its tall parts uncropped.
+  <svg viewBox="0 0 24 24" className="size-6 overflow-visible" aria-hidden>
+    <text
+      x="12"
+      y="12"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize="17"
+      fontWeight="700"
+      fill="currentColor"
+    >
+      അ
+    </text>
+  </svg>
 );
 
 const TranslateGlyph = (
