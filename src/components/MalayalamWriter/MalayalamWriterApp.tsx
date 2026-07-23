@@ -60,6 +60,40 @@ export function MalayalamWriterApp() {
     [text, setText],
   );
 
+  // Live handwriting "composition": the recognised word is shown at the caret
+  // and rewritten in place as the pen keeps moving, until it is committed
+  // (kept) or discarded. `base` is the document as it was before the guess.
+  const previewRef = useRef<{ start: number; base: string } | null>(null);
+
+  /** Show or replace the in-progress handwriting guess at the caret. */
+  const preview = useCallback(
+    (word: string) => {
+      let p = previewRef.current;
+      if (!p) {
+        // Insert at the caret only if the field is already focused; otherwise
+        // append at the end. Never focus the field from here — that would pop
+        // the mobile keyboard over the writing pad mid-stroke.
+        const focused =
+          typeof document !== "undefined" && document.activeElement === docRef.current;
+        const start = focused ? (docRef.current?.selectionStart ?? text.length) : text.length;
+        p = { start, base: text };
+        previewRef.current = p;
+      }
+      setText(p.base.slice(0, p.start) + word + p.base.slice(p.start));
+    },
+    [text, setText],
+  );
+
+  /** Finish the guess: `commit` keeps the shown text, otherwise it's removed. */
+  const endPreview = useCallback((commit: boolean) => {
+    const p = previewRef.current;
+    previewRef.current = null;
+    if (p && !commit) {
+      caretRef.current = p.start;
+      setText(p.base);
+    }
+  }, [setText]);
+
   /** Delete the selection, or one character before the caret. */
   const backspace = useCallback(() => {
     const ta = docRef.current;
@@ -181,7 +215,9 @@ export function MalayalamWriterApp() {
           >
             {method === "manglish" && <ManglishInput onInsert={insert} />}
             {method === "keyboard" && <MalayalamKeyboard onInsert={insert} onBackspace={backspace} />}
-            {method === "handwriting" && <HandwritingPad onInsert={insert} />}
+            {method === "handwriting" && (
+              <HandwritingPad onInsert={insert} onPreview={preview} onPreviewEnd={endPreview} />
+            )}
           </section>
         </div>
       </main>

@@ -171,19 +171,12 @@ const NewsGlyph = (
 );
 
 const MalayalamGlyph = (
-  <svg viewBox="0 0 24 24" fill="none" className="size-6">
-    <text
-      x="12"
-      y="13"
-      textAnchor="middle"
-      dominantBaseline="central"
-      fontSize="19"
-      fontWeight="700"
-      fill="currentColor"
-    >
-      അ
-    </text>
-  </svg>
+  <span
+    aria-hidden
+    className="grid size-6 place-items-center text-[19px] font-bold leading-none"
+  >
+    അ
+  </span>
 );
 
 const TranslateGlyph = (

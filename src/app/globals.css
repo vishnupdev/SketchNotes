@@ -10,7 +10,10 @@
   --grid: #d5dbe3;
   --ink: #1f2a33;
   --ink-soft: #66727d;
-  --panel: #ffffff;
+  /* Fraction of the panel colour kept opaque; the rest is glass. Flipped to
+     100% under prefers-reduced-transparency so panels stay fully solid. */
+  --glass-opacity: 72%;
+  --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #e4e9ee;
   --accent: #0f7b6c;
   --accent-soft: #ddf0ec;
@@ -27,7 +30,23 @@
   --dock-ink: #9fb0bc;
   --text: #1f2a33;
   --ed-bg: rgba(255, 255, 255, 0.55);
-  --shadow: 0 8px 28px rgba(31, 42, 51, 0.16), 0 1px 3px rgba(31, 42, 51, 0.1);
+  /* ---------------------------- glassmorphism ---------------------------- */
+  /* Blur applied behind every translucent panel. */
+  --glass-blur: 16px;
+  /* The glass bevel: a bright top sheen + a faint inner rim. Baked into
+     --shadow (below) so every shadow-panel surface carries it, and applied on
+     its own to panels without shadow-panel (see the .bg-panel rules further
+     down). Dark palettes dim this in the [data-dark] block so it can't blow out. */
+  --glass-edge: inset 0 1px 0 0 rgba(255, 255, 255, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  /* Soft, theme-tinted ambient field painted on every paper surface so the
+     glass has real colour to refract. background-attachment: fixed keeps the
+     field aligned to the viewport, so it stays coherent across scroll
+     containers and across small vs. large surfaces. */
+  --ambient:
+    radial-gradient(42rem 32rem at 12% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    radial-gradient(38rem 30rem at 108% 8%, color-mix(in srgb, var(--app-image) 10%, transparent), transparent 55%),
+    radial-gradient(46rem 34rem at 88% 112%, color-mix(in srgb, var(--app-todos) 9%, transparent), transparent 60%);
+  --shadow: var(--glass-edge), 0 8px 28px rgba(31, 42, 51, 0.16), 0 1px 3px rgba(31, 42, 51, 0.1);
   --hand: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Chalkboard SE", cursive;
 
   /* Modal / launcher backdrop scrim. */
@@ -51,6 +70,8 @@
    dark panels. Applies to every dark flag (`dark`, `midnight`, …). */
 [data-dark] {
   --scrim: rgba(0, 0, 0, 0.6);
+  /* A bright white sheen blows out on dark glass — dim the bevel right down. */
+  --glass-edge: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   /* Bright accents on dark themes need a dark foreground to clear AA contrast
      (white on #1ba38e is only ~3.1:1; near-black is ~5.8:1). */
   --on-accent: #0d1319;
@@ -73,7 +94,7 @@
   --text: #e6ecf1;
   --ink: #0d1319;
   --ink-soft: #8b99a6;
-  --panel: #1d2530;
+  --panel: color-mix(in srgb, #1d2530 var(--glass-opacity), transparent);
   --border: #2c3743;
   --accent: #1ba38e;
   --accent-soft: rgba(27, 163, 142, 0.18);
@@ -83,7 +104,7 @@
   --success: #30b96a;
   --dock-ink: #8b99a6;
   --ed-bg: rgba(20, 26, 33, 0.6);
-  --shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow: var(--glass-edge), 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 /* -------- colour-accented themes (light base; only hue tokens differ) ------- */
@@ -91,7 +112,7 @@
   --paper: #f3f7fc;
   --grid: #cddcee;
   --ink-soft: #5b6b7d;
-  --panel: #ffffff;
+  --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #dbe6f2;
   --accent: #1f74e0;
   --accent-soft: #dcebfb;
@@ -102,7 +123,7 @@
   --paper: #fdf6f2;
   --grid: #ecd9cd;
   --ink-soft: #7d6a60;
-  --panel: #fffdfc;
+  --panel: color-mix(in srgb, #fffdfc var(--glass-opacity), transparent);
   --border: #f2e3da;
   --accent: #ef5a3c;
   --accent-soft: #ffe3d8;
@@ -113,7 +134,7 @@
   --paper: #f8f6fd;
   --grid: #ddd3ef;
   --ink-soft: #6b6383;
-  --panel: #ffffff;
+  --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #e7e0f4;
   --accent: #8b5cf6;
   --accent-soft: #ece3fe;
@@ -124,7 +145,7 @@
   --paper: #fdf5f8;
   --grid: #eecdd9;
   --ink-soft: #7d616b;
-  --panel: #ffffff;
+  --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #f2dde5;
   --accent: #e14d82;
   --accent-soft: #fde0ea;
@@ -135,7 +156,7 @@
   --paper: #f4f9f4;
   --grid: #cee5d1;
   --ink-soft: #5d6f60;
-  --panel: #ffffff;
+  --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #dbebdd;
   --accent: #2f9e44;
   --accent-soft: #d8f3dd;
@@ -149,7 +170,7 @@
   --text: #e7e9f5;
   --ink: #0b0d15;
   --ink-soft: #8b8fb0;
-  --panel: #1a1e2e;
+  --panel: color-mix(in srgb, #1a1e2e var(--glass-opacity), transparent);
   --border: #2a2f45;
   --accent: #6d8bff;
   --accent-soft: rgba(109, 139, 255, 0.18);
@@ -159,7 +180,7 @@
   --success: #30b96a;
   --dock-ink: #8b8fb0;
   --ed-bg: rgba(18, 21, 31, 0.6);
-  --shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow: var(--glass-edge), 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 /* ---------------- expose tokens to Tailwind utilities ---------------- */
@@ -199,7 +220,9 @@ body {
   position: fixed;
   inset: 0;
   overflow: hidden;
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image: var(--ambient);
+  background-attachment: fixed;
   color: var(--text);
   font: 14px/1.45 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   touch-action: manipulation;
@@ -209,6 +232,45 @@ body {
 }
 svg {
   display: block;
+}
+
+/* --------------------------- glassmorphism --------------------------- */
+/* Paint the ambient field on every paper surface so the glass panels above it
+   have colour to refract. Fixed attachment aligns the field to the viewport,
+   keeping it coherent across independent scroll containers and across small
+   chips vs. full-screen canvases (each reveals its slice of one shared field). */
+.bg-paper {
+  background-image: var(--ambient);
+  background-attachment: fixed;
+}
+/* Every panel is frosted glass: blur + lift saturation of whatever shows
+   through the translucent --panel fill. -webkit- prefix covers iOS/Safari. */
+.bg-panel {
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+}
+/* Give the glass bevel to panels that don't already use shadow-panel.
+   shadow-panel carries the same --glass-edge as its first shadow layer, so
+   those are excluded here to preserve their drop shadow. No bg-panel element
+   in the app sets a bespoke box-shadow, so this never clobbers one. */
+.bg-panel:not(.shadow-panel) {
+  box-shadow: var(--glass-edge);
+}
+/* Respect users who ask for less transparency: solid panels, no blur, flat
+   paper. --glass-opacity flips to 100%, so every --panel color-mix resolves to
+   its fully-opaque base. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-opacity: 100%;
+  }
+  .bg-panel {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .bg-paper,
+  body {
+    background-image: none;
+  }
 }
 
 /* Reusable interactive tint that adapts to the theme. */
