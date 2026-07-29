@@ -10,9 +10,10 @@
   --grid: #d5dbe3;
   --ink: #1f2a33;
   --ink-soft: #66727d;
-  /* Fraction of the panel colour kept opaque; the rest is glass. Flipped to
-     100% under prefers-reduced-transparency so panels stay fully solid. */
-  --glass-opacity: 72%;
+  /* Fraction of the panel colour kept opaque; the rest is glass. Kept high for
+     an elegant, readable frost (nested panels compound toward fully solid).
+     Flipped to 100% under prefers-reduced-transparency. */
+  --glass-opacity: 82%;
   --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #e4e9ee;
   --accent: #0f7b6c;
@@ -31,22 +32,40 @@
   --text: #1f2a33;
   --ed-bg: rgba(255, 255, 255, 0.55);
   /* ---------------------------- glassmorphism ---------------------------- */
-  /* Blur applied behind every translucent panel. */
-  --glass-blur: 16px;
-  /* The glass bevel: a bright top sheen + a faint inner rim. Baked into
-     --shadow (below) so every shadow-panel surface carries it, and applied on
-     its own to panels without shadow-panel (see the .bg-panel rules further
-     down). Dark palettes dim this in the [data-dark] block so it can't blow out. */
-  --glass-edge: inset 0 1px 0 0 rgba(255, 255, 255, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  /* Blur + colour-lift applied behind every translucent panel. */
+  --glass-blur: 18px;
+  /* Diagonal light refraction painted on top of the panel tint — the sheen a
+     real pane of glass catches from a top-left light. Dimmed for dark palettes
+     in the [data-dark] block below so it never streaks. */
+  --glass-sheen: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  /* The glass rim: a crisp top highlight, a hairline all-round edge, and a soft
+     inner floor shadow that gives the pane thickness. Baked into --shadow so
+     every shadow-panel surface carries it, and applied on its own to panels
+     without shadow-panel (see the .bg-panel rules below). Dark palettes dim it. */
+  --glass-edge:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.75),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 -8px 20px -12px rgba(16, 24, 32, 0.14);
   /* Soft, theme-tinted ambient field painted on every paper surface so the
      glass has real colour to refract. background-attachment: fixed keeps the
      field aligned to the viewport, so it stays coherent across scroll
      containers and across small vs. large surfaces. */
   --ambient:
-    radial-gradient(42rem 32rem at 12% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
-    radial-gradient(38rem 30rem at 108% 8%, color-mix(in srgb, var(--app-image) 10%, transparent), transparent 55%),
-    radial-gradient(46rem 34rem at 88% 112%, color-mix(in srgb, var(--app-todos) 9%, transparent), transparent 60%);
-  --shadow: var(--glass-edge), 0 8px 28px rgba(31, 42, 51, 0.16), 0 1px 3px rgba(31, 42, 51, 0.1);
+    radial-gradient(48rem 36rem at 8% -12%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 62%),
+    radial-gradient(42rem 34rem at 110% 6%, color-mix(in srgb, var(--app-image) 9%, transparent), transparent 58%),
+    radial-gradient(52rem 40rem at 92% 116%, color-mix(in srgb, var(--app-todos) 8%, transparent), transparent 62%);
+  /* Elegant layered drop shadow — contact + key + ambient — prefixed by the rim. */
+  --shadow:
+    var(--glass-edge),
+    0 1px 2px rgba(16, 24, 32, 0.06),
+    0 10px 24px -8px rgba(16, 24, 32, 0.16),
+    0 24px 48px -16px rgba(16, 24, 32, 0.16);
   --hand: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Chalkboard SE", cursive;
 
   /* Modal / launcher backdrop scrim. */
@@ -70,8 +89,17 @@
    dark panels. Applies to every dark flag (`dark`, `midnight`, …). */
 [data-dark] {
   --scrim: rgba(0, 0, 0, 0.6);
-  /* A bright white sheen blows out on dark glass — dim the bevel right down. */
-  --glass-edge: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  /* A bright rim/sheen blows out on dark glass — dim both right down. */
+  --glass-edge:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 -8px 20px -12px rgba(0, 0, 0, 0.4);
+  --glass-sheen: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 32%,
+    rgba(255, 255, 255, 0) 60%
+  );
   /* Bright accents on dark themes need a dark foreground to clear AA contrast
      (white on #1ba38e is only ~3.1:1; near-black is ~5.8:1). */
   --on-accent: #0d1319;
@@ -104,7 +132,11 @@
   --success: #30b96a;
   --dock-ink: #8b99a6;
   --ed-bg: rgba(20, 26, 33, 0.6);
-  --shadow: var(--glass-edge), 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow:
+    var(--glass-edge),
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 12px 30px -8px rgba(0, 0, 0, 0.55),
+    0 28px 56px -18px rgba(0, 0, 0, 0.45);
 }
 
 /* -------- colour-accented themes (light base; only hue tokens differ) ------- */
@@ -180,7 +212,11 @@
   --success: #30b96a;
   --dock-ink: #8b8fb0;
   --ed-bg: rgba(18, 21, 31, 0.6);
-  --shadow: var(--glass-edge), 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow:
+    var(--glass-edge),
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 12px 30px -8px rgba(0, 0, 0, 0.55),
+    0 28px 56px -18px rgba(0, 0, 0, 0.45);
 }
 
 /* ---------------- expose tokens to Tailwind utilities ---------------- */
@@ -243,11 +279,15 @@ svg {
   background-image: var(--ambient);
   background-attachment: fixed;
 }
-/* Every panel is frosted glass: blur + lift saturation of whatever shows
-   through the translucent --panel fill. -webkit- prefix covers iOS/Safari. */
+/* Every panel is frosted glass: blur + lift the saturation of whatever shows
+   through the translucent --panel fill, then lay a diagonal light sheen over
+   the tint. -webkit- prefix covers iOS/Safari. Inline background-image on a
+   component (e.g. the launcher tiles) wins over this, so it's non-intrusive. */
 .bg-panel {
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  background-image: var(--glass-sheen);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 /* Give the glass bevel to panels that don't already use shadow-panel.
    shadow-panel carries the same --glass-edge as its first shadow layer, so
@@ -264,6 +304,7 @@ svg {
     --glass-opacity: 100%;
   }
   .bg-panel {
+    background-image: none;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
