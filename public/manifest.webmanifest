@@ -1,13 +1,15 @@
 {
   "name": "OneApp — every tool in one place",
   "short_name": "OneApp",
-  "description": "OneApp — every tool in one place. Sketch notes, a full PDF editor, image studio, todos, reminders, timer and more, in a single free offline-first web workspace.",
+  "description": "OneApp — every tool in one place. Sketch notes, a full PDF editor, image studio, todos, reminders, timer and more, in a single free offline-first web workspace that keeps working with no internet.",
   "categories": ["productivity", "utilities"],
   "lang": "en",
+  "dir": "ltr",
   "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
   "background_color": "#141a21",
   "theme_color": "#141a21",
@@ -17,6 +19,32 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Sketch Notes",
+      "short_name": "Sketch",
+      "description": "Freehand drawing and note canvas — works offline",
+      "url": "/"
+    },
+    {
+      "name": "Todos",
+      "short_name": "Todos",
+      "description": "Task list and weekly planner — works offline",
+      "url": "/todos"
+    },
+    {
+      "name": "PDF Editor",
+      "short_name": "PDF",
+      "description": "View, edit, merge and organize PDFs — works offline",
+      "url": "/pdfeditor"
+    },
+    {
+      "name": "Timer",
+      "short_name": "Timer",
+      "description": "Pomodoro and countdown timer — works offline",
+      "url": "/timer"
     }
   ]
 }

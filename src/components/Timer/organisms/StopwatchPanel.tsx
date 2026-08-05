@@ -42,8 +42,14 @@ export function StopwatchPanel() {
     let min = laps[0].split;
     let max = laps[0].split;
     for (const l of laps) {
-      if (l.split < min) (min = l.split), (f = l.index);
-      if (l.split > max) (max = l.split), (sIdx = l.index);
+      if (l.split < min) {
+        min = l.split;
+        f = l.index;
+      }
+      if (l.split > max) {
+        max = l.split;
+        sIdx = l.index;
+      }
     }
     return { fastest: f, slowest: sIdx };
   }, [laps]);

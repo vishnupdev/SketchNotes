@@ -70,6 +70,19 @@ export const useNetworkSpeedStore = create<NetworkSpeedState>((set, get) => ({
     const signal = controller.signal;
     const connection = readConnection();
 
+    // A speed test is the one thing here that is meaningless without a
+    // connection — fail it up front rather than after three failed phases.
+    if (!connection.online) {
+      set({
+        status: "error",
+        phase: "idle",
+        progress: 0,
+        connection,
+        error: "You appear to be offline. Connect to a network and try again.",
+      });
+      return;
+    }
+
     set({
       status: "running",
       phase: "ping",

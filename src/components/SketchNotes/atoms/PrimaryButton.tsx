@@ -9,8 +9,8 @@ export const PrimaryButton = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<
         ref={ref}
         type={type ?? "button"}
         className={cx(
-          "flex h-9 flex-none items-center gap-1.5 rounded-[10px] bg-accent px-3",
-          "font-semibold text-on-accent hover:brightness-110",
+          "hover-glow hover-sheen flex h-9 flex-none items-center gap-1.5 rounded-[10px] bg-accent px-3",
+          "font-semibold text-on-accent",
           className,
         )}
         {...rest}

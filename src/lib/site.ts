@@ -52,6 +52,11 @@ export const APPS: AppEntry[] = [
     name: "Translate",
     blurb: "translate text between languages online or fully offline on-device",
   },
+  {
+    path: "/assistant",
+    name: "Assistant",
+    blurb: "a free AI guide that answers what every app in the workspace can do",
+  },
 ];
 
 /** Keywords targeting the brand plus each tool's search intent. */
@@ -78,4 +83,8 @@ export const SITE_KEYWORDS = [
   "on-device translation",
   "offline PWA",
   "free online tools no signup",
+  "free ai assistant",
+  "in-app ai guide",
+  "on-device ai chat",
+  "ai agent no api key",
 ];

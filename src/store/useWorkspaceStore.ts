@@ -15,11 +15,14 @@ export type AppId =
   | "speed"
   | "news"
   | "malayalam"
-  | "translate";
+  | "translate"
+  | "assistant";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
 const ALL_APPS: AppId[] = [
   "sketchnotes",
+  // The guide sits near the front so a first-time visitor finds it early.
+  "assistant",
   "pdf",
   "image",
   "todos",

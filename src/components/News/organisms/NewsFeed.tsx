@@ -2,8 +2,10 @@
 
 import { useRef, useState } from "react";
 import { useNews } from "@/hooks/useNews";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { NewsCard } from "@/components/News/molecules/NewsCard";
 import { NewsPagination } from "@/components/News/molecules/NewsPagination";
+import { OfflineNotice } from "@/components/Offline/OfflineNotice";
 import { NewsIcon } from "@/components/SketchNotes/atoms/icons";
 
 /** Headlines shown per page — keeps the mobile feed to a short, tidy scroll. */
@@ -50,10 +52,22 @@ function FeedSkeleton() {
  */
 export function NewsFeed({ tabId }: { tabId: string }) {
   const { data, isLoading, isError, refetch } = useNews(tabId);
+  const { online } = useNetworkStatus();
   const [page, setPage] = useState(1);
   const topRef = useRef<HTMLDivElement>(null);
 
   if (isLoading) return <FeedSkeleton />;
+
+  // Nothing to show and no connection: headlines are the one thing here that
+  // can't be produced locally, so say so instead of showing a failure.
+  if (isError && !online) {
+    return (
+      <OfflineNotice title="No saved headlines for this category" action={{ label: "Try again", onClick: () => void refetch() }}>
+        News is the only part of the workspace that needs a connection. Categories you opened
+        while online are kept and still readable here.
+      </OfflineNotice>
+    );
+  }
 
   if (isError) {
     return (
@@ -101,6 +115,11 @@ export function NewsFeed({ tabId }: { tabId: string }) {
 
   return (
     <div ref={topRef}>
+      {!online && (
+        <OfflineNotice title="Offline" variant="inline" className="mb-3">
+          these are the headlines saved on your device
+        </OfflineNotice>
+      )}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {visible.map((article) => (
           <NewsCard key={article.id} article={article} />

@@ -6,6 +6,8 @@
  *    call, so it is only run on user request (never automatically).
  */
 
+import { readNetworkStatus } from "@/lib/net/status";
+
 const IP_RE = /((?:\d{1,3}\.){3}\d{1,3})|((?:[a-f0-9]{0,4}:){2,}[a-f0-9]{0,4})/i;
 
 export interface LocalIpResult {
@@ -67,15 +69,30 @@ export interface PublicIpResult {
   source: string;
 }
 
-/** Look up the public IP via an external service. Returns null on failure. */
+/** Give up on the echo service rather than leaving the button spinning. */
+const PUBLIC_IP_TIMEOUT_MS = 6000;
+
+/**
+ * Look up the public IP via an external service. Returns null on failure —
+ * including "no connection", where the request is skipped entirely: this is a
+ * live lookup, so a cached answer would be worse than none.
+ */
 export async function getPublicIP(): Promise<PublicIpResult | null> {
+  if (!readNetworkStatus().online) return null;
+  const abort = new AbortController();
+  const timer = setTimeout(() => abort.abort(), PUBLIC_IP_TIMEOUT_MS);
   try {
-    const res = await fetch("https://api.ipify.org?format=json", { cache: "no-store" });
+    const res = await fetch("https://api.ipify.org?format=json", {
+      cache: "no-store",
+      signal: abort.signal,
+    });
     if (!res.ok) return null;
     const data: unknown = await res.json();
     const ip = (data as { ip?: unknown }).ip;
     return typeof ip === "string" ? { ip, source: "api.ipify.org" } : null;
   } catch {
     return null;
+  } finally {
+    clearTimeout(timer);
   }
 }

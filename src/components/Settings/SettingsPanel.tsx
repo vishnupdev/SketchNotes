@@ -6,6 +6,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { cx } from "@/lib/utils";
 import { THEMES } from "@/lib/themes";
 import { CheckIcon, CloseIcon } from "@/components/SketchNotes/atoms/icons";
+import { OfflineSetting } from "@/components/Settings/OfflineSetting";
 
 /** One labelled block within the settings dialog. New settings go here. */
 function Section({
@@ -138,6 +139,13 @@ export function SettingsPanel() {
         <div className="flex flex-col gap-5">
           <Section title="Theme" description="Pick a colour theme for the whole workspace.">
             <ThemeSetting />
+          </Section>
+
+          <Section
+            title="Offline"
+            description="Keep every app on this device so the workspace opens with no internet."
+          >
+            <OfflineSetting />
           </Section>
         </div>
       </div>

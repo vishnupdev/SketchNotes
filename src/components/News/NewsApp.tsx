@@ -3,6 +3,7 @@
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { useNewsStore } from "@/store/useNewsStore";
 import { useNews } from "@/hooks/useNews";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { NewsTabs } from "@/components/News/molecules/NewsTabs";
 import { NewsFeed } from "@/components/News/organisms/NewsFeed";
 import { newsTabById } from "@/lib/News/catalog";
@@ -22,6 +23,7 @@ export function NewsApp() {
   const activeTab = useNewsStore((s) => s.activeTab);
   const setActiveTab = useNewsStore((s) => s.setActiveTab);
   const { isFetching, refetch } = useNews(activeTab);
+  const { online } = useNetworkStatus();
 
   const tabLabel = newsTabById(activeTab)?.label ?? "News";
 
@@ -47,8 +49,9 @@ export function NewsApp() {
               <button
                 type="button"
                 onClick={() => refetch()}
-                title="Refresh headlines"
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-panel px-3.5 py-2 font-mono text-[11px] uppercase tracking-[.1em] hover:border-accent hover:text-accent"
+                disabled={!online}
+                title={online ? "Refresh headlines" : "Offline — saved headlines are shown"}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-panel px-3.5 py-2 font-mono text-[11px] uppercase tracking-[.1em] hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-border disabled:hover:text-text"
               >
                 <RefreshIcon size={15} className={cx(isFetching && "animate-spin")} />
                 <span className="hidden sm:inline">Refresh</span>

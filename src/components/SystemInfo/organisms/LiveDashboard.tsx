@@ -230,14 +230,19 @@ export function LiveDashboard() {
               <button
                 type="button"
                 onClick={ip.lookupPublic}
-                disabled={ip.pubLoading}
-                className="self-start rounded-lg bg-accent px-3 py-1.5 text-[12.5px] font-semibold text-white hover:brightness-110 disabled:opacity-60"
+                disabled={ip.pubLoading || !net.online}
+                title={net.online ? undefined : "Offline — a public IP lookup needs a connection"}
+                className="self-start rounded-lg bg-accent px-3 py-1.5 text-[12.5px] font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {ip.pubLoading ? "Looking up…" : "Look up public IP"}
               </button>
               <span className="inline-flex items-center gap-1 text-[10.5px] text-ink-soft">
                 <GlobeIcon size={12} />
-                {ip.pubError ? "Lookup failed — try again." : "Contacts api.ipify.org (external request)."}
+                {!net.online
+                  ? "Offline — every other reading on this page is local."
+                  : ip.pubError
+                    ? "Lookup failed — try again."
+                    : "Contacts api.ipify.org (external request)."}
               </span>
             </>
           )}

@@ -68,6 +68,22 @@
     0 24px 48px -16px rgba(16, 24, 32, 0.16);
   --hand: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Chalkboard SE", cursive;
 
+  /* ------------------------ hover interactions ------------------------ */
+  /* One shared transition for every hover utility below. They all declare
+     `transition: var(--fx)`, so two of them landing on the same element can
+     never clobber each other's animated properties (transition is a shorthand
+     — the last one in the cascade would otherwise win outright). */
+  --fx:
+    transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background-color 0.18s ease,
+    color 0.18s ease,
+    filter 0.22s ease,
+    opacity 0.2s ease;
+  /* Specular streak swept across a surface on hover. Dimmed for dark palettes. */
+  --fx-streak: rgba(255, 255, 255, 0.38);
+
   /* Modal / launcher backdrop scrim. */
   --scrim: rgba(15, 20, 26, 0.55);
 
@@ -83,6 +99,7 @@
   --app-news: #c2410c;
   --app-malayalam: #0891b2;
   --app-translate: #4f46e5;
+  --app-assistant: #b026c9;
 }
 
 /* Dark palettes: brighten the scrim + app hues so glyphs stay legible on
@@ -100,6 +117,8 @@
     rgba(255, 255, 255, 0.02) 32%,
     rgba(255, 255, 255, 0) 60%
   );
+  /* A full-strength white streak reads as a flashlight on dark glass. */
+  --fx-streak: rgba(255, 255, 255, 0.14);
   /* Bright accents on dark themes need a dark foreground to clear AA contrast
      (white on #1ba38e is only ~3.1:1; near-black is ~5.8:1). */
   --on-accent: #0d1319;
@@ -114,6 +133,7 @@
   --app-news: #fb7141;
   --app-malayalam: #22c3dd;
   --app-translate: #818cf8;
+  --app-assistant: #e07ff0;
 }
 
 [data-theme="dark"] {
@@ -287,7 +307,7 @@ svg {
   background-image: var(--glass-sheen);
   backdrop-filter: blur(var(--glass-blur)) saturate(180%);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  transition: var(--fx);
 }
 /* Give the glass bevel to panels that don't already use shadow-panel.
    shadow-panel carries the same --glass-edge as its first shadow layer, so
@@ -314,14 +334,148 @@ svg {
   }
 }
 
+/* ------------------------ hover interactions ------------------------ */
+/* A small shared vocabulary of hover effects, used across every app so the
+   whole workspace responds the same way. Rules:
+   - only transform / opacity / box-shadow / filter animate (compositor-friendly,
+     so none of this costs layout work — see rule #7 Performance);
+   - hover states sit behind `@media (hover: hover)` so a tap on a touch device
+     never leaves an element stuck in its hovered look;
+   - every utility animates with the same `--fx` list, so combining two of them
+     on one element is safe;
+   - the reduced-motion block at the bottom strips the movement while keeping
+     the colour/contrast change, so the affordance survives. */
+
 /* Reusable interactive tint that adapts to the theme. */
 @utility tint {
-  &:hover {
-    background: rgba(31, 42, 51, 0.06);
+  transition: var(--fx);
+  @media (hover: hover) {
+    &:hover {
+      background: rgba(31, 42, 51, 0.06);
+    }
   }
 }
-[data-dark] .tint:hover {
-  background: rgba(230, 236, 241, 0.08);
+@media (hover: hover) {
+  [data-dark] .tint:hover {
+    background: rgba(230, 236, 241, 0.08);
+  }
+}
+
+/* Card / row lift: rises toward the pointer and picks up the panel shadow,
+   then presses in on click. For surfaces (tiles, list rows, cards). */
+@utility hover-lift {
+  transition: var(--fx);
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+  }
+  &:active {
+    transform: translateY(0) scale(0.985);
+    transition-duration: 0.08s;
+  }
+}
+
+/* Control pop: a small scale-up on hover and a springy press. For icon
+   buttons, tool buttons and other compact targets. */
+@utility hover-pop {
+  transition: var(--fx);
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.08);
+    }
+  }
+  &:active {
+    transform: scale(0.94);
+    transition-duration: 0.08s;
+  }
+}
+
+/* Accent halo: brightens the fill and throws an accent-tinted glow. For
+   filled/primary actions, where a lift would feel heavy. */
+@utility hover-glow {
+  transition: var(--fx);
+  @media (hover: hover) {
+    &:hover {
+      filter: brightness(1.08);
+      /* Keep the glass rim so a filled button doesn't flatten on hover. */
+      box-shadow:
+        var(--glass-edge),
+        0 0 0 1px color-mix(in srgb, var(--accent) 42%, transparent),
+        0 8px 22px -8px color-mix(in srgb, var(--accent) 65%, transparent);
+    }
+  }
+  &:active {
+    transform: scale(0.97);
+    transition-duration: 0.08s;
+  }
+}
+
+/* Specular sweep: a light streak travels across the surface once per hover —
+   the reflection a real pane of glass catches as you pass it. Purely
+   decorative and pointer-transparent. */
+@utility hover-sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 38%,
+      var(--fx-streak) 50%,
+      transparent 62%
+    );
+    opacity: 0;
+    translate: -130% 0;
+    transition: translate 0.62s cubic-bezier(0.25, 0.6, 0.3, 1), opacity 0.18s ease;
+  }
+  @media (hover: hover) {
+    &:hover::after {
+      opacity: 1;
+      translate: 130% 0;
+    }
+  }
+}
+
+/* Pointer-tracked spotlight: a soft pool of light that follows the cursor
+   across the surface. `--mx` / `--my` are written by a pointermove handler and
+   default to the centre, so the effect still reads without JS (and on focus).
+   `--spot` picks the light's hue — defaults to the theme accent, but the app
+   launcher overrides it per tile with that app's brand hue. */
+@utility hover-spot {
+  position: relative;
+  isolation: isolate;
+  --spot: var(--accent);
+  --mx: 50%;
+  --my: 50%;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      13rem 13rem at var(--mx) var(--my),
+      color-mix(in srgb, var(--spot) 26%, transparent),
+      transparent 72%
+    );
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  @media (hover: hover) {
+    &:hover::before {
+      opacity: 1;
+    }
+  }
 }
 
 /* Slim, theme-aware scrollbar. Track stays invisible; the thumb picks up the
@@ -357,5 +511,18 @@ svg {
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+  }
+  /* Drop the movement from the hover vocabulary, but keep the colour, shadow
+     and spotlight changes — the element still announces that it's interactive. */
+  .hover-lift:hover,
+  .hover-lift:active,
+  .hover-pop:hover,
+  .hover-pop:active,
+  .hover-glow:active {
+    transform: none;
+  }
+  /* A streak that can't animate is just a stripe across the content. */
+  .hover-sheen::after {
+    display: none;
   }
 }

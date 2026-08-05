@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import type { NewsArticle } from "@/lib/News/types";
 import { sourceLogo, timeAgo } from "@/lib/News/format";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { trackSpot } from "@/lib/utils";
 import { ExternalLinkIcon } from "@/components/SketchNotes/atoms/icons";
 
 /**
@@ -9,16 +12,23 @@ import { ExternalLinkIcon } from "@/components/SketchNotes/atoms/icons";
  * in a new tab. A related image (the publisher's logo, derived from the feed's
  * source URL) sits alongside the headline; when the feed omits the source the
  * card falls back to the publisher initial so the layout never shifts.
+ *
+ * The logo is a remote request, so it is skipped entirely on a metered or
+ * 2g-class link, and a failed load (offline, blocked) falls back to the same
+ * initial rather than a broken image.
  */
 export function NewsCard({ article }: { article: NewsArticle }) {
+  const { slow } = useNetworkStatus();
+  const [logoBroken, setLogoBroken] = useState(false);
   const when = timeAgo(article.publishedAt);
-  const logo = sourceLogo(article.sourceUrl);
+  const logo = slow || logoBroken ? null : sourceLogo(article.sourceUrl);
   return (
     <a
       href={article.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex gap-3 rounded-2xl border border-border bg-panel p-4 transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-panel focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      className="hover-lift hover-spot group flex gap-3 rounded-2xl border border-border bg-panel p-4 hover:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      onPointerMove={trackSpot}
     >
       <span
         aria-hidden
@@ -34,6 +44,7 @@ export function NewsCard({ article }: { article: NewsArticle }) {
             loading="lazy"
             decoding="async"
             referrerPolicy="no-referrer"
+            onError={() => setLogoBroken(true)}
             className="size-6 object-contain"
           />
         ) : (

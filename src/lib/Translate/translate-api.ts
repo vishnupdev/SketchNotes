@@ -1,10 +1,19 @@
 import { AUTO } from "./languages";
+import { fetchJson } from "@/lib/net/fetch";
 import type { OnlineTranslateResponse } from "./types";
+
+/** A translation is short work — fail fast rather than hang on a dead link. */
+const TRANSLATE_TIMEOUT_MS = 10_000;
 
 /**
  * Online translation via our own `/api/translate` route (which proxies the
  * upstream provider server-side, avoiding browser CORS limits and keeping our
  * origin as the only host the client talks to).
+ *
+ * Requests are attempted even with no connection: a translation is
+ * deterministic, so the service worker can replay a phrase translated earlier
+ * from its cache. On a real miss this rejects with a {@link NetError} carrying a
+ * ready-to-show message.
  */
 export async function translateOnline(
   text: string,
@@ -17,16 +26,9 @@ export async function translateOnline(
     source: source || AUTO,
     target,
   });
-  const res = await fetch(`/api/translate?${params.toString()}`, { signal });
-  if (!res.ok) {
-    let message = `Translation request failed (${res.status})`;
-    try {
-      const body = (await res.json()) as { error?: string };
-      if (body?.error) message = body.error;
-    } catch {
-      /* non-JSON error body — keep the generic message */
-    }
-    throw new Error(message);
-  }
-  return (await res.json()) as OnlineTranslateResponse;
+  return fetchJson<OnlineTranslateResponse>(`/api/translate?${params.toString()}`, {
+    label: "Translation",
+    timeoutMs: TRANSLATE_TIMEOUT_MS,
+    signal,
+  });
 }

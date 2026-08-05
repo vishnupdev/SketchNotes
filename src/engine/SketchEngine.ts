@@ -24,7 +24,7 @@ import {
 } from "./constants";
 import { clamp, bboxOf, contentBBox, hitEl, offsetEl } from "./geometry";
 import { drawEl, drawGrid } from "./render";
-import { SHAPES, isShape, shapeAbs } from "./shapes";
+import { isShape, shapeAbs } from "./shapes";
 import { exportDrawing, type ExportResult } from "./export";
 
 /** Live text-editing overlay state emitted to the React layer. */

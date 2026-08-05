@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { recognizeHandwriting, type Stroke } from "@/lib/MalayalamWriter/handwriting-api";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { cx } from "@/lib/utils";
+import { OfflineNotice } from "@/components/Offline/OfflineNotice";
 import { TrashSmallIcon, UndoIcon } from "@/components/SketchNotes/atoms/icons";
 
 type Mode = "ink" | "recognize";
@@ -55,6 +57,11 @@ export function HandwritingPad({ onInsert, onPreview, onPreviewEnd }: Handwritin
   const [auto, setAuto] = useState(true);
   const [candidates, setCandidates] = useState<string[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  // Recognition is the one part of this app that needs a server; freehand ink
+  // never does. With no connection the live-guess timers stay parked rather
+  // than firing requests that can only fail.
+  const { online } = useNetworkStatus();
+  const autoLive = mode === "recognize" && auto && online;
 
   /** Repaint the whole canvas from the stored strokes (theme-aware colour). */
   const redraw = useCallback(() => {
@@ -108,7 +115,7 @@ export function HandwritingPad({ onInsert, onPreview, onPreviewEnd }: Handwritin
   // When auto-convert is switched off, the mode changes, or the pad unmounts,
   // stop the timers and freeze any word still being previewed.
   useEffect(() => {
-    if (!(mode === "recognize" && auto)) clearAutoTimers();
+    if (!autoLive) clearAutoTimers();
     return () => {
       clearAutoTimers();
       if (composingRef.current) {
@@ -116,7 +123,7 @@ export function HandwritingPad({ onInsert, onPreview, onPreviewEnd }: Handwritin
         composingRef.current = false;
       }
     };
-  }, [mode, auto, onPreviewEnd]);
+  }, [autoLive, onPreviewEnd]);
 
   /** Map a pointer event to canvas-local coords using the cached rect. */
   function pointFromEvent(e: { clientX: number; clientY: number; timeStamp: number }) {
@@ -170,7 +177,7 @@ export function HandwritingPad({ onInsert, onPreview, onPreviewEnd }: Handwritin
       strokesRef.current.push(stroke);
       setHasInk(true);
       // Refresh the live guess shortly after the pen rests.
-      if (mode === "recognize" && auto) schedulePreview();
+      if (autoLive) schedulePreview();
     }
     drawingRef.current = null;
   }
@@ -181,7 +188,7 @@ export function HandwritingPad({ onInsert, onPreview, onPreviewEnd }: Handwritin
     const remaining = strokesRef.current.length;
     setHasInk(remaining > 0);
     redraw();
-    if (mode === "recognize" && auto) {
+    if (autoLive) {
       // Re-recognise the reduced ink, or drop the guess if nothing's left.
       if (remaining > 0) schedulePreview();
       else if (composingRef.current) {
@@ -327,6 +334,17 @@ export function HandwritingPad({ onInsert, onPreview, onPreviewEnd }: Handwritin
             : "Write a word, then Recognize. Uses an online service — strokes are sent for recognition."}
       </p>
 
+      {/* Recognition needs the network; freehand ink and the keyboard don't. */}
+      {mode === "recognize" && !online && (
+        <OfflineNotice
+          title="Recognition needs a connection"
+          variant="inline"
+          action={{ label: "Freehand ink", onClick: () => setMode("ink") }}
+        >
+          keep writing as ink, or use the keyboard and Manglish tabs — both work offline
+        </OfflineNotice>
+      )}
+
       {mode === "recognize" && (
         <div className="flex items-center gap-2">
           <button
@@ -334,10 +352,12 @@ export function HandwritingPad({ onInsert, onPreview, onPreviewEnd }: Handwritin
             role="switch"
             aria-checked={auto}
             aria-label="Auto-convert handwriting to text"
+            disabled={!online}
             onClick={() => setAuto((v) => !v)}
             className={cx(
               "relative h-5 w-9 flex-none rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
               auto ? "bg-accent" : "bg-border",
+              !online && "opacity-40",
             )}
           >
             <span
@@ -371,7 +391,8 @@ export function HandwritingPad({ onInsert, onPreview, onPreviewEnd }: Handwritin
           <button
             type="button"
             onClick={recognize}
-            disabled={!hasInk || status === "loading"}
+            disabled={!hasInk || status === "loading" || !online}
+            title={online ? undefined : "Offline — recognition needs a connection"}
             className="rounded-full bg-accent px-5 py-2.5 text-[13px] font-semibold text-on-accent hover:brightness-110 disabled:opacity-40"
           >
             {status === "loading" ? "Recognizing…" : "Recognize"}

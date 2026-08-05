@@ -9,7 +9,7 @@ export const IconButton = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTM
         ref={ref}
         type={type ?? "button"}
         className={cx(
-          "tint grid size-[38px] flex-none place-items-center rounded-[10px] text-ink-soft",
+          "tint hover-pop grid size-[38px] flex-none place-items-center rounded-[10px] text-ink-soft",
           "hover:text-text disabled:pointer-events-none disabled:opacity-30",
           className,
         )}

@@ -25,6 +25,22 @@ export const esc = (s: string): string =>
 export const cx = (...parts: Array<string | false | null | undefined>): string =>
   parts.filter(Boolean).join(" ");
 
+/**
+ * Feed the pointer's position to the `hover-spot` utility (globals.css) so the
+ * element's spotlight follows the cursor: attach as `onPointerMove`.
+ *
+ * Mouse/pen only — during a touch drag this would light whichever element the
+ * finger is scrolling past, and `hover-spot`'s centred default is the right
+ * look on touch anyway.
+ */
+export function trackSpot(e: React.PointerEvent<HTMLElement>): void {
+  if (e.pointerType === "touch") return;
+  const el = e.currentTarget;
+  const r = el.getBoundingClientRect();
+  el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+  el.style.setProperty("--my", `${e.clientY - r.top}px`);
+}
+
 /** Generate a pleasant random hex colour via HSL. */
 export function randColor(): string {
   const h = Math.floor(Math.random() * 360);

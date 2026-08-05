@@ -1,8 +1,9 @@
 "use client";
 
 import { useNetworkSpeedStore } from "@/store/useNetworkSpeedStore";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { SpeedGauge } from "@/components/NetworkSpeed/atoms/SpeedGauge";
-import { ResultMetrics } from "@/components/NetworkSpeed/molecules/ResultMetrics";
+import { OfflineNotice } from "@/components/Offline/OfflineNotice";
 import {
   formatMs,
   formatSpeed,
@@ -66,6 +67,7 @@ export function SpeedTestPanel() {
   const error = useNetworkSpeedStore((s) => s.error);
   const start = useNetworkSpeedStore((s) => s.start);
   const cancel = useNetworkSpeedStore((s) => s.cancel);
+  const { online } = useNetworkStatus();
 
   const running = status === "running";
   const g = gaugeFor(status, phase, live);
@@ -121,6 +123,14 @@ export function SpeedTestPanel() {
         <span aria-live="polite">{statusLine}</span>
       </div>
 
+      {/* Measuring a connection you don't have isn't possible — say so before
+          the button is pressed, and keep it out of the error path. */}
+      {!online && !error && (
+        <OfflineNotice title="Offline" variant="inline" className="max-w-[420px]">
+          a speed test needs a live connection; your past results below are saved on this device
+        </OfflineNotice>
+      )}
+
       {error && (
         <p className="max-w-[420px] rounded-xl border border-border bg-panel px-4 py-2.5 text-center text-[12.5px] leading-snug text-prio-high">
           {error}
@@ -130,8 +140,9 @@ export function SpeedTestPanel() {
       <button
         type="button"
         onClick={running ? cancel : start}
+        disabled={!online && !running}
         className={cx(
-          "min-w-[168px] rounded-full px-7 py-3 text-[14px] font-bold tracking-[.2px] transition-all active:scale-[.98]",
+          "min-w-[168px] rounded-full px-7 py-3 text-[14px] font-bold tracking-[.2px] transition-all active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-40",
           running
             ? "border border-border bg-panel text-ink-soft hover:border-danger hover:text-danger"
             : "bg-accent text-white shadow-panel hover:brightness-110",

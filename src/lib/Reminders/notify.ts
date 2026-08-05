@@ -46,15 +46,23 @@ function swSupported(): boolean {
 
 /**
  * Register (or adopt) the notification service worker. Idempotent and safe to
- * call repeatedly; needed for notifications to show on mobile. The worker does
- * no request caching, so it can't affect any other app in the workspace.
+ * call repeatedly; needed for notifications to show on mobile.
+ *
+ * `/sw.js` is the workspace's offline worker, so it also caches route shells and
+ * `/_next/static`. In development it must never be *installed* from here: the
+ * dev server reuses unhashed chunk URLs, so the worker's cache-first rule would
+ * serve pre-edit code against freshly compiled HTML (a hydration mismatch). An
+ * already-registered worker is still adopted, and desktop dev keeps notifying
+ * through the `Notification` constructor below.
  */
 export async function registerNotifier(): Promise<void> {
   if (!swSupported() || swReg) return;
   try {
     swReg =
       (await navigator.serviceWorker.getRegistration()) ??
-      (await navigator.serviceWorker.register("/sw.js"));
+      (process.env.NODE_ENV === "production"
+        ? await navigator.serviceWorker.register("/sw.js")
+        : null);
   } catch {
     swReg = null;
   }

@@ -51,7 +51,9 @@ function getMeasureCtx(): CanvasRenderingContext2D | null {
 /** Axis-aligned world-space bounding box of a single element. */
 export function bboxOf(
   el: SketchElement,
-  shapeAbs: (el: Extract<SketchElement, { type: "shape" }>) => [number, number][],
+  // Kept so callers can pass the same helper they give hitEl/offsetEl; shape
+  // bounds come from norm() here, so this one doesn't need it.
+  _shapeAbs?: (el: Extract<SketchElement, { type: "shape" }>) => [number, number][],
 ): Bounds {
   if (el.type === "pen") {
     let x1 = 1e9;

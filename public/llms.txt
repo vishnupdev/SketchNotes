@@ -15,8 +15,26 @@
 - [News](/news): latest headlines by category
 - [Malayalam Writer](/malayalam): write Malayalam by transliteration (Manglish), an on-screen keyboard, or handwriting
 - [Translate](/translate): translate text between languages, online (auto-detects the source) or fully offline on-device via the browser's built-in AI — no text leaves the device
+- [Assistant](/assistant): a free in-app AI guide — ask what any app does or how to do a task, and it answers from a built-in knowledge base of the workspace and opens the right tool. It also acts on instructions typed in the chat ("open the timer", "go to PDF merge", "turn on dark mode", "open settings", "clear the chat"). No API key or account; it uses the browser's built-in on-device model when present, otherwise a bundled offline retrieval engine
+
+## Offline / low-bandwidth behaviour
+
+- Works 100% offline after the first visit. A service worker (/sw.js) precaches every
+  app route's HTML, and a background warm-up downloads all twelve apps' code, so any
+  deep link (e.g. /todos, /pdfeditor) cold-loads with no connection — not just the app
+  that was open when the network dropped.
+- Users can force or clear the download from Settings → Offline ("Save all apps for
+  offline"). Automatic warm-up is skipped on metered or 2g-class connections.
+- On a weak connection the app serves saved content rather than stalling: navigations
+  fall back to the cached shell after 3.5s, API responses after 6s.
+- Fully offline: Sketch Notes, PDF Editor, Image Studio, Todos, Reminders, Timer,
+  System Info, Malayalam transliteration + keyboard, on-device Translate, Assistant.
+- Needs a connection: News (previously loaded headlines still open from cache), online
+  translation (previously translated phrases still open), Malayalam handwriting
+  recognition, Speed Test, public-IP lookup. Each of these states this in the UI when
+  offline instead of failing silently.
+- Installable as a PWA (manifest at /manifest.webmanifest, with app shortcuts).
 
 ## Notes
 
-- Works 100% offline after the first visit (service worker at /sw.js).
 - No accounts, no server storage — data is kept in the browser's localStorage.

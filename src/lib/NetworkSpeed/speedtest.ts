@@ -11,6 +11,7 @@
  * drag the number down. Everything is cancellable through an AbortSignal.
  */
 
+import { readNetworkStatus } from "@/lib/net/status";
 import type { ConnectionInfo, SpeedResult, SpeedTestCallbacks } from "./types";
 
 const DOWN_URL = "https://speed.cloudflare.com/__down";
@@ -41,21 +42,14 @@ const jitterOf = (xs: number[]): number => {
   return sum / (xs.length - 1);
 };
 
-/** Read the browser's own connection hints, where exposed. */
+/**
+ * Read the browser's own connection hints, where exposed. Delegates to the
+ * shared network snapshot so the speed test, the offline banner and every
+ * feature that adapts to a weak link agree on what the connection looks like.
+ */
 export function readConnection(): ConnectionInfo {
-  const online = typeof navigator === "undefined" ? true : navigator.onLine;
-  // Network Information API is non-standard / partially supported.
-  const c =
-    typeof navigator !== "undefined"
-      ? ((navigator as unknown as { connection?: Record<string, unknown> }).connection ?? null)
-      : null;
-  return {
-    effectiveType: (c?.effectiveType as string) ?? null,
-    downlink: typeof c?.downlink === "number" ? (c.downlink as number) : null,
-    rtt: typeof c?.rtt === "number" ? (c.rtt as number) : null,
-    saveData: Boolean(c?.saveData),
-    online,
-  };
+  const { effectiveType, downlink, rtt, saveData, online } = readNetworkStatus();
+  return { effectiveType, downlink, rtt, saveData, online };
 }
 
 class AbortError extends Error {

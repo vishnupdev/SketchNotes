@@ -12,11 +12,14 @@ interface ControlButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: Size;
 }
 
+// Each variant carries exactly one hover utility (they own the press feedback,
+// so pairing two would leave their `:active` transforms fighting).
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-accent text-white hover:brightness-110 shadow-panel",
-  neutral: "border border-border bg-panel hover:border-accent hover:text-accent",
-  ghost: "text-ink-soft hover:bg-accent-soft hover:text-accent",
-  danger: "border border-border bg-panel text-ink-soft hover:border-danger hover:text-danger",
+  primary: "hover-glow bg-accent text-white shadow-panel",
+  neutral: "hover-pop border border-border bg-panel hover:border-accent hover:text-accent",
+  ghost: "hover-pop text-ink-soft hover:bg-accent-soft hover:text-accent",
+  danger:
+    "hover-pop border border-border bg-panel text-ink-soft hover:border-danger hover:text-danger",
 };
 
 const SIZES: Record<Size, string> = {
@@ -40,7 +43,7 @@ export function ControlButton({
       aria-label={label}
       title={label}
       className={cx(
-        "grid flex-none place-items-center rounded-full transition-all active:scale-95 disabled:pointer-events-none disabled:opacity-40",
+        "grid flex-none place-items-center rounded-full disabled:pointer-events-none disabled:opacity-40",
         SIZES[size],
         VARIANTS[variant],
         className,

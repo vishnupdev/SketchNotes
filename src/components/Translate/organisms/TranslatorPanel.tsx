@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslateStore } from "@/store/useTranslateStore";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { AUTO, languageLabel } from "@/lib/Translate/languages";
 import { isOfflineTranslateSupported } from "@/lib/Translate/offline";
+import { OfflineNotice } from "@/components/Offline/OfflineNotice";
 import { LanguageBar } from "@/components/Translate/molecules/LanguageBar";
 import { SourceField } from "@/components/Translate/molecules/SourceField";
 import { OutputField } from "@/components/Translate/molecules/OutputField";
@@ -36,6 +38,8 @@ export function TranslatorPanel() {
   useEffect(() => {
     hydratePrefs();
   }, [hydratePrefs]);
+
+  const { online } = useNetworkStatus();
 
   // Whether this browser has the on-device translator (client-only check).
   const [offlineSupported, setOfflineSupported] = useState(true);
@@ -139,6 +143,25 @@ export function TranslatorPanel() {
           Chrome / Edge.
         </p>
       )}
+
+      {/* No connection: say which engine can still answer. */}
+      {!online &&
+        (offlineSupported ? (
+          mode !== "offline" && (
+            <OfflineNotice
+              title="You're offline"
+              variant="inline"
+              action={{ label: "Use on-device", onClick: () => setMode("offline") }}
+            >
+              phrases you translated before still open; new ones need the on-device engine
+            </OfflineNotice>
+          )
+        ) : (
+          <OfflineNotice title="You're offline" variant="inline">
+            this browser has no on-device translator, so only phrases you translated before will
+            open
+          </OfflineNotice>
+        ))}
 
       <div className="grid gap-3 md:grid-cols-2">
         <SourceField

@@ -8,7 +8,9 @@ import { AppLauncher } from "@/components/AppLauncher";
 import { SettingsPanel } from "@/components/Settings/SettingsPanel";
 import { ReminderScheduler } from "@/components/Reminders/organisms/ReminderScheduler";
 import { ReminderAlert } from "@/components/Reminders/organisms/ReminderAlert";
+import { OfflineBanner } from "@/components/Offline/OfflineBanner";
 import { TOOL_IDS } from "@/components/PdfEditor/catalog";
+import { APP_LOADERS } from "@/lib/offline/app-modules";
 import type { AppId } from "@/store/useWorkspaceStore";
 
 // Sketchnotes (EditorShell) is the default `/` route and stays statically
@@ -17,16 +19,20 @@ import type { AppId } from "@/store/useWorkspaceStore";
 // and fetched only when that app is first opened. They're client-only, so SSR
 // is skipped; each renders inside a `hidden` div, so lazy mounting causes no
 // layout shift on first paint.
-const PdfApp = dynamic(() => import("@/components/PdfEditor/PdfApp").then((m) => m.PdfApp), { ssr: false });
-const ImageStudio = dynamic(() => import("@/components/ImageStudio/ImageStudio").then((m) => m.ImageStudio), { ssr: false });
-const TodoApp = dynamic(() => import("@/components/Todos/TodoApp").then((m) => m.TodoApp), { ssr: false });
-const ReminderApp = dynamic(() => import("@/components/Reminders/ReminderApp").then((m) => m.ReminderApp), { ssr: false });
-const TimerApp = dynamic(() => import("@/components/Timer/TimerApp").then((m) => m.TimerApp), { ssr: false });
-const SystemInfoApp = dynamic(() => import("@/components/SystemInfo/SystemInfoApp").then((m) => m.SystemInfoApp), { ssr: false });
-const NetworkSpeedApp = dynamic(() => import("@/components/NetworkSpeed/NetworkSpeedApp").then((m) => m.NetworkSpeedApp), { ssr: false });
-const NewsApp = dynamic(() => import("@/components/News/NewsApp").then((m) => m.NewsApp), { ssr: false });
-const MalayalamWriterApp = dynamic(() => import("@/components/MalayalamWriter/MalayalamWriterApp").then((m) => m.MalayalamWriterApp), { ssr: false });
-const TranslateApp = dynamic(() => import("@/components/Translate/TranslateApp").then((m) => m.TranslateApp), { ssr: false });
+//
+// The loaders come from APP_LOADERS rather than being written inline, so the
+// offline warm-up caches the exact same chunks these components request.
+const PdfApp = dynamic(APP_LOADERS.pdf, { ssr: false });
+const ImageStudio = dynamic(APP_LOADERS.image, { ssr: false });
+const TodoApp = dynamic(APP_LOADERS.todos, { ssr: false });
+const ReminderApp = dynamic(APP_LOADERS.reminders, { ssr: false });
+const TimerApp = dynamic(APP_LOADERS.timer, { ssr: false });
+const SystemInfoApp = dynamic(APP_LOADERS.system, { ssr: false });
+const NetworkSpeedApp = dynamic(APP_LOADERS.speed, { ssr: false });
+const NewsApp = dynamic(APP_LOADERS.news, { ssr: false });
+const MalayalamWriterApp = dynamic(APP_LOADERS.malayalam, { ssr: false });
+const TranslateApp = dynamic(APP_LOADERS.translate, { ssr: false });
+const AssistantApp = dynamic(APP_LOADERS.assistant, { ssr: false });
 
 const PDF_BASE = "/pdfeditor";
 const IMAGE_BASE = "/image";
@@ -38,6 +44,7 @@ const SPEED_BASE = "/speedtest";
 const NEWS_BASE = "/news";
 const MALAYALAM_BASE = "/malayalam";
 const TRANSLATE_BASE = "/translate";
+const ASSISTANT_BASE = "/assistant";
 
 /** Derive the app + PDF section from a path. */
 function parsePath(pathname: string): { app: AppId; tool: string | null } {
@@ -55,6 +62,7 @@ function parsePath(pathname: string): { app: AppId; tool: string | null } {
   if (pathname === NEWS_BASE || pathname === NEWS_BASE + "/") return { app: "news", tool: null };
   if (pathname === MALAYALAM_BASE || pathname === MALAYALAM_BASE + "/") return { app: "malayalam", tool: null };
   if (pathname === TRANSLATE_BASE || pathname === TRANSLATE_BASE + "/") return { app: "translate", tool: null };
+  if (pathname === ASSISTANT_BASE || pathname === ASSISTANT_BASE + "/") return { app: "assistant", tool: null };
   return { app: "sketchnotes", tool: null };
 }
 const pdfPath = (tool: string | null) => (tool ? `${PDF_BASE}/${tool}` : PDF_BASE);
@@ -79,7 +87,9 @@ const pathForApp = (app: AppId, tool: string | null) =>
                     ? MALAYALAM_BASE
                     : app === "translate"
                       ? TRANSLATE_BASE
-                      : "/";
+                      : app === "assistant"
+                        ? ASSISTANT_BASE
+                        : "/";
 
 /**
  * Top-level workspace hosting both apps natively (no iframe) and keeping the
@@ -143,11 +153,12 @@ export function Workspace() {
   const newsActive = activeApp === "news";
   const malayalamActive = activeApp === "malayalam";
   const translateActive = activeApp === "translate";
+  const assistantActive = activeApp === "assistant";
 
   return (
     <>
       {/* Sketchnotes — always mounted, hidden while another app is active. */}
-      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive || systemActive || speedActive || newsActive || malayalamActive || translateActive}>
+      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive || systemActive || speedActive || newsActive || malayalamActive || translateActive || assistantActive}>
         <EditorShell />
       </div>
 
@@ -201,8 +212,17 @@ export function Workspace() {
         {translateActive && <TranslateApp />}
       </div>
 
+      {/* Assistant — the in-app AI guide. */}
+      <div hidden={!assistantActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {assistantActive && <AssistantApp />}
+      </div>
+
       <AppLauncher />
       <SettingsPanel />
+
+      {/* Connection status — app-wide, since losing the network changes what a
+          few features can do (and nothing else). */}
+      <OfflineBanner />
 
       {/* Reminders fire app-wide, regardless of which app is on screen. */}
       <ReminderScheduler />

@@ -347,6 +347,23 @@ export const WifiIcon = (p: IconProps) => (
   </Svg>
 );
 
+/** Wifi arcs struck through — "no connection". */
+export const WifiOffIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 9a13 13 0 0 1 16 0M6.5 12.2a9 9 0 0 1 11 0M9 15.4a5 5 0 0 1 6 0" />
+    <circle cx="12" cy="18.5" r="0.6" fill="currentColor" stroke="none" />
+    <path d="M3.5 20.5 20.5 3.5" />
+  </Svg>
+);
+
+/** Cloud with a tick — "saved on this device for offline use". */
+export const CloudCheckIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M7 18.5a4 4 0 0 1-.3-8A5.5 5.5 0 0 1 17.4 10a3.8 3.8 0 0 1 1.5 7.3" />
+    <path d="M9 15.2 11.2 17.5 15.5 12.8" />
+  </Svg>
+);
+
 export const DriveIcon = (p: IconProps) => (
   <Svg {...p}>
     <rect x="3" y="5" width="18" height="14" rx="2" />
@@ -410,6 +427,22 @@ export const ExternalLinkIcon = (p: IconProps) => (
     <path d="M14 5h5v5" />
     <path d="M19 5l-8 8" />
     <path d="M18 13.5V18a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h4.5" />
+  </Svg>
+);
+
+/** Assistant glyph — a chat bubble with a spark, for the in-app AI guide. */
+export const AssistantIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M20 12.5a7 7 0 0 1-7 7H8.8L5 21.5v-4.2A7 7 0 0 1 9.5 5.6" />
+    <path d="M16.5 2.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" />
+    <path d="M9.5 13h6" />
+  </Svg>
+);
+
+export const SendIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4.5 12h6" />
+    <path d="M5.2 5.4 20 12 5.2 18.6l1.7-6.6z" />
   </Svg>
 );
 

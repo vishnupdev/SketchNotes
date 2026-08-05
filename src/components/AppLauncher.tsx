@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useWorkspaceStore, type AppId } from "@/store/useWorkspaceStore";
-import { cx } from "@/lib/utils";
+import { cx, trackSpot } from "@/lib/utils";
 import { CloseIcon, SettingsIcon } from "@/components/SketchNotes/atoms/icons";
 
 interface AppEntry {
@@ -204,6 +204,22 @@ const TranslateGlyph = (
   </svg>
 );
 
+const AssistantGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <path d="M20 12.5a7 7 0 0 1-7 7H8.8L5 21.5v-4.2A7 7 0 0 1 9.5 5.6" />
+    <path d="M16.5 2.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" />
+    <path d="M9.5 13h6" />
+  </svg>
+);
+
 const GripGlyph = (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className="size-4.5">
     <circle cx="9" cy="6" r="1.5" />
@@ -222,6 +238,13 @@ const APPS: AppEntry[] = [
     tagline: "Sketch ideas and jot notes on an infinite canvas.",
     icon: SketchGlyph,
     hue: "--app-sketchnotes",
+  },
+  {
+    id: "assistant",
+    name: "Assistant",
+    tagline: "Ask what this workspace can do — a free, private guide to every app.",
+    icon: AssistantGlyph,
+    hue: "--app-assistant",
   },
   {
     id: "pdf",
@@ -462,7 +485,7 @@ export function AppLauncher() {
           <button
             aria-label="Close"
             onClick={closeLauncher}
-            className="tint -mr-1 -mt-1 grid size-9 place-items-center rounded-[10px] text-ink-soft hover:text-text"
+            className="tint hover-pop -mr-1 -mt-1 grid size-9 place-items-center rounded-[10px] text-ink-soft hover:text-text"
           >
             <CloseIcon size={18} />
           </button>
@@ -486,17 +509,19 @@ export function AppLauncher() {
               >
                 <button
                   onClick={() => setActiveApp(app.id)}
+                  onPointerMove={dragId ? undefined : trackSpot}
                   aria-current={active}
+                  style={{ "--spot": hue } as React.CSSProperties}
                   className={cx(
-                    "flex w-full flex-col items-start gap-3 overflow-hidden rounded-2xl border p-4 pr-11 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                    "hover-spot hover-sheen flex w-full flex-col items-start gap-3 rounded-2xl border p-4 pr-11 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                     active
                       ? "border-accent bg-accent-soft ring-1 ring-accent"
-                      : "border-border bg-paper hover:-translate-y-0.5 hover:border-accent hover:shadow-panel",
+                      : "hover-lift border-border bg-paper hover:border-accent",
                     dropTarget && "border-accent ring-2 ring-accent",
                   )}
                 >
                   <span
-                    className="grid size-12 place-items-center rounded-[14px] text-white transition-transform duration-200 group-hover:scale-105"
+                    className="grid size-12 place-items-center rounded-[14px] text-white transition-transform duration-300 ease-[cubic-bezier(.2,.7,.3,1)] group-hover:-rotate-6 group-hover:scale-110"
                     style={{
                       background: `linear-gradient(140deg, ${hue}, color-mix(in srgb, ${hue} 78%, black))`,
                       boxShadow: `0 8px 18px -6px color-mix(in srgb, ${hue} 60%, transparent)`,
@@ -538,7 +563,7 @@ export function AppLauncher() {
                   onPointerCancel={endDrag}
                   onKeyDown={(e) => reorderByKey(e, app.id)}
                   className={cx(
-                    "absolute right-2 top-2 z-10 grid size-8 touch-none place-items-center rounded-lg text-ink-soft transition-colors hover:bg-panel hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                    "hover-pop absolute right-2 top-2 z-10 grid size-8 touch-none place-items-center rounded-lg text-ink-soft hover:bg-panel hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                     dragging ? "cursor-grabbing" : "cursor-grab",
                   )}
                 >
@@ -552,9 +577,9 @@ export function AppLauncher() {
         <div className="mt-5 border-t border-border pt-4">
           <button
             onClick={openSettings}
-            className="tint flex w-full items-center gap-3 rounded-xl border border-border bg-paper px-4 py-3 text-left transition-colors hover:border-accent"
+            className="tint hover-lift group flex w-full items-center gap-3 rounded-xl border border-border bg-paper px-4 py-3 text-left hover:border-accent"
           >
-            <span className="grid size-9 place-items-center rounded-[11px] bg-accent-soft text-accent">
+            <span className="grid size-9 place-items-center rounded-[11px] bg-accent-soft text-accent transition-transform duration-300 ease-[cubic-bezier(.2,.7,.3,1)] group-hover:rotate-45">
               <SettingsIcon size={18} />
             </span>
             <span className="flex flex-col">
