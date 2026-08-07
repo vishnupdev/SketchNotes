@@ -13,6 +13,7 @@ import { WatermarkTool } from "@/components/PdfEditor/tools/WatermarkTool";
 import { PageNumbersTool } from "@/components/PdfEditor/tools/PageNumbersTool";
 import { MetadataTool } from "@/components/PdfEditor/tools/MetadataTool";
 import { EditTool } from "@/components/PdfEditor/tools/EditTool";
+import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
 
 const TOOL_COMPONENTS: Record<string, ComponentType> = {
@@ -34,7 +35,6 @@ const TOOL_COMPONENTS: Record<string, ComponentType> = {
  */
 export function PdfApp() {
   const pdfTool = useWorkspaceStore((s) => s.pdfTool);
-  const setPdfTool = useWorkspaceStore((s) => s.setPdfTool);
   const openLauncher = useWorkspaceStore((s) => s.openLauncher);
 
   const Active = pdfTool ? TOOL_COMPONENTS[pdfTool] : null;
@@ -43,13 +43,11 @@ export function PdfApp() {
     <div className="flex min-h-full flex-col">
       <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-[18px] pt-[22px]">
         <div className="mx-auto flex max-w-[1080px] flex-wrap items-end justify-between gap-4">
-          <button
-            type="button"
-            onClick={() => setPdfTool(null)}
-            title="Back to all tools"
-            className="-m-1.5 flex items-center gap-3.5 rounded-2xl p-1.5 text-left transition-colors hover:bg-accent-soft"
-          >
-            <span className="grid size-[46px] flex-none place-items-center rounded-[13px] bg-accent text-white shadow-[0_0_0_4px_var(--accent-soft)]">
+          {/* Goes to the workspace home, like every other app's masthead. The
+              tool grid stays one click away from inside a tool via ToolFrame's
+              "← All tools". */}
+          <AppBrand
+            icon={
               <svg
                 viewBox="0 0 24 24"
                 width="26"
@@ -64,17 +62,10 @@ export function PdfApp() {
                 <path d="M13 3.6V8.5H17.9" />
                 <path d="M8.6 12.5h6.8M8.6 15.4h6.8M8.6 18.2h4.2" />
               </svg>
-            </span>
-            <span>
-              <span className="block text-[27px] font-extrabold leading-none tracking-tight">PDF Editor</span>
-              <span className="mt-1 block font-serif text-[15px] italic text-ink-soft">
-                every PDF tool, on one sheet
-              </span>
-              <span className="mt-1.5 block font-mono text-[9.5px] uppercase tracking-[.18em] text-accent">
-                by Vishnu P
-              </span>
-            </span>
-          </button>
+            }
+            name="PDF Editor"
+            tagline="every PDF tool, on one sheet"
+          />
 
           <div className="flex flex-wrap items-center gap-2.5">
             <button

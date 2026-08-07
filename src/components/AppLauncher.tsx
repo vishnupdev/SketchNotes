@@ -220,6 +220,53 @@ const AssistantGlyph = (
   </svg>
 );
 
+const MorseGlyph = (
+  // Filled marks rather than strokes, so the 1:3 dit-to-dah ratio that defines
+  // the code stays readable at tile size.
+  <svg viewBox="0 0 24 24" fill="currentColor" className="size-6" aria-hidden>
+    <circle cx="4.5" cy="6.5" r="1.9" />
+    <rect x="9" y="4.6" width="10.5" height="3.8" rx="1.9" />
+    <rect x="2.6" y="10.1" width="10.5" height="3.8" rx="1.9" />
+    <circle cx="17.5" cy="12" r="1.9" />
+    <circle cx="4.5" cy="17.5" r="1.9" />
+    <circle cx="10" cy="17.5" r="1.9" />
+    <rect x="14" y="15.6" width="7.4" height="3.8" rx="1.9" />
+  </svg>
+);
+
+const SoundGlyph = (
+  // A tuning fork over a level trace: the two things the app measures, pitch
+  // and loudness, in one mark.
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <path d="M3 12v3M6.5 9.5v8M10 6v12M13.5 9v6M17 4.5v15M20.5 10.5v4" />
+  </svg>
+);
+
+const ColorGlyph = (
+  // An eyedropper over a colour drop: the action (sample) and the result
+  // (a colour) in one mark.
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <path d="M16 3.6a2.2 2.2 0 0 1 3.1 0l1.3 1.3a2.2 2.2 0 0 1 0 3.1L18.6 9.8 14.2 5.4z" />
+    <path d="M13.2 6.4 4.6 15a2 2 0 0 0-.55 1.05L3.5 19.2a1 1 0 0 0 1.15 1.15l3.15-.55A2 2 0 0 0 8.85 19.25L17.6 10.8z" />
+  </svg>
+);
+
 const GripGlyph = (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className="size-4.5">
     <circle cx="9" cy="6" r="1.5" />
@@ -284,7 +331,7 @@ const APPS: AppEntry[] = [
   {
     id: "system",
     name: "System Info",
-    tagline: "Analyze this device & browser — full hardware & capability report.",
+    tagline: "Analyze this device & browser, and scan for nearby devices.",
     icon: SystemGlyph,
     hue: "--app-system",
   },
@@ -315,6 +362,27 @@ const APPS: AppEntry[] = [
     tagline: "Convert text between languages — online, or fully offline on-device.",
     icon: TranslateGlyph,
     hue: "--app-translate",
+  },
+  {
+    id: "morse",
+    name: "Morse Code",
+    tagline: "Learn, practise & send Morse — chart, drills and a real key.",
+    icon: MorseGlyph,
+    hue: "--app-morse",
+  },
+  {
+    id: "sound",
+    name: "Sound Meter",
+    tagline: "Measure sound frequency, pitch, note & loudness from your mic.",
+    icon: SoundGlyph,
+    hue: "--app-sound",
+  },
+  {
+    id: "color",
+    name: "Color Lens",
+    tagline: "Read any colour from a photo — hex, RGB, HSL, palette & contrast.",
+    icon: ColorGlyph,
+    hue: "--app-color",
   },
 ];
 

@@ -15,6 +15,7 @@ import { MonthView } from "@/components/Todos/organisms/MonthView";
 import { YearView } from "@/components/Todos/organisms/YearView";
 import { TaskEditor } from "@/components/Todos/organisms/TaskEditor";
 import { AppsIcon, PlusIcon } from "@/components/SketchNotes/atoms/icons";
+import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
 
 /**
@@ -61,23 +62,18 @@ export function TodoApp() {
     <div className="flex min-h-full flex-col">
       <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-[18px] pt-[22px]">
         <div className="mx-auto flex max-w-[860px] flex-wrap items-end justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <span className="grid size-[46px] flex-none place-items-center rounded-[13px] bg-accent text-white shadow-[0_0_0_4px_var(--accent-soft)]">
+          <AppBrand
+            icon={
               <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
                 <rect x="4" y="4.5" width="16" height="15.5" rx="2.4" />
                 <path d="M8 3v3M16 3v3" />
                 <path d="M7.5 12l1.8 1.8 3.2-3.6" />
                 <path d="M14.5 12.5h3M14.5 16h3M7.5 16.4l1.8 1.8 3.2-3.6" />
               </svg>
-            </span>
-            <div>
-              <div className="text-[27px] font-extrabold leading-none tracking-tight">Todos</div>
-              <div className="mt-1 font-serif text-[15px] italic text-ink-soft">
-                plan by day, week, month &amp; year
-              </div>
-              <div className="mt-1.5 font-mono text-[9.5px] uppercase tracking-[.18em] text-accent">by Vishnu P</div>
-            </div>
-          </div>
+            }
+            name="Todos"
+            tagline="plan by day, week, month & year"
+          />
 
           <div className="flex flex-wrap items-center gap-2.5">
             <button

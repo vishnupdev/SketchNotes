@@ -2,6 +2,11 @@
 
 import { create } from "zustand";
 import { sGet, sSet } from "@/lib/storage";
+import {
+  DEFAULT_CURSOR_SETTINGS,
+  normalizeCursorSettings,
+  type CursorSettings,
+} from "@/lib/cursors";
 
 /** Apps available in the workspace launcher. Sketchnotes is the default. */
 export type AppId =
@@ -16,6 +21,9 @@ export type AppId =
   | "news"
   | "malayalam"
   | "translate"
+  | "morse"
+  | "sound"
+  | "color"
   | "assistant";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
@@ -33,9 +41,13 @@ const ALL_APPS: AppId[] = [
   "news",
   "malayalam",
   "translate",
+  "morse",
+  "sound",
+  "color",
 ];
 
 const ORDER_KEY = "sknotes:app-order";
+const CURSOR_KEY = "sknotes:cursor";
 
 /**
  * Coerce an untrusted stored value into a valid, complete ordering: keep only
@@ -69,6 +81,8 @@ interface WorkspaceState {
   settingsOpen: boolean;
   /** User-defined order of launcher tiles; persisted to localStorage. */
   appOrder: AppId[];
+  /** Chosen mouse pointer for the whole workspace. See `@/lib/cursors`. */
+  cursor: CursorSettings;
 
   setActiveApp: (app: AppId) => void;
   setPdfTool: (tool: string | null) => void;
@@ -79,14 +93,19 @@ interface WorkspaceState {
   /** Merge the persisted launcher order in after mount (avoids SSR mismatch). */
   hydrateAppOrder: () => void;
   setAppOrder: (order: AppId[]) => void;
+  /** Merge the persisted pointer choice in after mount (avoids SSR mismatch). */
+  hydrateCursor: () => void;
+  /** Change part of the pointer setup (preset, size, colour or custom image). */
+  updateCursor: (patch: Partial<CursorSettings>) => void;
 }
 
-export const useWorkspaceStore = create<WorkspaceState>((set) => ({
+export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   activeApp: "sketchnotes",
   pdfTool: null,
   launcherOpen: false,
   settingsOpen: false,
   appOrder: ALL_APPS,
+  cursor: DEFAULT_CURSOR_SETTINGS,
 
   setActiveApp: (app) => set({ activeApp: app, launcherOpen: false }),
   setPdfTool: (pdfTool) => set({ pdfTool }),
@@ -109,5 +128,24 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
     const next = normalizeOrder(order);
     set({ appOrder: next });
     void sSet(ORDER_KEY, JSON.stringify(next));
+  },
+
+  hydrateCursor: async () => {
+    const raw = await sGet(CURSOR_KEY);
+    if (!raw) return;
+    // Anything unrecognised — a retired preset, an older format, a hand-edited
+    // value — is coerced back to something usable rather than left to break the
+    // pointer. The first version of this feature stored a bare id string, which
+    // isn't JSON, so a parse failure is a legitimate value and not an error.
+    try {
+      set({ cursor: normalizeCursorSettings(JSON.parse(raw)) });
+    } catch {
+      set({ cursor: normalizeCursorSettings(raw) });
+    }
+  },
+  updateCursor: (patch) => {
+    const next = normalizeCursorSettings({ ...get().cursor, ...patch });
+    set({ cursor: next });
+    void sSet(CURSOR_KEY, JSON.stringify(next));
   },
 }));

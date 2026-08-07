@@ -100,6 +100,9 @@
   --app-malayalam: #0891b2;
   --app-translate: #4f46e5;
   --app-assistant: #b026c9;
+  --app-morse: #4d7c0f;
+  --app-sound: #be123c;
+  --app-color: #0d9488;
 }
 
 /* Dark palettes: brighten the scrim + app hues so glyphs stay legible on
@@ -134,6 +137,9 @@
   --app-malayalam: #22c3dd;
   --app-translate: #818cf8;
   --app-assistant: #e07ff0;
+  --app-morse: #a3e635;
+  --app-sound: #fb7185;
+  --app-color: #2dd4bf;
 }
 
 [data-theme="dark"] {
@@ -288,6 +294,64 @@ body {
 }
 svg {
   display: block;
+}
+
+/* --------------------------- custom pointer --------------------------- */
+/* `data-cursor` and the two image variables are written onto <body> by
+   <CursorEffect /> from the picker in Settings → Pointer. Nothing here applies
+   until a pointer is chosen, so the default "System" preset costs nothing.
+   Gated on a fine pointer existing — there's no cursor to replace on touch. */
+@media (any-pointer: fine) {
+  body[data-cursor] {
+    cursor: var(--cursor-arrow);
+  }
+  /* Clickable things take the accent-inked variant. Anything that uses its
+     cursor to say something else — drag handles, the drawing canvas, text
+     fields, disabled controls — keeps it, because there the shape is the
+     affordance. Tailwind's preflight pins buttons to `default`, so they're
+     listed explicitly rather than left to inherit. */
+  body[data-cursor]
+    :where(
+      a[href],
+      button,
+      [role="button"],
+      label,
+      summary,
+      select,
+      input[type="checkbox"],
+      input[type="radio"],
+      .cursor-pointer
+    ):not(
+      :disabled,
+      [aria-disabled="true"],
+      .cursor-grab,
+      .cursor-grabbing,
+      .cursor-move,
+      .cursor-crosshair,
+      .cursor-text,
+      .cursor-not-allowed
+    ) {
+    cursor: var(--cursor-hand);
+  }
+  /* Typing surfaces always keep the caret — no decorative pointer is worth
+     losing the "you can type here" signal. */
+  body[data-cursor]
+    :where(
+      input:not(
+        [type="checkbox"],
+        [type="radio"],
+        [type="button"],
+        [type="submit"],
+        [type="reset"],
+        [type="range"],
+        [type="color"],
+        [type="file"]
+      ),
+      textarea,
+      [contenteditable="true"]
+    ) {
+    cursor: text;
+  }
 }
 
 /* --------------------------- glassmorphism --------------------------- */

@@ -3,6 +3,7 @@
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { TranslatorPanel } from "@/components/Translate/organisms/TranslatorPanel";
 import { AppsIcon, TranslateIcon } from "@/components/SketchNotes/atoms/icons";
+import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
 
 /**
@@ -22,20 +23,12 @@ export function TranslateApp() {
     <div className="flex min-h-full flex-col">
       <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-3.5 pt-[22px]">
         <div className="mx-auto flex max-w-[900px] items-end justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <span className="grid size-[46px] flex-none place-items-center rounded-[13px] bg-accent text-on-accent shadow-[0_0_0_4px_var(--accent-soft)]">
-              <TranslateIcon size={26} />
-            </span>
-            <div>
-              <h1 className="text-[27px] font-extrabold leading-none tracking-tight">Translate</h1>
-              <p className="mt-1 font-serif text-[15px] italic text-ink-soft">
-                any language, online or offline
-              </p>
-              <div className="mt-1.5 font-mono text-[9.5px] uppercase tracking-[.18em] text-accent">
-                by Vishnu P
-              </div>
-            </div>
-          </div>
+          <AppBrand
+            icon={<TranslateIcon size={26} />}
+            name="Translate"
+            tagline="any language, online or offline"
+            heading
+          />
 
           <button
             type="button"

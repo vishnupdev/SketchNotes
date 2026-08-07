@@ -25,6 +25,9 @@ export const APP_LABELS: Record<AppId, string> = {
   news: "News",
   malayalam: "Malayalam Writer",
   translate: "Translate",
+  morse: "Morse Code",
+  sound: "Sound Meter",
+  color: "Color Lens",
   assistant: "Assistant",
 };
 
@@ -39,11 +42,51 @@ export const APP_ALIASES: Record<AppId, string[]> = {
   todos: ["todos", "todo", "to-do", "tasks", "task list", "planner"],
   reminders: ["reminders", "reminder", "alerts", "alarm", "alarms"],
   timer: ["timer", "timers", "stopwatch", "pomodoro", "countdown"],
-  system: ["system info", "system", "device info", "hardware", "specs"],
+  system: ["system info", "system", "device info", "hardware", "specs", "nearby devices"],
   speed: ["network speed", "speed test", "speedtest", "internet speed", "bandwidth"],
   news: ["news", "headlines", "newspaper"],
   malayalam: ["malayalam writer", "malayalam", "manglish", "മലയാളം"],
   translate: ["translate", "translator", "translation"],
+  morse: ["morse code", "morse", "sos", "dots and dashes", "telegraph", "cw"],
+  sound: [
+    "sound meter",
+    "sound frequency",
+    "frequency meter",
+    "frequency",
+    "hz",
+    "hertz",
+    "pitch",
+    "tuner",
+    "decibel",
+    "decibels",
+    "db meter",
+    "spectrum analyzer",
+    "spectrum analyser",
+    "microphone",
+    "mic",
+    "noise level",
+  ],
+  color: [
+    "color lens",
+    "colour lens",
+    "color picker",
+    "colour picker",
+    "eyedropper",
+    "eye dropper",
+    "color code",
+    "colour code",
+    "hex code",
+    "hex colour",
+    "hex color",
+    "rgb",
+    "hsl",
+    "cmyk",
+    "color palette",
+    "colour palette",
+    "color from image",
+    "colour from image",
+    "contrast checker",
+  ],
   assistant: ["assistant", "guide", "ai agent", "helper", "chatbot"],
 };
 
@@ -78,6 +121,9 @@ export const APP_PATHS: Record<AppId, string> = {
   news: "/news",
   malayalam: "/malayalam",
   translate: "/translate",
+  morse: "/morse",
+  sound: "/soundmeter",
+  color: "/color",
   assistant: "/assistant",
 };
 
@@ -89,11 +135,14 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   todos: "tasks framed by day, week, month and year",
   reminders: "timed alerts that ring with a sound you pick",
   timer: "countdown timers, a lap stopwatch and pomodoro cycles",
-  system: "a live report on this device, browser and hardware",
+  system: "a live report on this device, browser and hardware, plus a nearby-device scan",
   speed: "download, upload, ping and jitter measurement",
-  news: "headlines by category — tech, sports, national, state, local, world",
+  news: "headlines by category — tech, software engineering, sports, national, state, local, world",
   malayalam: "type Malayalam by Manglish, on-screen keyboard or handwriting",
   translate: "translate text online, or fully offline on-device",
+  morse: "learn, practise and send Morse code — chart, drills, translator and a key",
+  sound: "measure sound frequency, musical pitch and loudness from the microphone",
+  color: "read any colour out of a photo — every code, its name, contrast and palette",
   assistant: "this guide — ask what the workspace can do",
 };
 
@@ -104,11 +153,11 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "What OneApp is",
     keywords: ["oneapp", "one app", "overview", "about", "what is this", "workspace", "summary", "purpose", "intro"],
     answer:
-      "OneApp is a single web workspace holding twelve tools, so you never install twelve apps.\n" +
+      "OneApp is a single web workspace holding fifteen tools, so you never install fifteen apps.\n" +
       "• Creative: Sketchnotes canvas, Image Studio, PDF Editor\n" +
       "• Planning: Todos, Reminders, Timer\n" +
-      "• Info: News, System Info, Network Speed\n" +
-      "• Language: Translate, Malayalam Writer, and me — the Assistant\n" +
+      "• Info: News, System Info, Network Speed, Sound Meter, Color Lens\n" +
+      "• Language: Translate, Malayalam Writer, Morse Code, and me — the Assistant\n" +
       "Everything is free, needs no account, and keeps your data in your own browser.",
     followUps: ["List all the apps", "Is my data private?", "Does it work offline?"],
   },
@@ -130,9 +179,9 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     keywords: ["offline", "offline mode", "work offline", "works offline", "use it offline", "use offline", "no internet", "no connection", "without internet", "airplane mode", "slow internet", "weak connection", "save data", "data saver", "install", "pwa", "home screen", "app icon", "service worker", "download app", "save for offline"],
     answer:
       "OneApp is a PWA: after your first visit it saves itself on your device, so every app opens with no connection — including a fresh reload of any app's link.\n" +
-      "• All twelve apps are downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
+      "• All fifteen apps are downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
       "• Install it from your browser's Install / Add to Home Screen option to get an app icon and its own window\n" +
-      "• Fully offline: Sketchnotes, PDF Editor, Image Studio, Todos, Reminders, Timer, System Info, Malayalam typing/keyboard, on-device Translate, and me\n" +
+      "• Fully offline: Sketchnotes, PDF Editor, Image Studio, Todos, Reminders, Timer, System Info, Sound Meter, Color Lens, Malayalam typing/keyboard, on-device Translate, and me\n" +
       "• Needs a connection: News (saved headlines still open), online translation (past phrases still open), handwriting recognition and the speed test\n" +
       "• On a weak or metered connection it serves saved content instead of stalling, and skips optional downloads like news logos",
     followUps: ["Is my data private?", "Which apps need internet?", "List all the apps"],
@@ -167,7 +216,21 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "• Light, Ocean, Sunset, Grape, Rose and Forest (light)\n" +
       "• Dark and Midnight (dark)\n" +
       "The choice applies to every app at once and is remembered on this device. Or just tell me — \"switch to Ocean\" — and I'll set it for you.",
-    followUps: ["How do I switch apps?", "What is OneApp?"],
+    followUps: ["How do I switch apps?", "How do I change the mouse pointer?"],
+  },
+  {
+    id: "cursor",
+    title: "Changing the mouse pointer",
+    keywords: ["cursor", "mouse", "pointer", "mouse pointer", "arrow", "crosshair", "big cursor", "large cursor", "custom cursor", "emoji cursor", "settings", "appearance"],
+    answer:
+      "Settings → Pointer swaps the mouse cursor for the whole workspace. Thirteen shapes are drawn in, plus your device's own:\n" +
+      "• Everyday — System (your device's own, the default), Arrow, Chevron, Hand, Crosshair, Dot, Ring\n" +
+      "• Drawing — Pen, Pencil, Brush\n" +
+      "• Playful — Sparkle, Star, Heart, Pixel (retro 8-bit)\n" +
+      "Then make it yours: four sizes from Small to Huge, and a colour that follows the theme, the accent, or any shade you pick.\n" +
+      "You can also bring your own — upload an image or choose an emoji and it becomes the pointer, with the point set to the top-left corner or the middle. It's drawn on your device and never uploaded.\n" +
+      "Hover a tile in the picker to try a pointer before choosing it. The pointer turns accent-coloured over anything clickable, and the cursors that mean something specific — the drawing crosshair, the text caret, drag handles — are left alone. Touch and pen input are unaffected, and the choice is remembered on this device.",
+    followUps: ["How do I change the theme?", "Is the app accessible?"],
   },
   {
     id: "backup",
@@ -187,7 +250,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "Mobile and touch support",
     keywords: ["mobile", "phone", "tablet", "ipad", "touch", "responsive", "stylus", "pen", "finger", "small screen"],
     answer:
-      "Every screen is designed mobile-first and reflows down to about 360px wide, so all twelve tools work on a phone.\n" +
+      "Every screen is designed mobile-first and reflows down to about 360px wide, so all fifteen tools work on a phone.\n" +
       "• Drawing, handwriting and the PDF editor accept touch and stylus input\n" +
       "• Install it to your home screen to use it like a native app\n" +
       "• Layouts widen into side-by-side panes on tablets and desktops",
@@ -342,12 +405,13 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     id: "app-system",
     title: "System Info — device and browser report",
     app: "system",
-    keywords: ["system", "device", "hardware", "cpu", "gpu", "memory", "ram", "battery", "screen", "resolution", "browser", "specs", "diagnostics", "report", "capabilities"],
+    keywords: ["system", "device", "hardware", "cpu", "gpu", "memory", "ram", "battery", "screen", "resolution", "browser", "specs", "diagnostics", "report", "capabilities", "nearby devices", "nearby", "scan devices", "scan for devices", "bluetooth", "ble", "usb", "hid", "serial", "peripherals", "gamepad", "cast", "chromecast", "connected devices"],
     answer:
       "System Info reads everything your browser will reveal about this machine and presents it as a live dashboard plus an exportable report.\n" +
       "• CPU, memory, GPU, screen, battery, storage and network details\n" +
       "• A feature matrix of what this browser supports\n" +
       "• Live meters that update as you watch\n" +
+      "• Nearby devices — scan for Bluetooth, USB, HID and serial devices, list attached microphones, cameras and gamepads, and check for cast-capable displays on your network\n" +
       "Nothing is sent anywhere — it's all read locally.",
     followUps: ["How do I test my internet speed?", "Is my data private?"],
   },
@@ -365,9 +429,9 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     id: "app-news",
     title: "News — headlines by category",
     app: "news",
-    keywords: ["news", "headlines", "articles", "tech news", "sports", "national", "international", "kerala", "state", "local", "world", "feed", "rss"],
+    keywords: ["news", "headlines", "articles", "tech news", "software engineering", "programming", "developer news", "sports", "national", "international", "kerala", "state", "local", "world", "feed", "rss"],
     answer:
-      "News pulls current headlines into six tabs: Tech, Sports, National, International, State (Kerala) and Local.\n" +
+      "News pulls current headlines into seven tabs: Tech, Software Engineering, Sports, National, International, State (Kerala) and Local.\n" +
       "• Each card shows the source and how recently it was published, and opens the full article\n" +
       "• Results are paginated and refresh on demand\n" +
       "This is the one app that always needs a connection.",
@@ -398,6 +462,50 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "• Auto — on-device when a pack is already installed, otherwise online\n" +
       "Swap the two languages in one tap to translate back.",
     followUps: ["What can Malayalam Writer do?", "Which apps need internet?"],
+  },
+  {
+    id: "app-morse",
+    title: "Morse Code — learn it, practise it, send it",
+    app: "morse",
+    keywords: ["morse", "morse code", "sos", "dots and dashes", "dot", "dash", "dit", "dah", "telegraph", "cw", "wpm", "learn morse", "morse translator", "prosign"],
+    answer:
+      "Morse Code is four tools over one signal engine:\n" +
+      "• Learn — a tappable chart of every letter, number, punctuation mark and prosign; each one plays, and shows its rhythm as \"di-DAH\"\n" +
+      "• Practice — a four-choice drill that asks more about the characters you get wrong, and keeps a mastery score per character\n" +
+      "• Translate — text to Morse and back, with the message playable and copyable\n" +
+      "• Key — hold a pad (or the space bar) and it decodes your own timing into letters\n" +
+      "Speed runs 5–30 WPM and the pitch is adjustable; every signal comes out as sound, an on-screen lamp and optional vibration, so you can practise silently. It all works offline — the tone is synthesized in the browser.",
+    followUps: ["Does it work offline?", "List all the apps"],
+  },
+  {
+    id: "app-sound",
+    title: "Sound Meter — measure sound frequency and loudness",
+    app: "sound",
+    keywords: ["sound", "sound meter", "frequency", "sound frequency", "hz", "hertz", "khz", "pitch", "note", "cents", "tuner", "tune a guitar", "tune an instrument", "decibel", "decibels", "db", "dbfs", "spl", "loudness", "volume level", "noise", "noise level", "spectrum", "spectrum analyzer", "fft", "waveform", "oscilloscope", "microphone", "mic", "measure sound"],
+    answer:
+      "Sound Meter turns your microphone into four measurements at once:\n" +
+      "• Frequency — the fundamental in Hz, tracked by autocorrelation from 50 Hz to 2 kHz, plus the loudest tone present\n" +
+      "• Pitch — the nearest musical note and how many cents sharp or flat it is, so it works as an instrument tuner; the reference A can be set from 415 to 444 Hz\n" +
+      "• Level — RMS and peak loudness in dBFS with a peak hold and clipping warning, and a rough dB SPL estimate you can calibrate\n" +
+      "• Spectrum and waveform — a live 20 Hz–20 kHz log spectrum (point at a spike to read its frequency) or a time-domain scope\n" +
+      "Nothing is recorded, saved or uploaded: audio is analysed frame by frame in the browser and thrown away, and the microphone is released the moment you stop or switch apps. It works fully offline — but it does need microphone permission, and accuracy is limited by your mic.",
+    followUps: ["Is my data private?", "What does System Info show?", "List all the apps"],
+  },
+  {
+    id: "app-color",
+    title: "Color Lens — read any colour out of a picture",
+    app: "color",
+    keywords: ["color", "colour", "color lens", "colour lens", "color picker", "colour picker", "pick a color", "pick a colour", "eyedropper", "eye dropper", "dropper", "hex", "hex code", "hex color", "rgb", "rgba", "hsl", "hsb", "hsv", "cmyk", "lab", "lch", "color code", "colour code", "what color is this", "what colour is this", "color from photo", "colour from photo", "color from image", "identify color", "color name", "colour name", "palette", "color palette", "dominant colors", "swatch", "swatches", "color scheme", "complementary", "analogous", "triadic", "tint", "shade", "contrast", "contrast ratio", "wcag", "accessible colors", "camera color"],
+    answer:
+      "Color Lens tells you exactly what a colour is. Attach a photo, drop or paste one, or take one with your camera, then tap anywhere on the picture.\n" +
+      "• Every code for the point you tapped — HEX, RGB, HSL, HSB, CMYK, LAB, LCH, XYZ and luminance — each one tap to copy\n" +
+      "• The nearest real colour name, out of the 148 CSS colours\n" +
+      "• A magnifier shows the exact pixels, and you can average a 3×3 or 5×5 block instead of one pixel when the photo is grainy\n" +
+      "• Contrast against white and black, graded pass/fail to WCAG AA and AAA, so you know if the colour is usable as text\n" +
+      "• The whole image's palette — 4 to 12 dominant colours with how much of the picture each covers — exportable as a hex list, CSS variables, a Tailwind theme block, SCSS or JSON\n" +
+      "• Matching schemes from any pick: complementary, analogous, triadic, split, tetradic, monochromatic, plus a tints-and-shades ramp\n" +
+      "You can also just type a hex code in to look it up. The picture is decoded on your device and never uploaded, so it all works offline — the camera needs permission, and it's released as soon as you capture or close the viewfinder.",
+    followUps: ["Is my data private?", "What can Image Studio do?", "List all the apps"],
   },
   {
     id: "app-assistant",

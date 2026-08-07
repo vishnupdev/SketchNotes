@@ -10,17 +10,20 @@
 - [Todos](/todos): task and week planner
 - [Reminders](/reminders): scheduled reminders with notifications
 - [Timer](/timer): pomodoro and countdown timer
-- [System Info](/system): live device and system dashboard
+- [System Info](/system): live device and system dashboard, plus a nearby-devices scanner that lists Bluetooth, USB, HID, serial, audio/video and gamepad hardware around this machine and detects cast-capable displays on the network
 - [Speed Test](/speedtest): network speed measurement
-- [News](/news): latest headlines by category
+- [News](/news): latest headlines by category — tech, software engineering, sports, national, international, state (Kerala) and local
 - [Malayalam Writer](/malayalam): write Malayalam by transliteration (Manglish), an on-screen keyboard, or handwriting
 - [Translate](/translate): translate text between languages, online (auto-detects the source) or fully offline on-device via the browser's built-in AI — no text leaves the device
+- [Morse Code](/morse): learn, practise and send International Morse code. Four tools — a tappable chart of every letter, number, punctuation mark and prosign; a four-choice drill that weights unseen and shaky characters and tracks per-character mastery; a text ⇄ Morse translator that plays the message; and a straight key you hold to send, decoded live from your own timing. Speed (5–30 WPM) and sidetone pitch are adjustable, and every signal plays as sound, an on-screen lamp and optional vibration. Fully offline — the tone is synthesized with the Web Audio API, so no audio files are downloaded
+- [Sound Meter](/soundmeter): measure sound from the microphone. Four readings from one live analysis — the fundamental frequency in Hz (autocorrelation, 50 Hz–2 kHz) alongside the loudest tone present; the nearest musical note with its cents error, making it a working instrument tuner (reference A adjustable 415–444 Hz); loudness as RMS and peak dBFS with a session peak hold, a clipping warning and an adjustable — explicitly uncalibrated — dB SPL estimate; and a live visualization that switches between a 20 Hz–20 kHz log-scale FFT spectrum (pointing at a peak reads out its frequency and note) and a time-domain waveform scope. Fully offline via the Web Audio API. Requires microphone permission; no audio is recorded, stored or transmitted, each frame is analysed and discarded, and the microphone is released on stopping or switching apps
+- [Color Lens](/color): identify any colour in a picture. Attach an image, drop or paste one, or take a photo with the device camera (in-app viewfinder with front/rear switching, falling back to the system camera app), then tap, drag or arrow-key anywhere on it; a pixel-level loupe magnifies the sample point and the sample size is switchable between 1 px, 3×3 and 5×5 averaging. Every reading is reported in full — HEX (with the short form), RGB, HSL, HSB/HSV, CMYK, CIE L*a*b*, LCH, XYZ and WCAG relative luminance — alongside the nearest of the 148 CSS colour names (matched by ΔE in L*a*b*), perceived brightness, a warm/cool read, and contrast ratios against white and black graded to WCAG 2.2 AA, AA-large and AAA with live text samples. It also extracts the image's dominant palette by median cut (4, 6, 8 or 12 swatches, each with the share of the picture it covers) plus the overall average colour, and derives complementary, analogous, triadic, split-complementary, tetradic and monochromatic schemes and a nine-step tint/shade ramp from whatever is picked. Palettes export as a hex list, CSS variables, a Tailwind v4 `@theme` block, SCSS variables or JSON. A hex code can be typed in directly instead of read from a photo, recent picks are kept on the device, and on Chromium the browser's EyeDropper API adds picking from anywhere on screen. Fully offline — the image is decoded and sampled in the browser and is never uploaded
 - [Assistant](/assistant): a free in-app AI guide — ask what any app does or how to do a task, and it answers from a built-in knowledge base of the workspace and opens the right tool. It also acts on instructions typed in the chat ("open the timer", "go to PDF merge", "turn on dark mode", "open settings", "clear the chat"). No API key or account; it uses the browser's built-in on-device model when present, otherwise a bundled offline retrieval engine
 
 ## Offline / low-bandwidth behaviour
 
 - Works 100% offline after the first visit. A service worker (/sw.js) precaches every
-  app route's HTML, and a background warm-up downloads all twelve apps' code, so any
+  app route's HTML, and a background warm-up downloads all fifteen apps' code, so any
   deep link (e.g. /todos, /pdfeditor) cold-loads with no connection — not just the app
   that was open when the network dropped.
 - Users can force or clear the download from Settings → Offline ("Save all apps for
@@ -28,13 +31,34 @@
 - On a weak connection the app serves saved content rather than stalling: navigations
   fall back to the cached shell after 3.5s, API responses after 6s.
 - Fully offline: Sketch Notes, PDF Editor, Image Studio, Todos, Reminders, Timer,
-  System Info, Malayalam transliteration + keyboard, on-device Translate, Assistant.
+  System Info, Morse Code, Sound Meter, Color Lens, Malayalam transliteration +
+  keyboard, on-device Translate, Assistant.
 - Needs a connection: News (previously loaded headlines still open from cache), online
   translation (previously translated phrases still open), Malayalam handwriting
   recognition, Speed Test, public-IP lookup. Each of these states this in the UI when
   offline instead of failing silently.
 - Installable as a PWA (manifest at /manifest.webmanifest, with app shortcuts).
 
+## Settings
+
+Opened from the bottom of the app launcher; every preference applies to all apps and is
+stored on the device.
+
+- Theme: eight palettes — Light, Ocean, Sunset, Grape, Rose, Forest (light), Dark and
+  Midnight (dark).
+- Pointer: replaces the mouse cursor workspace-wide. System (the device's own) plus
+  thirteen drawn presets — Arrow, Chevron, Hand, Crosshair, Dot, Ring, Pen, Pencil,
+  Brush, Sparkle, Star, Heart and Pixel — each in four sizes (Small to Huge) and
+  coloured by the theme, by the accent, or by a colour you pick. A pointer of your own can be made
+  from any image file or emoji, rendered on the device (nothing is uploaded), with its
+  hotspot at the top-left or the centre. Touch input and the drawing/text cursors are
+  unaffected.
+- Offline: save every app to the device, or clear what's stored.
+
 ## Notes
 
 - No accounts, no server storage — data is kept in the browser's localStorage.
+- Device permissions are asked for only on the feature that needs one, and only from a
+  click: notifications (Reminders), the microphone (Sound Meter) and the camera (Color
+  Lens). Captured audio and video are analysed in memory and discarded — never recorded
+  or transmitted — and the device is released as soon as the feature is done with it.

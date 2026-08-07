@@ -33,6 +33,9 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   malayalam: () =>
     import("@/components/MalayalamWriter/MalayalamWriterApp").then((m) => m.MalayalamWriterApp),
   translate: () => import("@/components/Translate/TranslateApp").then((m) => m.TranslateApp),
+  morse: () => import("@/components/Morse/MorseApp").then((m) => m.MorseApp),
+  sound: () => import("@/components/SoundMeter/SoundMeterApp").then((m) => m.SoundMeterApp),
+  color: () => import("@/components/ColorLens/ColorLensApp").then((m) => m.ColorLensApp),
   assistant: () => import("@/components/Assistant/AssistantApp").then((m) => m.AssistantApp),
 };
 
@@ -46,6 +49,9 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "timer",
   "reminders",
   "assistant",
+  "morse",
+  "sound",
+  "color",
   "translate",
   "malayalam",
   "image",
@@ -67,5 +73,8 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   news: "News",
   malayalam: "Malayalam Writer",
   translate: "Translate",
+  morse: "Morse Code",
+  sound: "Sound Meter",
+  color: "Color Lens",
   assistant: "Assistant",
 };

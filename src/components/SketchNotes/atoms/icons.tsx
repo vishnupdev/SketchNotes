@@ -471,6 +471,40 @@ export const SwapIcon = (p: IconProps) => (
 );
 
 /**
+ * Morse — a dit, a dah and a dit, drawn as filled marks so the 1:3 length ratio
+ * that defines the code is visible even at 16px.
+ */
+export const MorseIcon = ({ size = 20, ...rest }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" {...rest}>
+    <circle cx="4" cy="12" r="2" />
+    <rect x="8.5" y="10" width="11" height="4" rx="2" />
+  </svg>
+);
+
+export const BookIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H10a2.5 2.5 0 0 1 2 1v13a2.5 2.5 0 0 0-2-1H5.5A1.5 1.5 0 0 1 4 15.5z" />
+    <path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H14a2.5 2.5 0 0 0-2 1v13a2.5 2.5 0 0 1 2-1h4.5a1.5 1.5 0 0 0 1.5-1.5z" />
+  </Svg>
+);
+
+export const TargetIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8" />
+    <circle cx="12" cy="12" r="4" />
+    <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+export const TapIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="10" r="3.5" />
+    <path d="M5.5 16.5a8 8 0 0 1 13 0" />
+    <path d="M3 20.5a12 12 0 0 1 18 0" />
+  </Svg>
+);
+
+/**
  * App glyph for the Malayalam writer — the letter "അ" set in the icon grid.
  * Uses a filled text node (not the shared stroke paths) so the script reads
  * cleanly at small sizes; `currentColor` keeps it themeable like the rest.
@@ -489,4 +523,88 @@ export const MalayalamIcon = ({ size = 20, ...rest }: IconProps) => (
       അ
     </text>
   </svg>
+);
+
+export const EyedropperIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M14.5 6.5 17.5 9.5" />
+    <path d="M16 3.6a2.2 2.2 0 0 1 3.1 0l1.3 1.3a2.2 2.2 0 0 1 0 3.1L18.6 9.8 14.2 5.4z" />
+    <path d="M13.2 6.4 4.6 15a2 2 0 0 0-.55 1.05L3.5 19.2a1 1 0 0 0 1.15 1.15l3.15-.55A2 2 0 0 0 8.85 19.25L17.6 10.8z" />
+  </Svg>
+);
+
+export const CameraIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 8.5h2.8l1.4-2.4a1.3 1.3 0 0 1 1.1-.6h5.4a1.3 1.3 0 0 1 1.1.6l1.4 2.4H20a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 20 19H4a1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 4 8.5Z" />
+    <circle cx="12" cy="13.5" r="3.3" />
+  </Svg>
+);
+
+/** Switch between the front and rear camera. */
+export const CameraFlipIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 8.5h2.8l1.4-2.4a1.3 1.3 0 0 1 1.1-.6h5.4a1.3 1.3 0 0 1 1.1.6l1.4 2.4H20a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 20 19H4a1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 4 8.5Z" />
+    <path d="M9.6 13.6a2.6 2.6 0 0 1 4.4-1.9M14.4 13.6a2.6 2.6 0 0 1-4.4 1.9" />
+    <path d="M14.2 10.6h1.5v1.5M9.8 16.6H8.3v-1.5" />
+  </Svg>
+);
+
+export const PaletteIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.2 0 1.9-.8 1.9-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7h1.3a4.6 4.6 0 0 0 4.6-4.6c0-3.7-3.8-6.6-8.5-6.6Z" />
+    <circle cx="7.6" cy="11.4" r="1.15" fill="currentColor" stroke="none" />
+    <circle cx="10.4" cy="7.4" r="1.15" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="8.2" r="1.15" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+/** Split disc — the standard mark for a light/dark contrast reading. */
+export const ContrastIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M12 3.5v17a8.5 8.5 0 0 0 0-17Z" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+/* ---- Sound Meter app ---- */
+
+export const MicIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="9" y="2.8" width="6" height="11" rx="3" />
+    <path d="M5.5 11.2a6.5 6.5 0 0 0 13 0" />
+    <path d="M12 17.7v3.5M8.8 21.2h6.4" />
+  </Svg>
+);
+
+/** Microphone with the standard "off" slash. */
+export const MicOffIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M15 5.6A3 3 0 0 0 9 5.8v4.4M9 12.3a3 3 0 0 0 5.6 1.5" />
+    <path d="M5.5 11.2a6.5 6.5 0 0 0 9.6 5.7M18.5 11.2a6.4 6.4 0 0 1-.5 2.5" />
+    <path d="M12 17.7v3.5M8.8 21.2h6.4" />
+    <path d="M3.5 3.5 20.5 20.5" />
+  </Svg>
+);
+
+/** Oscilloscope trace — the time-domain view. */
+export const WaveformIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M2.5 12h2.2c.9 0 1.3-.7 1.7-2.4S7.2 5 8.1 5s1.3 2.6 1.9 7 1 7 1.9 7 1.3-2.6 1.9-7 1-7 1.9-7 1.3 2.9 1.7 4.6.8 2.4 1.7 2.4h2.4" />
+  </Svg>
+);
+
+/** FFT bars — the frequency-domain view. */
+export const SpectrumIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.5 20V14M8 20V6.5M12.5 20v-9M17 20V4M21 20v-7" />
+  </Svg>
+);
+
+/** Tuning fork — pitch and note detection. */
+export const TuningForkIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M8 3v7.5a4 4 0 0 0 8 0V3" />
+    <path d="M12 14.5V21" />
+    <path d="M9.6 21h4.8" />
+  </Svg>
 );

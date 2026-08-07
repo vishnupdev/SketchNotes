@@ -3,6 +3,7 @@
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { AssistantChat } from "@/components/Assistant/organisms/AssistantChat";
 import { AppsIcon, AssistantIcon } from "@/components/SketchNotes/atoms/icons";
+import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
 
 /**
@@ -25,20 +26,12 @@ export function AssistantApp() {
     <div className="flex h-full min-h-0 flex-col">
       <header className="z-20 shrink-0 border-b border-border bg-paper px-[22px] pb-3.5 pt-[22px]">
         <div className="mx-auto flex max-w-[760px] items-end justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <span className="grid size-[46px] flex-none place-items-center rounded-[13px] bg-accent text-on-accent shadow-[0_0_0_4px_var(--accent-soft)]">
-              <AssistantIcon size={26} />
-            </span>
-            <div>
-              <h1 className="text-[27px] font-extrabold leading-none tracking-tight">Assistant</h1>
-              <p className="mt-1 font-serif text-[15px] italic text-ink-soft">
-                your guide to every app here
-              </p>
-              <div className="mt-1.5 font-mono text-[9.5px] uppercase tracking-[.18em] text-accent">
-                by Vishnu P
-              </div>
-            </div>
-          </div>
+          <AppBrand
+            icon={<AssistantIcon size={26} />}
+            name="Assistant"
+            tagline="your guide to every app here"
+            heading
+          />
 
           <button
             type="button"

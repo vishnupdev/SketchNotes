@@ -32,7 +32,7 @@
  * always reflect the real network, and dev HMR traffic must never go stale.
  */
 
-const VERSION = "oneapp-v3";
+const VERSION = "oneapp-v5";
 const SHELL_CACHE = `oneapp-shell-${VERSION}`;
 const STATIC_CACHE = `oneapp-static-${VERSION}`;
 const DATA_CACHE = `oneapp-data-${VERSION}`;
@@ -77,6 +77,9 @@ const SHELL_URLS = [
   "/news",
   "/malayalam",
   "/translate",
+  "/morse",
+  "/soundmeter",
+  "/color",
   "/assistant",
 ];
 

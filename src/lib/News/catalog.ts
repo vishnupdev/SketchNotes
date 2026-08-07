@@ -25,6 +25,11 @@ export const NEWS_LOCALE = "hl=en-IN&gl=IN&ceid=IN:en";
 
 export const NEWS_TABS: NewsTab[] = [
   { id: "tech", label: "Tech News", feed: { topic: "TECHNOLOGY" } },
+  {
+    id: "software",
+    label: "Software Engineering",
+    feed: { search: "software engineering OR software development OR programming" },
+  },
   { id: "sports", label: "Sports", feed: { topic: "SPORTS" } },
   { id: "india", label: "National", feed: { topic: "NATION" } },
   { id: "international", label: "International", feed: { search: "international news" } },

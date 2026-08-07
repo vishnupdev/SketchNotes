@@ -7,6 +7,7 @@ import { cx } from "@/lib/utils";
 import { THEMES } from "@/lib/themes";
 import { CheckIcon, CloseIcon } from "@/components/SketchNotes/atoms/icons";
 import { OfflineSetting } from "@/components/Settings/OfflineSetting";
+import { CursorSetting } from "@/components/Settings/CursorSetting";
 
 /** One labelled block within the settings dialog. New settings go here. */
 function Section({
@@ -118,7 +119,10 @@ export function SettingsPanel() {
         aria-modal="true"
         aria-label="Settings"
         className={cx(
-          "relative w-[min(92vw,540px)] max-h-[85vh] overflow-y-auto rounded-2xl border border-border bg-panel p-6 shadow-panel transition-transform duration-200",
+          // scroll-slim keeps the overflow bar thin and theme-coloured instead
+          // of the platform's full-width one, which sat proud of the rounded
+          // corners; its stable gutter means nothing shifts when it appears.
+          "scroll-slim relative w-[min(92vw,540px)] max-h-[85vh] overflow-y-auto rounded-2xl border border-border bg-panel p-6 shadow-panel transition-transform duration-200",
           open ? "translate-y-0" : "translate-y-3",
         )}
       >
@@ -139,6 +143,13 @@ export function SettingsPanel() {
         <div className="flex flex-col gap-5">
           <Section title="Theme" description="Pick a colour theme for the whole workspace.">
             <ThemeSetting />
+          </Section>
+
+          <Section
+            title="Pointer"
+            description="Swap the mouse pointer — a drawn preset in your theme colours, or an image of your own. Touch input is unaffected."
+          >
+            <CursorSetting />
           </Section>
 
           <Section

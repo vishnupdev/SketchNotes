@@ -2,6 +2,7 @@
 
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { ImageEditor } from "@/components/ImageStudio/ImageEditor";
+import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
 
 /** Image Studio — crop, resize, compress & convert images to fit upload
@@ -13,23 +14,18 @@ export function ImageStudio() {
     <div className="flex min-h-full flex-col">
       <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-[18px] pt-[22px]">
         <div className="mx-auto flex max-w-[1080px] flex-wrap items-end justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <span className="grid size-[46px] flex-none place-items-center rounded-[13px] bg-accent text-white shadow-[0_0_0_4px_var(--accent-soft)]">
+          <AppBrand
+            icon={
               <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
                 <circle cx="8.5" cy="9.5" r="1.6" />
                 <path d="M4 17l4.5-4.5a2 2 0 0 1 2.8 0L17 18" />
                 <path d="M14 15l2-2a2 2 0 0 1 2.8 0L20.5 15" />
               </svg>
-            </span>
-            <div>
-              <div className="text-[27px] font-extrabold leading-none tracking-tight">Image Studio</div>
-              <div className="mt-1 font-serif text-[15px] italic text-ink-soft">
-                resize, crop &amp; compress for any upload
-              </div>
-              <div className="mt-1.5 font-mono text-[9.5px] uppercase tracking-[.18em] text-accent">by Vishnu P</div>
-            </div>
-          </div>
+            }
+            name="Image Studio"
+            tagline="resize, crop & compress for any upload"
+          />
 
           <div className="flex flex-wrap items-center gap-2.5">
             <button

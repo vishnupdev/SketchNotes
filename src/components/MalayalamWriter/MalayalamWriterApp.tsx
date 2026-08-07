@@ -9,6 +9,7 @@ import { MalayalamKeyboard } from "@/components/MalayalamWriter/molecules/Malaya
 import { HandwritingPad } from "@/components/MalayalamWriter/molecules/HandwritingPad";
 import { cx } from "@/lib/utils";
 import { AppsIcon, CopyIcon, DownloadIcon, MalayalamIcon, TrashSmallIcon } from "@/components/SketchNotes/atoms/icons";
+import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
 
 /**
@@ -134,18 +135,11 @@ export function MalayalamWriterApp() {
     <div className="flex min-h-full flex-col">
       <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-[18px] pt-[22px]">
         <div className="mx-auto flex max-w-[820px] flex-wrap items-end justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <span className="grid size-[46px] flex-none place-items-center rounded-[13px] bg-accent text-on-accent shadow-[0_0_0_4px_var(--accent-soft)]">
-              <MalayalamIcon size={26} />
-            </span>
-            <div>
-              <div className="text-[27px] font-extrabold leading-none tracking-tight">Malayalam Writer</div>
-              <div className="mt-1 font-serif text-[15px] italic text-ink-soft">
-                type, tap or handwrite in Malayalam
-              </div>
-              <div className="mt-1.5 font-mono text-[9.5px] uppercase tracking-[.18em] text-accent">by Vishnu P</div>
-            </div>
-          </div>
+          <AppBrand
+            icon={<MalayalamIcon size={26} />}
+            name="Malayalam Writer"
+            tagline="type, tap or handwrite in Malayalam"
+          />
 
           <button
             type="button"

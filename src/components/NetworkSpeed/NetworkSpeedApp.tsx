@@ -8,6 +8,7 @@ import { ResultMetrics } from "@/components/NetworkSpeed/molecules/ResultMetrics
 import { ConnectionCard } from "@/components/NetworkSpeed/molecules/ConnectionCard";
 import { HistoryPanel } from "@/components/NetworkSpeed/organisms/HistoryPanel";
 import { AppsIcon, GaugeIcon } from "@/components/SketchNotes/atoms/icons";
+import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
 
 /**
@@ -32,18 +33,11 @@ export function NetworkSpeedApp() {
     <div className="flex min-h-full flex-col">
       <header className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] pb-[18px] pt-[22px]">
         <div className="mx-auto flex max-w-[760px] flex-wrap items-end justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <span className="grid size-[46px] flex-none place-items-center rounded-[13px] bg-accent text-white shadow-[0_0_0_4px_var(--accent-soft)]">
-              <GaugeIcon size={26} />
-            </span>
-            <div>
-              <div className="text-[27px] font-extrabold leading-none tracking-tight">Network Speed</div>
-              <div className="mt-1 font-serif text-[15px] italic text-ink-soft">
-                download, upload, ping &amp; jitter
-              </div>
-              <div className="mt-1.5 font-mono text-[9.5px] uppercase tracking-[.18em] text-accent">by Vishnu P</div>
-            </div>
-          </div>
+          <AppBrand
+            icon={<GaugeIcon size={26} />}
+            name="Network Speed"
+            tagline="download, upload, ping & jitter"
+          />
 
           <button
             type="button"

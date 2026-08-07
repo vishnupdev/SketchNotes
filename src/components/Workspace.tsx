@@ -6,6 +6,7 @@ import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { EditorShell } from "@/components/SketchNotes/EditorShell";
 import { AppLauncher } from "@/components/AppLauncher";
 import { SettingsPanel } from "@/components/Settings/SettingsPanel";
+import { CursorEffect } from "@/components/Settings/CursorEffect";
 import { ReminderScheduler } from "@/components/Reminders/organisms/ReminderScheduler";
 import { ReminderAlert } from "@/components/Reminders/organisms/ReminderAlert";
 import { OfflineBanner } from "@/components/Offline/OfflineBanner";
@@ -32,6 +33,9 @@ const NetworkSpeedApp = dynamic(APP_LOADERS.speed, { ssr: false });
 const NewsApp = dynamic(APP_LOADERS.news, { ssr: false });
 const MalayalamWriterApp = dynamic(APP_LOADERS.malayalam, { ssr: false });
 const TranslateApp = dynamic(APP_LOADERS.translate, { ssr: false });
+const MorseApp = dynamic(APP_LOADERS.morse, { ssr: false });
+const SoundMeterApp = dynamic(APP_LOADERS.sound, { ssr: false });
+const ColorLensApp = dynamic(APP_LOADERS.color, { ssr: false });
 const AssistantApp = dynamic(APP_LOADERS.assistant, { ssr: false });
 
 const PDF_BASE = "/pdfeditor";
@@ -44,6 +48,9 @@ const SPEED_BASE = "/speedtest";
 const NEWS_BASE = "/news";
 const MALAYALAM_BASE = "/malayalam";
 const TRANSLATE_BASE = "/translate";
+const MORSE_BASE = "/morse";
+const SOUND_BASE = "/soundmeter";
+const COLOR_BASE = "/color";
 const ASSISTANT_BASE = "/assistant";
 
 /** Derive the app + PDF section from a path. */
@@ -62,6 +69,9 @@ function parsePath(pathname: string): { app: AppId; tool: string | null } {
   if (pathname === NEWS_BASE || pathname === NEWS_BASE + "/") return { app: "news", tool: null };
   if (pathname === MALAYALAM_BASE || pathname === MALAYALAM_BASE + "/") return { app: "malayalam", tool: null };
   if (pathname === TRANSLATE_BASE || pathname === TRANSLATE_BASE + "/") return { app: "translate", tool: null };
+  if (pathname === MORSE_BASE || pathname === MORSE_BASE + "/") return { app: "morse", tool: null };
+  if (pathname === SOUND_BASE || pathname === SOUND_BASE + "/") return { app: "sound", tool: null };
+  if (pathname === COLOR_BASE || pathname === COLOR_BASE + "/") return { app: "color", tool: null };
   if (pathname === ASSISTANT_BASE || pathname === ASSISTANT_BASE + "/") return { app: "assistant", tool: null };
   return { app: "sketchnotes", tool: null };
 }
@@ -87,9 +97,15 @@ const pathForApp = (app: AppId, tool: string | null) =>
                     ? MALAYALAM_BASE
                     : app === "translate"
                       ? TRANSLATE_BASE
-                      : app === "assistant"
-                        ? ASSISTANT_BASE
-                        : "/";
+                      : app === "morse"
+                        ? MORSE_BASE
+                        : app === "sound"
+                          ? SOUND_BASE
+                          : app === "color"
+                            ? COLOR_BASE
+                            : app === "assistant"
+                              ? ASSISTANT_BASE
+                              : "/";
 
 /**
  * Top-level workspace hosting both apps natively (no iframe) and keeping the
@@ -153,12 +169,15 @@ export function Workspace() {
   const newsActive = activeApp === "news";
   const malayalamActive = activeApp === "malayalam";
   const translateActive = activeApp === "translate";
+  const morseActive = activeApp === "morse";
+  const soundActive = activeApp === "sound";
+  const colorActive = activeApp === "color";
   const assistantActive = activeApp === "assistant";
 
   return (
     <>
       {/* Sketchnotes — always mounted, hidden while another app is active. */}
-      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive || systemActive || speedActive || newsActive || malayalamActive || translateActive || assistantActive}>
+      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive || systemActive || speedActive || newsActive || malayalamActive || translateActive || morseActive || soundActive || colorActive || assistantActive}>
         <EditorShell />
       </div>
 
@@ -212,6 +231,23 @@ export function Workspace() {
         {translateActive && <TranslateApp />}
       </div>
 
+      {/* Morse Code. */}
+      <div hidden={!morseActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {morseActive && <MorseApp />}
+      </div>
+
+      {/* Sound Meter. Unmounting on an app switch is what releases the
+          microphone, so the recording indicator never follows the user out. */}
+      <div hidden={!soundActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {soundActive && <SoundMeterApp />}
+      </div>
+
+      {/* Color Lens. Unmounted on an app switch, which is what stops the camera
+          if the viewfinder was left open. */}
+      <div hidden={!colorActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {colorActive && <ColorLensApp />}
+      </div>
+
       {/* Assistant — the in-app AI guide. */}
       <div hidden={!assistantActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
         {assistantActive && <AssistantApp />}
@@ -219,6 +255,9 @@ export function Workspace() {
 
       <AppLauncher />
       <SettingsPanel />
+
+      {/* Paints the chosen mouse pointer onto <body> for every app. */}
+      <CursorEffect />
 
       {/* Connection status — app-wide, since losing the network changes what a
           few features can do (and nothing else). */}
