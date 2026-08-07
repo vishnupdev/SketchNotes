@@ -64,9 +64,11 @@ export function MorseApp() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[720px] flex-1 px-5 pb-[80px] pt-[22px]">
+      {/* ModeTabs is the floating bottom bar, so it's rendered outside the
+          content flow and `bottom-nav-clear` keeps the last panel scrollable
+          out from under it. */}
+      <main className="bottom-nav-clear mx-auto w-full max-w-[720px] flex-1 px-5 pt-[22px]">
         <div className="flex flex-col gap-4">
-          <ModeTabs mode={mode} onMode={setMode} />
           <PlaybackBar />
           <div id={`morse-panel-${mode}`} role="tabpanel">
             {mode === "learn" ? (
@@ -81,6 +83,8 @@ export function MorseApp() {
           </div>
         </div>
       </main>
+
+      <ModeTabs mode={mode} onMode={setMode} />
 
       <AppFooter />
     </div>

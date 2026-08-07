@@ -1,11 +1,13 @@
-import { cx } from "@/lib/utils";
+"use client";
+
 import type { TimerMode } from "@/lib/Timer/types";
 import { PomodoroIcon, StopwatchIcon, TimerIcon } from "@/components/SketchNotes/atoms/icons";
+import { BottomNav, type BottomNavItem } from "@/components/SketchNotes/molecules/BottomNav";
 
-const TABS: { id: TimerMode; label: string; icon: typeof TimerIcon }[] = [
-  { id: "countdown", label: "Timer", icon: TimerIcon },
-  { id: "stopwatch", label: "Stopwatch", icon: StopwatchIcon },
-  { id: "pomodoro", label: "Pomodoro", icon: PomodoroIcon },
+const TABS: BottomNavItem<TimerMode>[] = [
+  { id: "countdown", label: "Timer", hint: "Count down to zero", icon: <TimerIcon size={19} /> },
+  { id: "stopwatch", label: "Stopwatch", hint: "Count up, with laps", icon: <StopwatchIcon size={19} /> },
+  { id: "pomodoro", label: "Pomodoro", hint: "Focus and break cycles", icon: <PomodoroIcon size={19} /> },
 ];
 
 interface ModeTabsProps {
@@ -13,25 +15,7 @@ interface ModeTabsProps {
   onMode: (mode: TimerMode) => void;
 }
 
-/** Segmented control switching between the three timer tools. */
+/** The three timer tools, as the floating bottom bar. */
 export function ModeTabs({ mode, onMode }: ModeTabsProps) {
-  return (
-    <div className="inline-flex w-full gap-1 rounded-2xl border border-border bg-panel p-1">
-      {TABS.map(({ id, label, icon: Icon }) => (
-        <button
-          key={id}
-          type="button"
-          onClick={() => onMode(id)}
-          aria-current={mode === id}
-          className={cx(
-            "flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-colors",
-            mode === id ? "bg-accent text-white shadow-panel" : "text-ink-soft hover:text-text",
-          )}
-        >
-          <Icon size={17} />
-          <span>{label}</span>
-        </button>
-      ))}
-    </div>
-  );
+  return <BottomNav label="Timer tools" items={TABS} value={mode} onChange={onMode} maxWidth={380} />;
 }

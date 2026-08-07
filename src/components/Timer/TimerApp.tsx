@@ -51,9 +51,10 @@ export function TimerApp() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[720px] flex-1 px-5 pb-[80px] pt-[22px]">
+      {/* ModeTabs is the floating bottom bar — outside the content flow, with
+          `bottom-nav-clear` keeping the panel scrollable out from under it. */}
+      <main className="bottom-nav-clear mx-auto w-full max-w-[720px] flex-1 px-5 pt-[22px]">
         <div className="flex flex-col gap-5">
-          <ModeTabs mode={mode} onMode={setMode} />
           {mode === "countdown" ? (
             <CountdownPanel />
           ) : mode === "stopwatch" ? (
@@ -63,6 +64,8 @@ export function TimerApp() {
           )}
         </div>
       </main>
+
+      <ModeTabs mode={mode} onMode={setMode} />
 
       <AppFooter />
     </div>

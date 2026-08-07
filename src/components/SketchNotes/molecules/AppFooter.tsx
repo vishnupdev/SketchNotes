@@ -9,7 +9,9 @@
  */
 export function AppFooter() {
   return (
-    <footer className="sticky bottom-0 z-20 border-t border-border bg-paper px-5 py-[22px] text-center font-mono text-[10.5px] tracking-[.1em] text-ink-soft">
+    /* min-h pins the height that --footer-h promises, so the floating bottom nav
+       can sit directly above the footer without measuring it at runtime. */
+    <footer className="sticky bottom-0 z-20 min-h-[var(--footer-h)] border-t border-border bg-paper px-5 py-[22px] text-center font-mono text-[10.5px] tracking-[.1em] text-ink-soft">
       <div className="font-serif text-[14.5px] not-italic tracking-normal">
         Crafted by <b className="font-semibold text-accent">Vishnu P</b>
       </div>

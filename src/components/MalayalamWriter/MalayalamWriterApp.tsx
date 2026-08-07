@@ -153,7 +153,9 @@ export function MalayalamWriterApp() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[820px] flex-1 px-5 pb-[80px] pt-[22px]">
+      {/* MethodTabs is the floating bottom bar — outside the content flow, with
+          `bottom-nav-clear` keeping the input pad clear of it. */}
+      <main className="bottom-nav-clear mx-auto w-full max-w-[820px] flex-1 px-5 pt-[22px]">
         <div className="flex flex-col gap-5">
           {/* The shared document every input method writes into. */}
           <section aria-label="Document" className="flex flex-col gap-2">
@@ -201,8 +203,6 @@ export function MalayalamWriterApp() {
             <div className="text-right text-[11px] text-ink-soft">{[...text].length} characters</div>
           </section>
 
-          <MethodTabs method={method} onMethod={setMethod} />
-
           <section
             aria-label="Input method"
             className={cx("rounded-2xl border border-border bg-panel/40 p-4")}
@@ -215,6 +215,8 @@ export function MalayalamWriterApp() {
           </section>
         </div>
       </main>
+
+      <MethodTabs method={method} onMethod={setMethod} />
 
       <AppFooter />
     </div>

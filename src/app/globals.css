@@ -68,6 +68,17 @@
     0 24px 48px -16px rgba(16, 24, 32, 0.16);
   --hand: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Chalkboard SE", cursive;
 
+  /* ----------------------- bottom bar geometry ------------------------ */
+  /* AppFooter is sticky to the viewport bottom in every app, so the floating
+     bottom nav is offset above it rather than over it. Both heights live here
+     so the bar's offset, the footer and the content clearance can never drift
+     apart. The footer enforces --footer-h as a min-height. */
+  --footer-h: 66px;
+  --bottom-nav-h: 4.5rem;
+  /* Accent halo under the raised active tab. Derived from --accent, so it
+     re-tints with the theme instead of needing a per-palette value. */
+  --nav-glow: 0 10px 22px -6px color-mix(in srgb, var(--accent) 60%, transparent);
+
   /* ------------------------ hover interactions ------------------------ */
   /* One shared transition for every hover utility below. They all declare
      `transition: var(--fx)`, so two of them landing on the same element can
@@ -545,6 +556,16 @@ svg {
 /* Slim, theme-aware scrollbar. Track stays invisible; the thumb picks up the
    border token at rest and the accent on hover, so it blends into any theme
    (light, dark, and the colour-accented palettes). */
+/* Bottom padding for the content of an app that shows the floating bottom nav,
+   so the last card can be scrolled clear of the bar instead of ending under it.
+   The footer is deliberately NOT in this sum: it's sticky *in flow*, so it
+   already occupies its own space at the end of the scroll — counting it here
+   would leave a screenful of dead air. Just the bar, its 10px offset, and a
+   little breathing room. */
+@utility bottom-nav-clear {
+  padding-bottom: calc(var(--bottom-nav-h) + 1.375rem);
+}
+
 @utility scroll-slim {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
