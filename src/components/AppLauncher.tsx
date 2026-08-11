@@ -75,6 +75,24 @@ const ImageGlyph = (
   </svg>
 );
 
+const BoardGlyph = (
+  // Cards on a page with a spark at the corner: sections you conjure by typing.
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <rect x="3.2" y="3.5" width="7.6" height="7" rx="1.6" />
+    <rect x="13.2" y="3.5" width="7.6" height="11" rx="1.6" />
+    <rect x="3.2" y="13" width="7.6" height="7.5" rx="1.6" />
+    <path d="M15 18.4h5.8M17.9 15.6v5.6" />
+  </svg>
+);
+
 const TodoGlyph = (
   <svg
     viewBox="0 0 24 24"
@@ -167,6 +185,25 @@ const NewsGlyph = (
     <path d="M4 5.5h11.5v13H6a2 2 0 0 1-2-2z" />
     <path d="M15.5 8.5H18a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2" />
     <path d="M7 9h5.5M7 12h5.5M7 15h3.5" />
+  </svg>
+);
+
+const WorldClockGlyph = (
+  // A globe with a clock set into it: the two halves of the app in one mark.
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <path d="M20.9 13.4A9 9 0 1 1 10.6 3.1" />
+    <path d="M3.5 9h8.2M3.5 15h6.1" />
+    <path d="M11.5 3.2A14 14 0 0 0 9.4 20.6" />
+    <circle cx="17" cy="17" r="4.5" />
+    <path d="M17 14.9V17l1.5 1.1" />
   </svg>
 );
 
@@ -308,6 +345,13 @@ const APPS: AppEntry[] = [
     hue: "--app-image",
   },
   {
+    id: "board",
+    name: "Board",
+    tagline: "Build your own page by prompting — add, edit & remove sections.",
+    icon: BoardGlyph,
+    hue: "--app-board",
+  },
+  {
     id: "todos",
     name: "Todos",
     tagline: "Plan & track tasks by day, week, month & year.",
@@ -348,6 +392,13 @@ const APPS: AppEntry[] = [
     tagline: "Latest headlines — tech, sports, India, Kerala, world & more.",
     icon: NewsGlyph,
     hue: "--app-news",
+  },
+  {
+    id: "world",
+    name: "World Clock",
+    tagline: "Live times worldwide — plus each country's facts & news.",
+    icon: WorldClockGlyph,
+    hue: "--app-world",
   },
   {
     id: "malayalam",

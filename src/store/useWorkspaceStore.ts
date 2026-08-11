@@ -13,12 +13,14 @@ export type AppId =
   | "sketchnotes"
   | "pdf"
   | "image"
+  | "board"
   | "todos"
   | "reminders"
   | "timer"
   | "system"
   | "speed"
   | "news"
+  | "world"
   | "malayalam"
   | "translate"
   | "morse"
@@ -33,12 +35,14 @@ const ALL_APPS: AppId[] = [
   "assistant",
   "pdf",
   "image",
+  "board",
   "todos",
   "reminders",
   "timer",
   "system",
   "speed",
   "news",
+  "world",
   "malayalam",
   "translate",
   "morse",

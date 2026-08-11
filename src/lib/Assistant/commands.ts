@@ -1,4 +1,5 @@
 import { THEMES } from "@/lib/themes";
+import { hasPhrase } from "@/lib/utils";
 import type { AppId } from "@/store/useWorkspaceStore";
 import { APP_ALIASES, APP_LABELS, APP_SUMMARIES, PDF_TOOL_LABELS } from "./knowledge";
 import type { AgentAction } from "./types";
@@ -14,14 +15,6 @@ import type { AgentAction } from "./types";
  * section, overlays, theme, this conversation) — never another app's internals,
  * so the Assistant can't break an app by driving it.
  */
-
-/** Escape a literal for use inside a RegExp. */
-const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-/** Whole-word test that also behaves around non-ASCII text. */
-function hasPhrase(text: string, phrase: string): boolean {
-  return new RegExp(`(^|[^\\p{L}\\p{N}])${escapeRe(phrase)}($|[^\\p{L}\\p{N}])`, "u").test(text);
-}
 
 /** Politeness and filler that wraps a real instruction. */
 const PREAMBLE_RE =

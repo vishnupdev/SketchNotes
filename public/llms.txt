@@ -7,12 +7,14 @@
 - [Sketch Notes](/): freehand drawing and note canvas
 - [PDF Editor](/pdfeditor): view, edit, annotate and organize PDFs
 - [Image Studio](/image): image editing and adjustments
+- [Board](/board): a personal page the user composes **by prompting**. One text field takes plain-English instructions and a local, deterministic parser (no network, no API key, no model) turns each one into a single board edit. Five section types — **Note** (free text), **Checklist** (tickable rows), **Counter** (a tally with an optional goal, step and unit), **Links** (saved `http(s)` addresses) and **Habit** (a seven-day local-calendar streak). The grammar covers add ("add a checklist for groceries", "add a counter for water with a goal of 8", "add a note called Ideas"), modify ("rename groceries to shopping", "set the water goal to 10", "set the water unit to glasses", "turn ideas into a checklist", "make ideas wide", "move groceries to top", "collapse ideas"), fill in ("add milk to groceries", "add docs example.com to work", "check milk", "add 5 to water", "check today on reading") and remove ("remove milk from groceries", "remove groceries", "reset water", "clear the board", "undo"). References resolve by title, then loosely, then by type name, and an ambiguous or unknown reference is answered with which sections exist rather than a silent no-op; every phrasing is published in an in-app "What you can say" sheet whose lines are tappable and live. Every command has an equivalent direct control on the card (add-type bar, inline title editing, +/−, tick, move, width, reset, remove, change type), so the app is fully usable without composing a sentence. Undo covers the last 25 changes for the session. Fully offline; the board is stored in this browser under `sknotes:board` and never uploaded
 - [Todos](/todos): task and week planner
 - [Reminders](/reminders): scheduled reminders with notifications
 - [Timer](/timer): pomodoro and countdown timer
 - [System Info](/system): live device and system dashboard, plus a nearby-devices scanner that lists Bluetooth, USB, HID, serial, audio/video and gamepad hardware around this machine and detects cast-capable displays on the network
 - [Speed Test](/speedtest): network speed measurement
 - [News](/news): latest headlines by category — tech, software engineering, sports, national, international, state (Kerala) and local
+- [World Clock](/worldclock): live time anywhere in the world, and the country behind each clock. Three views over one selection. **Clocks** — your own time leads a board of pinned cities (120+ cities across 68 countries and every inhabited time zone, including half- and quarter-hour offsets like India's UTC+05:30 and Nepal's UTC+05:45); each card shows the live time, the zone abbreviation, the offset relative to you, a "Tomorrow"/"Yesterday" badge whenever the date differs, a day/night glyph and a plain-language read on whether it is a reasonable hour to call. A time-shift slider moves every clock together by up to ±12 hours for planning a call or meeting across zones. Cities are searchable by name, former name, country, capital, ISO code or IANA zone ("bombay", "kerala", "GB", "asia/kolkata" all work) and the pinned board persists on the device. **Country** — capital, region, population (approximate, with density), area, currency and symbol, official languages, international dialling code, which side of the road it drives on, internet TLD and current UTC offset, plus a short profile and what the country is known for (its specialities), and the live local time in each of its cities. **News** — latest headlines from that country's own news edition in English. Time zones are computed with the browser's `Intl` API, so daylight saving always follows the platform's current tz database; the clocks, country details and specialities are all bundled and work fully offline, and only the headlines need a connection
 - [Malayalam Writer](/malayalam): write Malayalam by transliteration (Manglish), an on-screen keyboard, or handwriting
 - [Translate](/translate): translate text between languages, online (auto-detects the source) or fully offline on-device via the browser's built-in AI — no text leaves the device
 - [Morse Code](/morse): learn, practise and send International Morse code. Four tools — a tappable chart of every letter, number, punctuation mark and prosign; a four-choice drill that weights unseen and shaky characters and tracks per-character mastery; a text ⇄ Morse translator that plays the message; and a straight key you hold to send, decoded live from your own timing. Speed (5–30 WPM) and sidetone pitch are adjustable, and every signal plays as sound, an on-screen lamp and optional vibration. Fully offline — the tone is synthesized with the Web Audio API, so no audio files are downloaded
@@ -23,17 +25,20 @@
 ## Offline / low-bandwidth behaviour
 
 - Works 100% offline after the first visit. A service worker (/sw.js) precaches every
-  app route's HTML, and a background warm-up downloads all fifteen apps' code, so any
+  app route's HTML, and a background warm-up downloads all seventeen apps' code, so any
   deep link (e.g. /todos, /pdfeditor) cold-loads with no connection — not just the app
   that was open when the network dropped.
 - Users can force or clear the download from Settings → Offline ("Save all apps for
   offline"). Automatic warm-up is skipped on metered or 2g-class connections.
 - On a weak connection the app serves saved content rather than stalling: navigations
   fall back to the cached shell after 3.5s, API responses after 6s.
-- Fully offline: Sketch Notes, PDF Editor, Image Studio, Todos, Reminders, Timer,
+- Fully offline: Sketch Notes, PDF Editor, Image Studio, Board, Todos, Reminders, Timer,
   System Info, Morse Code, Sound Meter, Color Lens, Malayalam transliteration +
-  keyboard, on-device Translate, Assistant.
-- Needs a connection: News (previously loaded headlines still open from cache), online
+  keyboard, on-device Translate, Assistant, and World Clock apart from its News tab —
+  clocks, time zones and every country detail are computed and bundled locally, and
+  country flags fall back to the ISO code when the flag image has not been cached.
+- Needs a connection: News and World Clock headlines (previously loaded headlines still
+  open from cache), online
   translation (previously translated phrases still open), Malayalam handwriting
   recognition, Speed Test, public-IP lookup. Each of these states this in the UI when
   offline instead of failing silently.

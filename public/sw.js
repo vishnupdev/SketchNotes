@@ -32,7 +32,10 @@
  * always reflect the real network, and dev HMR traffic must never go stale.
  */
 
-const VERSION = "oneapp-v5";
+// Bumped whenever the precached shell list changes, so existing installs pick
+// up newly added app routes (v6 adds /worldclock) instead of serving a shell
+// cache that predates them.
+const VERSION = "oneapp-v6";
 const SHELL_CACHE = `oneapp-shell-${VERSION}`;
 const STATIC_CACHE = `oneapp-static-${VERSION}`;
 const DATA_CACHE = `oneapp-data-${VERSION}`;
@@ -69,12 +72,14 @@ const SHELL_URLS = [
   "/",
   "/pdfeditor",
   "/image",
+  "/board",
   "/todos",
   "/reminders",
   "/timer",
   "/system",
   "/speedtest",
   "/news",
+  "/worldclock",
   "/malayalam",
   "/translate",
   "/morse",
@@ -86,8 +91,8 @@ const SHELL_URLS = [
 /** Non-HTML files the workspace can't start (or edit PDFs) without. */
 const CORE_ASSET_URLS = ["/manifest.webmanifest", "/icon.svg", "/pdf.worker.min.mjs"];
 
-/** Remote hosts whose images may be cached (news publisher logos). */
-const MEDIA_HOSTS = ["www.google.com", "news.google.com"];
+/** Remote hosts whose images may be cached (news publisher logos, country flags). */
+const MEDIA_HOSTS = ["www.google.com", "news.google.com", "flagcdn.com"];
 
 /* ----------------------------- lifecycle ------------------------------ */
 
@@ -212,7 +217,11 @@ function isRevalidatingAsset(url) {
  * hit is the same answer the network would give).
  */
 function isCacheableApi(url) {
-  return url.pathname === "/api/news" || url.pathname === "/api/translate";
+  return (
+    url.pathname === "/api/news" ||
+    url.pathname === "/api/worldclock/news" ||
+    url.pathname === "/api/translate"
+  );
 }
 
 /* ------------------------------ strategies ---------------------------- */

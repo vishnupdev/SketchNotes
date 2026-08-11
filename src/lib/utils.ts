@@ -13,6 +13,18 @@ export function timeAgo(ts: number): string {
   return d < 7 ? `${d}d ago` : new Date(ts).toLocaleDateString();
 }
 
+/** Escape a literal so it can be embedded in a RegExp source. */
+export const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Whole-word phrase test that also behaves around non-ASCII text: the phrase must
+ * be bounded by something that isn't a letter or a digit, so "list" doesn't match
+ * inside "listen". Used by the natural-language parsers (Assistant, Board).
+ */
+export function hasPhrase(text: string, phrase: string): boolean {
+  return new RegExp(`(^|[^\\p{L}\\p{N}])${escapeRe(phrase)}($|[^\\p{L}\\p{N}])`, "u").test(text);
+}
+
 /** HTML-escape for safe text interpolation. */
 export const esc = (s: string): string =>
   String(s).replace(

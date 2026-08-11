@@ -24,12 +24,14 @@ export type AppLoader = () => Promise<ComponentType>;
 export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   pdf: () => import("@/components/PdfEditor/PdfApp").then((m) => m.PdfApp),
   image: () => import("@/components/ImageStudio/ImageStudio").then((m) => m.ImageStudio),
+  board: () => import("@/components/Board/BoardApp").then((m) => m.BoardApp),
   todos: () => import("@/components/Todos/TodoApp").then((m) => m.TodoApp),
   reminders: () => import("@/components/Reminders/ReminderApp").then((m) => m.ReminderApp),
   timer: () => import("@/components/Timer/TimerApp").then((m) => m.TimerApp),
   system: () => import("@/components/SystemInfo/SystemInfoApp").then((m) => m.SystemInfoApp),
   speed: () => import("@/components/NetworkSpeed/NetworkSpeedApp").then((m) => m.NetworkSpeedApp),
   news: () => import("@/components/News/NewsApp").then((m) => m.NewsApp),
+  world: () => import("@/components/WorldClock/WorldClockApp").then((m) => m.WorldClockApp),
   malayalam: () =>
     import("@/components/MalayalamWriter/MalayalamWriterApp").then((m) => m.MalayalamWriterApp),
   translate: () => import("@/components/Translate/TranslateApp").then((m) => m.TranslateApp),
@@ -45,6 +47,7 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
  * PDF editor is last: its pdf.js bundle is by far the largest download.
  */
 export const WARMUP_ORDER: LazyAppId[] = [
+  "board",
   "todos",
   "timer",
   "reminders",
@@ -58,6 +61,7 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "system",
   "speed",
   "news",
+  "world",
   "pdf",
 ];
 
@@ -65,12 +69,14 @@ export const WARMUP_ORDER: LazyAppId[] = [
 export const APP_LABELS: Record<LazyAppId, string> = {
   pdf: "PDF Editor",
   image: "Image Studio",
+  board: "Board",
   todos: "Todos",
   reminders: "Reminders",
   timer: "Timer",
   system: "System Info",
   speed: "Speed Test",
   news: "News",
+  world: "World Clock",
   malayalam: "Malayalam Writer",
   translate: "Translate",
   morse: "Morse Code",

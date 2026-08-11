@@ -25,12 +25,14 @@ import type { AppId } from "@/store/useWorkspaceStore";
 // offline warm-up caches the exact same chunks these components request.
 const PdfApp = dynamic(APP_LOADERS.pdf, { ssr: false });
 const ImageStudio = dynamic(APP_LOADERS.image, { ssr: false });
+const BoardApp = dynamic(APP_LOADERS.board, { ssr: false });
 const TodoApp = dynamic(APP_LOADERS.todos, { ssr: false });
 const ReminderApp = dynamic(APP_LOADERS.reminders, { ssr: false });
 const TimerApp = dynamic(APP_LOADERS.timer, { ssr: false });
 const SystemInfoApp = dynamic(APP_LOADERS.system, { ssr: false });
 const NetworkSpeedApp = dynamic(APP_LOADERS.speed, { ssr: false });
 const NewsApp = dynamic(APP_LOADERS.news, { ssr: false });
+const WorldClockApp = dynamic(APP_LOADERS.world, { ssr: false });
 const MalayalamWriterApp = dynamic(APP_LOADERS.malayalam, { ssr: false });
 const TranslateApp = dynamic(APP_LOADERS.translate, { ssr: false });
 const MorseApp = dynamic(APP_LOADERS.morse, { ssr: false });
@@ -38,74 +40,58 @@ const SoundMeterApp = dynamic(APP_LOADERS.sound, { ssr: false });
 const ColorLensApp = dynamic(APP_LOADERS.color, { ssr: false });
 const AssistantApp = dynamic(APP_LOADERS.assistant, { ssr: false });
 
-const PDF_BASE = "/pdfeditor";
-const IMAGE_BASE = "/image";
-const TODOS_BASE = "/todos";
-const REMINDERS_BASE = "/reminders";
-const TIMER_BASE = "/timer";
-const SYSTEM_BASE = "/system";
-const SPEED_BASE = "/speedtest";
-const NEWS_BASE = "/news";
-const MALAYALAM_BASE = "/malayalam";
-const TRANSLATE_BASE = "/translate";
-const MORSE_BASE = "/morse";
-const SOUND_BASE = "/soundmeter";
-const COLOR_BASE = "/color";
-const ASSISTANT_BASE = "/assistant";
+/**
+ * Every app's deep-link path — the one place a route is declared, read in both
+ * directions by {@link parsePath} and {@link pathForApp}. Sketchnotes is the
+ * root; the PDF editor appends its section below its base. Keep in sync with
+ * APPS in `src/lib/site.ts` and SHELL_URLS in `public/sw.js`.
+ *
+ * `Record<AppId, string>` is doing real work here: adding an app to `AppId`
+ * without giving it a path is a type error rather than a route that silently
+ * resolves to Sketchnotes.
+ */
+const APP_PATHS: Record<AppId, string> = {
+  sketchnotes: "/",
+  pdf: "/pdfeditor",
+  image: "/image",
+  board: "/board",
+  todos: "/todos",
+  reminders: "/reminders",
+  timer: "/timer",
+  system: "/system",
+  speed: "/speedtest",
+  news: "/news",
+  world: "/worldclock",
+  malayalam: "/malayalam",
+  translate: "/translate",
+  morse: "/morse",
+  sound: "/soundmeter",
+  color: "/color",
+  assistant: "/assistant",
+};
+
+const PDF_BASE = APP_PATHS.pdf;
+
+/** The same table inverted, so a path resolves in one lookup. */
+const APP_BY_PATH = new Map<string, AppId>(
+  Object.entries(APP_PATHS).map(([app, path]) => [path, app as AppId]),
+);
 
 /** Derive the app + PDF section from a path. */
 function parsePath(pathname: string): { app: AppId; tool: string | null } {
-  if (pathname === PDF_BASE || pathname === PDF_BASE + "/") return { app: "pdf", tool: null };
-  if (pathname.startsWith(PDF_BASE + "/")) {
-    const t = pathname.slice(PDF_BASE.length + 1).replace(/\/+$/, "");
-    return { app: "pdf", tool: t && TOOL_IDS.includes(t) ? t : null };
+  // Normalise a trailing slash once, so "/todos/" and "/todos" are one case.
+  const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") || "/" : pathname;
+
+  if (path.startsWith(PDF_BASE + "/")) {
+    const tool = path.slice(PDF_BASE.length + 1);
+    return { app: "pdf", tool: tool && TOOL_IDS.includes(tool) ? tool : null };
   }
-  if (pathname === IMAGE_BASE || pathname === IMAGE_BASE + "/") return { app: "image", tool: null };
-  if (pathname === TODOS_BASE || pathname === TODOS_BASE + "/") return { app: "todos", tool: null };
-  if (pathname === REMINDERS_BASE || pathname === REMINDERS_BASE + "/") return { app: "reminders", tool: null };
-  if (pathname === TIMER_BASE || pathname === TIMER_BASE + "/") return { app: "timer", tool: null };
-  if (pathname === SYSTEM_BASE || pathname === SYSTEM_BASE + "/") return { app: "system", tool: null };
-  if (pathname === SPEED_BASE || pathname === SPEED_BASE + "/") return { app: "speed", tool: null };
-  if (pathname === NEWS_BASE || pathname === NEWS_BASE + "/") return { app: "news", tool: null };
-  if (pathname === MALAYALAM_BASE || pathname === MALAYALAM_BASE + "/") return { app: "malayalam", tool: null };
-  if (pathname === TRANSLATE_BASE || pathname === TRANSLATE_BASE + "/") return { app: "translate", tool: null };
-  if (pathname === MORSE_BASE || pathname === MORSE_BASE + "/") return { app: "morse", tool: null };
-  if (pathname === SOUND_BASE || pathname === SOUND_BASE + "/") return { app: "sound", tool: null };
-  if (pathname === COLOR_BASE || pathname === COLOR_BASE + "/") return { app: "color", tool: null };
-  if (pathname === ASSISTANT_BASE || pathname === ASSISTANT_BASE + "/") return { app: "assistant", tool: null };
-  return { app: "sketchnotes", tool: null };
+
+  return { app: APP_BY_PATH.get(path) ?? "sketchnotes", tool: null };
 }
-const pdfPath = (tool: string | null) => (tool ? `${PDF_BASE}/${tool}` : PDF_BASE);
-const pathForApp = (app: AppId, tool: string | null) =>
-  app === "pdf"
-    ? pdfPath(tool)
-    : app === "image"
-      ? IMAGE_BASE
-      : app === "todos"
-        ? TODOS_BASE
-        : app === "reminders"
-          ? REMINDERS_BASE
-          : app === "timer"
-            ? TIMER_BASE
-            : app === "system"
-              ? SYSTEM_BASE
-              : app === "speed"
-                ? SPEED_BASE
-                : app === "news"
-                  ? NEWS_BASE
-                  : app === "malayalam"
-                    ? MALAYALAM_BASE
-                    : app === "translate"
-                      ? TRANSLATE_BASE
-                      : app === "morse"
-                        ? MORSE_BASE
-                        : app === "sound"
-                          ? SOUND_BASE
-                          : app === "color"
-                            ? COLOR_BASE
-                            : app === "assistant"
-                              ? ASSISTANT_BASE
-                              : "/";
+
+const pathForApp = (app: AppId, tool: string | null): string =>
+  app === "pdf" && tool ? `${PDF_BASE}/${tool}` : APP_PATHS[app];
 
 /**
  * Top-level workspace hosting both apps natively (no iframe) and keeping the
@@ -161,12 +147,14 @@ export function Workspace() {
 
   const pdfActive = activeApp === "pdf";
   const imageActive = activeApp === "image";
+  const boardActive = activeApp === "board";
   const todosActive = activeApp === "todos";
   const remindersActive = activeApp === "reminders";
   const timerActive = activeApp === "timer";
   const systemActive = activeApp === "system";
   const speedActive = activeApp === "speed";
   const newsActive = activeApp === "news";
+  const worldActive = activeApp === "world";
   const malayalamActive = activeApp === "malayalam";
   const translateActive = activeApp === "translate";
   const morseActive = activeApp === "morse";
@@ -177,7 +165,7 @@ export function Workspace() {
   return (
     <>
       {/* Sketchnotes — always mounted, hidden while another app is active. */}
-      <div hidden={pdfActive || imageActive || todosActive || remindersActive || timerActive || systemActive || speedActive || newsActive || malayalamActive || translateActive || morseActive || soundActive || colorActive || assistantActive}>
+      <div hidden={activeApp !== "sketchnotes"}>
         <EditorShell />
       </div>
 
@@ -189,6 +177,11 @@ export function Workspace() {
       {/* Image Studio. */}
       <div hidden={!imageActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
         {imageActive && <ImageStudio />}
+      </div>
+
+      {/* Board — the prompt-composed page of sections. */}
+      <div hidden={!boardActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {boardActive && <BoardApp />}
       </div>
 
       {/* Todos. */}
@@ -219,6 +212,12 @@ export function Workspace() {
       {/* News. */}
       <div hidden={!newsActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
         {newsActive && <NewsApp />}
+      </div>
+
+      {/* World Clock. Unmounted on an app switch, which is what stops its
+          per-second tick from running behind another app. */}
+      <div hidden={!worldActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+        {worldActive && <WorldClockApp />}
       </div>
 
       {/* Malayalam Writer. */}

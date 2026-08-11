@@ -164,6 +164,10 @@ export const ChevronRightIcon = (p: IconProps) => (
   <Svg strokeWidth={2} {...p}><path d="M9.5 6 15 12l-5.5 6" /></Svg>
 );
 
+export const ChevronDownIcon = (p: IconProps) => (
+  <Svg strokeWidth={2} {...p}><path d="M6 9.5 12 15l6-5.5" /></Svg>
+);
+
 export const CalendarIcon = (p: IconProps) => (
   <Svg {...p}>
     <rect x="4" y="5.5" width="16" height="14.5" rx="2.2" />
@@ -606,5 +610,178 @@ export const TuningForkIcon = (p: IconProps) => (
     <path d="M8 3v7.5a4 4 0 0 0 8 0V3" />
     <path d="M12 14.5V21" />
     <path d="M9.6 21h4.8" />
+  </Svg>
+);
+
+/* ----------------------------- world clock ---------------------------- */
+
+/** A globe with a clock face — the World Clock app mark. */
+export const WorldClockIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M20.9 13.4A9 9 0 1 1 10.6 3.1" />
+    <path d="M3.5 9h8.2M3.5 15h6.1" />
+    <path d="M11.5 3.2A14 14 0 0 0 9.4 20.6" />
+    <circle cx="17" cy="17" r="4.5" />
+    <path d="M17 14.9V17l1.5 1.1" />
+  </Svg>
+);
+
+/** Pin — add a city to the clock board. */
+export const PinIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 21v-6.5" />
+    <path d="M8.2 3h7.6l-1 4.6 2.4 3.3a1 1 0 0 1-.8 1.6H7.6a1 1 0 0 1-.8-1.6l2.4-3.3z" />
+  </Svg>
+);
+
+/** Pin with a strike — remove a city from the board. */
+export const PinOffIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 21v-6.5" />
+    <path d="M8.2 3h7.6l-1 4.6 2.4 3.3a1 1 0 0 1-.8 1.6H7.6a1 1 0 0 1-.8-1.6l2.4-3.3z" />
+    <path d="M4 4l16 16" />
+  </Svg>
+);
+
+/** Sun rising over a horizon — the dawn/dusk clock states. */
+export const SunriseIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3 18h18" />
+    <path d="M6.5 14.5a5.5 5.5 0 0 1 11 0" />
+    <path d="M12 3v3.5M5.2 7.2l1.6 1.6M18.8 7.2l-1.6 1.6" />
+  </Svg>
+);
+
+/** A group of people — population. */
+export const UsersIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="9.5" cy="8" r="3.2" />
+    <path d="M3.5 19.5a6 6 0 0 1 12 0" />
+    <path d="M16.5 5.2a3.2 3.2 0 0 1 0 5.6M17.5 14.2a6 6 0 0 1 3 5.3" />
+  </Svg>
+);
+
+/** A coin — currency. */
+export const CoinIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M14.4 9.2a3 3 0 1 0 0 5.6" />
+    <path d="M12 6.5v11" />
+  </Svg>
+);
+
+/** A handset — international dialling code. */
+export const PhoneIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M7.2 3.5 9.4 8l-1.9 1.6a12 12 0 0 0 6.9 6.9L16 14.6l4.5 2.2v3a1.7 1.7 0 0 1-1.9 1.7C10.5 20.7 3.3 13.5 2.5 5.4A1.7 1.7 0 0 1 4.2 3.5z" />
+  </Svg>
+);
+
+/** A car — which side of the road a country drives on. */
+export const CarIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 16.5v2a1 1 0 0 1-1 1H2.5M20 16.5v2a1 1 0 0 0 1 1h.5" />
+    <path d="M3 16.5v-3.2l1.9-4.6A2 2 0 0 1 6.7 7.5h10.6a2 2 0 0 1 1.8 1.2l1.9 4.6v3.2z" />
+    <path d="M3.5 13.3h17" />
+    <circle cx="7.5" cy="16.4" r="1.1" />
+    <circle cx="16.5" cy="16.4" r="1.1" />
+  </Svg>
+);
+
+/** A ruler — land area. */
+export const RulerIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M14.8 2.9 21.1 9.2a1.5 1.5 0 0 1 0 2.1L11.3 21.1a1.5 1.5 0 0 1-2.1 0L2.9 14.8a1.5 1.5 0 0 1 0-2.1L12.7 2.9a1.5 1.5 0 0 1 2.1 0Z" />
+    <path d="M7.5 12.2 9.3 14M10.4 9.3l1.8 1.8M13.3 6.4l1.8 1.8" />
+  </Svg>
+);
+
+/** A compass — region and orientation. */
+export const CompassIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M15.4 8.6 13.7 13.7 8.6 15.4 10.3 10.3z" />
+  </Svg>
+);
+
+/** Two speech bubbles — spoken languages. */
+export const LanguagesIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3 6.5A2 2 0 0 1 5 4.5h7a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H8l-3 2.5V11.5a2 2 0 0 1-2-2z" />
+    <path d="M17 9.5h2a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2v2.8L16 16.5h-3" />
+  </Svg>
+);
+
+/** A classical building — the capital city. */
+export const CapitolIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.5 9.5 12 4.5l8.5 5" />
+    <path d="M5.5 9.5v8M9.5 9.5v8M14.5 9.5v8M18.5 9.5v8" />
+    <path d="M3 20.5h18" />
+  </Svg>
+);
+
+/** A sparkle — what a place is known for. */
+export const SparkleIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3.2 13.9 9 19.7 10.9 13.9 12.8 12 18.6 10.1 12.8 4.3 10.9 10.1 9z" />
+    <path d="M18.5 3v3M20 4.5h-3" />
+  </Svg>
+);
+
+/** A slider handle on a track — the time scrubber. */
+export const SlidersIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.5 8h17M3.5 16h17" />
+    <circle cx="9" cy="8" r="2.3" />
+    <circle cx="15.5" cy="16" r="2.3" />
+  </Svg>
+);
+
+/** A page of cards with a spark on it — a board you compose by prompting. */
+export const BoardIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.2" y="3.5" width="7.6" height="7" rx="1.6" />
+    <rect x="13.2" y="3.5" width="7.6" height="11" rx="1.6" />
+    <rect x="3.2" y="13" width="7.6" height="7.5" rx="1.6" />
+    <path d="M15 18.4h5.8M17.9 15.6v5.6" />
+  </Svg>
+);
+
+/** Two links of a chain — a saved web address. */
+export const LinkIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M10.3 13.7a3.6 3.6 0 0 0 5.1 0l3-3a3.6 3.6 0 1 0-5.1-5.1l-1.2 1.2" />
+    <path d="M13.7 10.3a3.6 3.6 0 0 0-5.1 0l-3 3a3.6 3.6 0 1 0 5.1 5.1l1.2-1.2" />
+  </Svg>
+);
+
+export const ChevronUpIcon = (p: IconProps) => (
+  <Svg strokeWidth={2} {...p}><path d="M6 14.5 12 9l6 5.5" /></Svg>
+);
+
+/** Three dots — an overflow menu. */
+export const MoreIcon = (p: IconProps) => (
+  <Svg {...p} fill="currentColor" stroke="none">
+    <circle cx="12" cy="5.4" r="1.7" />
+    <circle cx="12" cy="12" r="1.7" />
+    <circle cx="12" cy="18.6" r="1.7" />
+  </Svg>
+);
+
+/** Arrows pushing outward against two walls — widen this card. */
+export const WidthIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.5 5.5v13M20.5 5.5v13" />
+    <path d="M7 12h10M9.4 9.4 7 12l2.4 2.6M14.6 9.4 17 12l-2.4 2.6" />
+  </Svg>
+);
+
+/** A question mark in a circle — show the grammar. */
+export const HelpIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .9-1 1.6v.3" />
+    <path d="M12 17.1h.01" />
   </Svg>
 );

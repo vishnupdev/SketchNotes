@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { DEFAULT_NEWS_TAB, newsFeedUrl, newsTabById } from "@/lib/News/catalog";
-import { parseNewsRss } from "@/lib/News/parse-rss";
+import { parseNewsRss } from "@/lib/rss/parse-rss";
 import type { NewsFeedResponse } from "@/lib/News/types";
 
 // Always run on the server at request time — the feed is live and per-tab.

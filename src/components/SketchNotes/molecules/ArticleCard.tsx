@@ -1,23 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import type { NewsArticle } from "@/lib/News/types";
-import { sourceLogo, timeAgo } from "@/lib/News/format";
+import type { FeedArticle } from "@/lib/rss/types";
+import { sourceLogo, timeAgo } from "@/lib/rss/format";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { trackSpot } from "@/lib/utils";
 import { ExternalLinkIcon } from "@/components/SketchNotes/atoms/icons";
 
 /**
- * A single headline. The whole card is the link; it opens the original article
- * in a new tab. A related image (the publisher's logo, derived from the feed's
- * source URL) sits alongside the headline; when the feed omits the source the
- * card falls back to the publisher initial so the layout never shifts.
+ * A single headline from an RSS feed. The whole card is the link; it opens the
+ * original article in a new tab. A related image (the publisher's logo, derived
+ * from the feed's source URL) sits alongside the headline; when the feed omits
+ * the source the card falls back to the publisher initial so the layout never
+ * shifts.
  *
  * The logo is a remote request, so it is skipped entirely on a metered or
  * 2g-class link, and a failed load (offline, blocked) falls back to the same
  * initial rather than a broken image.
+ *
+ * Shared across apps — the News feed and World Clock's per-country headlines
+ * both render it — so a headline reads and behaves identically everywhere.
  */
-export function NewsCard({ article }: { article: NewsArticle }) {
+export function ArticleCard({ article }: { article: FeedArticle }) {
   const { slow } = useNetworkStatus();
   const [logoBroken, setLogoBroken] = useState(false);
   const when = timeAgo(article.publishedAt);

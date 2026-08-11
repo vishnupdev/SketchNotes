@@ -3,22 +3,27 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/SketchNotes/atoms/icons";
 import { cx } from "@/lib/utils";
 
-interface NewsPaginationProps {
+interface PaginationProps {
   /** Current page, 1-based. */
   page: number;
   /** Total number of pages. */
   pageCount: number;
   /** Called with the 1-based page to move to. */
   onPage: (page: number) => void;
+  /** Names the nav for assistive tech, e.g. "News pages". */
+  label?: string;
 }
 
 /**
- * Page navigation for the headline list. Keeps the mobile feed short — instead
- * of one long scroll through every headline, readers page through a handful at
- * a time. Renders nothing when everything fits on a single page. Numbered
- * buttons stay reachable side-to-side on narrow screens via horizontal scroll.
+ * Page navigation for a long list. Keeps a mobile feed short — instead of one
+ * endless scroll, readers page through a handful of items at a time. Renders
+ * nothing when everything fits on a single page. Numbered buttons stay
+ * reachable side-to-side on narrow screens via horizontal scroll.
+ *
+ * Shared across apps; pass `label` so each list's pager is named for its own
+ * content.
  */
-export function NewsPagination({ page, pageCount, onPage }: NewsPaginationProps) {
+export function Pagination({ page, pageCount, onPage, label = "Pages" }: PaginationProps) {
   if (pageCount <= 1) return null;
 
   const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
@@ -27,7 +32,7 @@ export function NewsPagination({ page, pageCount, onPage }: NewsPaginationProps)
 
   return (
     <nav
-      aria-label="News pages"
+      aria-label={label}
       className="scroll-slim mt-6 flex items-center justify-center gap-1.5 overflow-x-auto pb-1"
     >
       <button

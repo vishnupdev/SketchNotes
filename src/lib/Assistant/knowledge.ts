@@ -17,12 +17,14 @@ export const APP_LABELS: Record<AppId, string> = {
   sketchnotes: "Sketchnotes",
   pdf: "PDF Editor",
   image: "Image Studio",
+  board: "Board",
   todos: "Todos",
   reminders: "Reminders",
   timer: "Timer",
   system: "System Info",
   speed: "Network Speed",
   news: "News",
+  world: "World Clock",
   malayalam: "Malayalam Writer",
   translate: "Translate",
   morse: "Morse Code",
@@ -39,12 +41,32 @@ export const APP_ALIASES: Record<AppId, string[]> = {
   sketchnotes: ["sketchnotes", "sketch notes", "sketch", "canvas", "draw", "drawing", "notes", "whiteboard", "doodle"],
   pdf: ["pdf editor", "pdf", "pdfs", "document editor"],
   image: ["image studio", "image", "images", "photo", "photos", "picture", "pictures"],
+  // "board" and "sections" only — the generic words ("dashboard", "page") are
+  // left out so they can't outrank a question about the workspace itself.
+  board: ["board", "my board", "sections", "custom dashboard", "prompt board", "habit tracker", "counter"],
   todos: ["todos", "todo", "to-do", "tasks", "task list", "planner"],
   reminders: ["reminders", "reminder", "alerts", "alarm", "alarms"],
   timer: ["timer", "timers", "stopwatch", "pomodoro", "countdown"],
   system: ["system info", "system", "device info", "hardware", "specs", "nearby devices"],
   speed: ["network speed", "speed test", "speedtest", "internet speed", "bandwidth"],
   news: ["news", "headlines", "newspaper"],
+  world: [
+    "world clock",
+    "world time",
+    "worldclock",
+    "time zone",
+    "time zones",
+    "timezone",
+    "timezones",
+    "utc",
+    "gmt",
+    "what time is it",
+    "time in",
+    "country info",
+    "country details",
+    "country facts",
+    "countries",
+  ],
   malayalam: ["malayalam writer", "malayalam", "manglish", "മലയാളം"],
   translate: ["translate", "translator", "translation"],
   morse: ["morse code", "morse", "sos", "dots and dashes", "telegraph", "cw"],
@@ -113,12 +135,14 @@ export const APP_PATHS: Record<AppId, string> = {
   sketchnotes: "/",
   pdf: "/pdfeditor",
   image: "/image",
+  board: "/board",
   todos: "/todos",
   reminders: "/reminders",
   timer: "/timer",
   system: "/system",
   speed: "/speedtest",
   news: "/news",
+  world: "/worldclock",
   malayalam: "/malayalam",
   translate: "/translate",
   morse: "/morse",
@@ -132,12 +156,14 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   sketchnotes: "draw and write on an infinite canvas, with many saved notes",
   pdf: "ten PDF tools — edit, merge, split, organise, convert, watermark and more",
   image: "crop, resize, compress and convert images to any upload limit",
+  board: "a page you build by typing — add, edit and remove sections in plain English",
   todos: "tasks framed by day, week, month and year",
   reminders: "timed alerts that ring with a sound you pick",
   timer: "countdown timers, a lap stopwatch and pomodoro cycles",
   system: "a live report on this device, browser and hardware, plus a nearby-device scan",
   speed: "download, upload, ping and jitter measurement",
   news: "headlines by category — tech, software engineering, sports, national, state, local, world",
+  world: "live time in cities worldwide, with each country's facts, specialities and news",
   malayalam: "type Malayalam by Manglish, on-screen keyboard or handwriting",
   translate: "translate text online, or fully offline on-device",
   morse: "learn, practise and send Morse code — chart, drills, translator and a key",
@@ -153,10 +179,10 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "What OneApp is",
     keywords: ["oneapp", "one app", "overview", "about", "what is this", "workspace", "summary", "purpose", "intro"],
     answer:
-      "OneApp is a single web workspace holding fifteen tools, so you never install fifteen apps.\n" +
+      "OneApp is a single web workspace holding seventeen tools, so you never install seventeen apps.\n" +
       "• Creative: Sketchnotes canvas, Image Studio, PDF Editor\n" +
-      "• Planning: Todos, Reminders, Timer\n" +
-      "• Info: News, System Info, Network Speed, Sound Meter, Color Lens\n" +
+      "• Planning: Board, Todos, Reminders, Timer\n" +
+      "• Info: News, World Clock, System Info, Network Speed, Sound Meter, Color Lens\n" +
       "• Language: Translate, Malayalam Writer, Morse Code, and me — the Assistant\n" +
       "Everything is free, needs no account, and keeps your data in your own browser.",
     followUps: ["List all the apps", "Is my data private?", "Does it work offline?"],
@@ -179,10 +205,10 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     keywords: ["offline", "offline mode", "work offline", "works offline", "use it offline", "use offline", "no internet", "no connection", "without internet", "airplane mode", "slow internet", "weak connection", "save data", "data saver", "install", "pwa", "home screen", "app icon", "service worker", "download app", "save for offline"],
     answer:
       "OneApp is a PWA: after your first visit it saves itself on your device, so every app opens with no connection — including a fresh reload of any app's link.\n" +
-      "• All fifteen apps are downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
+      "• All seventeen apps are downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
       "• Install it from your browser's Install / Add to Home Screen option to get an app icon and its own window\n" +
-      "• Fully offline: Sketchnotes, PDF Editor, Image Studio, Todos, Reminders, Timer, System Info, Sound Meter, Color Lens, Malayalam typing/keyboard, on-device Translate, and me\n" +
-      "• Needs a connection: News (saved headlines still open), online translation (past phrases still open), handwriting recognition and the speed test\n" +
+      "• Fully offline: Sketchnotes, PDF Editor, Image Studio, Board, Todos, Reminders, Timer, System Info, Sound Meter, Color Lens, World Clock (clocks and country details), Malayalam typing/keyboard, on-device Translate, and me\n" +
+      "• Needs a connection: News and World Clock headlines (saved ones still open), online translation (past phrases still open), handwriting recognition and the speed test\n" +
       "• On a weak or metered connection it serves saved content instead of stalling, and skips optional downloads like news logos",
     followUps: ["Is my data private?", "Which apps need internet?", "List all the apps"],
   },
@@ -250,7 +276,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "Mobile and touch support",
     keywords: ["mobile", "phone", "tablet", "ipad", "touch", "responsive", "stylus", "pen", "finger", "small screen"],
     answer:
-      "Every screen is designed mobile-first and reflows down to about 360px wide, so all fifteen tools work on a phone.\n" +
+      "Every screen is designed mobile-first and reflows down to about 360px wide, so all seventeen tools work on a phone.\n" +
       "• Drawing, handwriting and the PDF editor accept touch and stylus input\n" +
       "• Install it to your home screen to use it like a native app\n" +
       "• Layouts widen into side-by-side panes on tablets and desktops",
@@ -364,6 +390,21 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     followUps: ["How do I compress an image to a size limit?", "How do I convert images to PDF?"],
   },
   {
+    id: "app-board",
+    title: "Board — a page you build by prompting",
+    app: "board",
+    keywords: ["board", "my board", "sections", "section", "add a section", "remove a section", "custom page", "custom dashboard", "dashboard", "build my own", "prompt", "prompting", "plain english", "natural language", "widget", "widgets", "card", "cards", "counter", "tally", "habit", "habit tracker", "streak", "checklist", "links", "bookmarks", "note"],
+    answer:
+      "Board is a page you compose by describing it. Type what you want and it appears:\n" +
+      "• Add — \"add a checklist for groceries\", \"add a counter for water with a goal of 8\", \"add a habit for reading\", \"add a note called Ideas\"\n" +
+      "• Modify — \"rename groceries to shopping\", \"set the water goal to 10\", \"turn ideas into a checklist\", \"make ideas wide\", \"move groceries to top\"\n" +
+      "• Fill in — \"add milk to groceries\", \"check milk\", \"add 5 to water\", \"check today on reading\"\n" +
+      "• Remove — \"remove milk from groceries\", \"remove groceries\", \"reset water\", \"clear the board\", \"undo\"\n" +
+      "Five section types: Note, Checklist, Counter (with a goal, step and unit), Links and Habit (a seven-day streak). Every card also has its own buttons, so you never have to guess a phrase, and the ? button lists every wording it understands.\n" +
+      "The wording is read by a small parser built into the app — no API key, no account, nothing sent anywhere — so it works offline, and your board stays in this browser.",
+    followUps: ["How do Todos work?", "Is my data private?", "Does it work offline?"],
+  },
+  {
     id: "app-todos",
     title: "Todos — tasks by day, week, month and year",
     app: "todos",
@@ -436,6 +477,19 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "• Results are paginated and refresh on demand\n" +
       "This is the one app that always needs a connection.",
     followUps: ["Which apps need internet?", "List all the apps"],
+  },
+  {
+    id: "app-world",
+    title: "World Clock — live times, countries and their news",
+    app: "world",
+    keywords: ["world clock", "world time", "time zone", "timezone", "utc", "gmt", "offset", "what time is it", "time difference", "daylight saving", "dst", "meeting across time zones", "country", "capital", "currency", "population", "dialling code", "specialities", "known for"],
+    answer:
+      "World Clock shows the time anywhere, and the country behind each clock, across three views:\n" +
+      "• Clocks — your time leads a board of pinned cities; each card gives the live time, the offset from you, a Tomorrow/Yesterday badge when the date differs, and whether it's a sociable hour to call\n" +
+      "• Country — capital, population, area, currency, languages, dialling code, driving side, domain and time zone, plus a short profile and what the country is known for\n" +
+      "• News — the latest headlines from that country, in English\n" +
+      "A time-shift slider moves every clock together by up to ±12 hours for planning a call. Search cities by name, former name, country, capital or zone. Only the headlines need a connection — the clocks and country details work offline.",
+    followUps: ["Which apps need internet?", "How do I check the news?", "List all the apps"],
   },
   {
     id: "app-malayalam",

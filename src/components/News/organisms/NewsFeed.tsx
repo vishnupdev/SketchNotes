@@ -3,8 +3,8 @@
 import { useRef, useState } from "react";
 import { useNews } from "@/hooks/useNews";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
-import { NewsCard } from "@/components/News/molecules/NewsCard";
-import { NewsPagination } from "@/components/News/molecules/NewsPagination";
+import { ArticleCard } from "@/components/SketchNotes/molecules/ArticleCard";
+import { Pagination } from "@/components/SketchNotes/molecules/Pagination";
 import { OfflineNotice } from "@/components/Offline/OfflineNotice";
 import { NewsIcon } from "@/components/SketchNotes/atoms/icons";
 
@@ -122,10 +122,10 @@ export function NewsFeed({ tabId }: { tabId: string }) {
       )}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {visible.map((article) => (
-          <NewsCard key={article.id} article={article} />
+          <ArticleCard key={article.id} article={article} />
         ))}
       </div>
-      <NewsPagination page={safePage} pageCount={pageCount} onPage={goToPage} />
+      <Pagination page={safePage} pageCount={pageCount} onPage={goToPage} label="News pages" />
     </div>
   );
 }

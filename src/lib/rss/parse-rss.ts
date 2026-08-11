@@ -1,10 +1,11 @@
-import type { NewsArticle } from "./types";
+import type { FeedArticle } from "./types";
 
 /**
  * Minimal, dependency-free RSS parser for Google News feeds. The feeds are
  * well-formed and predictable, so a few scoped regexes are lighter than pulling
- * in an XML library — and this runs server-side in the `/api/news` route where
- * no DOMParser exists. Only the fields we render are extracted.
+ * in an XML library — and this runs server-side in the feed proxy routes
+ * (`/api/news`, `/api/worldclock/news`) where no DOMParser exists. Only the
+ * fields we render are extracted.
  */
 
 const NAMED_ENTITIES: Record<string, string> = {
@@ -68,9 +69,9 @@ function buildSummary(description: string | undefined, title: string): string | 
 }
 
 /** Parse a Google News RSS document into normalized articles. */
-export function parseNewsRss(xml: string): NewsArticle[] {
+export function parseNewsRss(xml: string): FeedArticle[] {
   const items = xml.match(/<item>[\s\S]*?<\/item>/gi) ?? [];
-  const articles: NewsArticle[] = [];
+  const articles: FeedArticle[] = [];
   const seen = new Set<string>();
 
   for (const item of items) {

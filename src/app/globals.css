@@ -102,18 +102,29 @@
   --app-sketchnotes: #0f7b6c;
   --app-pdf: #e0533b;
   --app-image: #8b5cf6;
+  --app-board: #7c3aed;
   --app-todos: #1f74e0;
   --app-reminders: #e8930c;
   --app-timer: #e14d82;
   --app-system: #2f9e44;
   --app-speed: #6d8bff;
   --app-news: #c2410c;
+  --app-world: #1d63b8;
   --app-malayalam: #0891b2;
   --app-translate: #4f46e5;
   --app-assistant: #b026c9;
   --app-morse: #4d7c0f;
   --app-sound: #be123c;
   --app-color: #0d9488;
+
+  /* Board section-type hues. Only ever used as a small glyph tile and a hairline
+     rim (never as text or a fill behind text), so these are chosen for being
+     tellable apart at 16px rather than for text contrast. */
+  --board-note: #b45309;
+  --board-checklist: #1f74e0;
+  --board-counter: #0f7b6c;
+  --board-links: #7c3aed;
+  --board-habit: #be185d;
 }
 
 /* Dark palettes: brighten the scrim + app hues so glyphs stay legible on
@@ -139,18 +150,25 @@
   --app-sketchnotes: #1fb89f;
   --app-pdf: #ff6f57;
   --app-image: #a688ff;
+  --app-board: #a78bfa;
   --app-todos: #4d94ff;
   --app-reminders: #ffb224;
   --app-timer: #ff6f9c;
   --app-system: #40c463;
   --app-speed: #8ba4ff;
   --app-news: #fb7141;
+  --app-world: #5a9dfb;
   --app-malayalam: #22c3dd;
   --app-translate: #818cf8;
   --app-assistant: #e07ff0;
   --app-morse: #a3e635;
   --app-sound: #fb7185;
   --app-color: #2dd4bf;
+  --board-note: #fbbf24;
+  --board-checklist: #4d94ff;
+  --board-counter: #1fb89f;
+  --board-links: #a78bfa;
+  --board-habit: #f472b6;
 }
 
 [data-theme="dark"] {
