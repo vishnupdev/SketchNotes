@@ -29,9 +29,10 @@ function Section({
 }
 
 /**
- * Theme picker. Each tile is scoped with its own `data-theme`, so it previews
- * the real palette (paper, panel, accent, grid) straight from the CSS tokens —
- * no colour values are duplicated in JS.
+ * Theme picker. Each tile is scoped with its own `data-theme` (plus `data-dark`
+ * for dark palettes, exactly as the theme is applied to <body>), so it previews
+ * the real palette — paper, panel, accent, grid and label ink — straight from
+ * the CSS tokens, with no colour values duplicated in JS.
  */
 function ThemeSetting() {
   const { themeId, setTheme } = useTheme();
@@ -51,6 +52,7 @@ function ThemeSetting() {
             aria-checked={active}
             aria-label={t.label}
             data-theme={t.id}
+            data-dark={t.dark ? "" : undefined}
             onClick={() => setTheme(t.id)}
             className={cx(
               "relative flex flex-col gap-2.5 overflow-hidden rounded-xl border bg-paper p-3 text-left transition-all",
@@ -68,7 +70,7 @@ function ThemeSetting() {
             <span className="flex items-center justify-between">
               <span className="text-[12.5px] font-bold text-text">{t.label}</span>
               {active && (
-                <span className="grid size-4 place-items-center rounded-full bg-accent text-white">
+                <span className="grid size-4 place-items-center rounded-full bg-accent text-on-accent">
                   <CheckIcon size={11} />
                 </span>
               )}

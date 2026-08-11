@@ -5,15 +5,30 @@
 @custom-variant dark (&:where([data-dark] *));
 
 /* ---------------- theme tokens (flip on [data-theme]) ---------------- */
+
+/* Fraction of the panel colour kept opaque; the rest is glass. Kept high for
+   an elegant, readable frost (nested panels compound toward fully solid).
+   Stays on :root alone so the prefers-reduced-transparency query below can flip
+   it to 100% for the whole document — a palette scoped to a nested element must
+   not re-assert 82% underneath it. */
 :root {
+  --glass-opacity: 82%;
+}
+
+/* The light base palette. Declared for :root *and* for every non-dark
+   `data-theme`, so a light palette scoped to a nested element re-states these
+   tokens instead of inheriting the document's. That is what lets the settings
+   theme tiles preview a light palette inside a dark workspace — without it they
+   inherit the dark `--text` (and the `[data-dark]` rim / `--on-accent` from
+   <body>) and their labels vanish against light `--paper`. Dark palettes are
+   excluded here and override what they flip further down; a new dark theme must
+   be added to the :not() list as well as getting its own block. */
+:root,
+[data-theme]:where(:not([data-theme="dark"], [data-theme="midnight"])) {
   --paper: #f7f8f6;
   --grid: #d5dbe3;
   --ink: #1f2a33;
   --ink-soft: #66727d;
-  /* Fraction of the panel colour kept opaque; the rest is glass. Kept high for
-     an elegant, readable frost (nested panels compound toward fully solid).
-     Flipped to 100% under prefers-reduced-transparency. */
-  --glass-opacity: 82%;
   --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #e4e9ee;
   --accent: #0f7b6c;
