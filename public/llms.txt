@@ -24,12 +24,20 @@
 
 ## Offline / low-bandwidth behaviour
 
-- Works 100% offline after the first visit. A service worker (/sw.js) precaches every
-  app route's HTML, and a background warm-up downloads all seventeen apps' code, so any
-  deep link (e.g. /todos, /pdfeditor) cold-loads with no connection — not just the app
-  that was open when the network dropped.
+- Works 100% offline after the first visit. A service worker (/sw.js) precaches every app
+  route's HTML, then stores every file in the build manifest (/precache-manifest.json) —
+  which includes the code-split chunk for each of the seventeen apps. So one online visit
+  to any single page is enough for every deep link (e.g. /todos, /pdfeditor) to cold-load
+  with no connection, not just the app that was open when the network dropped.
+- An app whose code is somehow not stored (a connection lost mid-download, or a deploy
+  that renamed the chunks) shows a "not saved for offline use yet" panel with a way to
+  open another app, rather than failing the whole page.
 - Users can force or clear the download from Settings → Offline ("Save all apps for
-  offline"). Automatic warm-up is skipped on metered or 2g-class connections.
+  offline"). Automatic precaching is skipped on metered or 2g-class connections; the
+  explicit save from Settings runs regardless.
+- Offline is detected from what requests actually do, not only `navigator.onLine`, so the
+  offline states also appear behind a captive portal or a dead uplink that the browser
+  still reports as being online.
 - On a weak connection the app serves saved content rather than stalling: navigations
   fall back to the cached shell after 3.5s, API responses after 6s.
 - Fully offline: Sketch Notes, PDF Editor, Image Studio, Board, Todos, Reminders, Timer,
@@ -49,8 +57,15 @@
 Opened from the bottom of the app launcher; every preference applies to all apps and is
 stored on the device.
 
-- Theme: eight palettes — Light, Ocean, Sunset, Grape, Rose, Forest (light), Dark and
-  Midnight (dark).
+- Theme: twenty-four built-in palettes, grouped by base. Light — Light, Ocean, Sky, Mint,
+  Forest, Sunset, Clay, Sand, Olive, Rose, Grape, Lavender, Slate. Dark — Dark, Midnight,
+  Carbon, Abyss, Matrix, Nebula, Ember, Wine, Mocha, Arctic, Noir (Noir is pure black, for
+  OLED screens). Every palette holds WCAG AA contrast on the text it carries.
+  Custom themes: up to twelve of your own, each built from a base (light or dark), an
+  accent and a background colour — the rest of the palette is derived from those, and the
+  editor shows the accent's live contrast ratio against the background so a theme you make
+  stays readable. Saved themes can be renamed, re-coloured and deleted. Everything is
+  stored on the device.
 - Pointer: replaces the mouse cursor workspace-wide. System (the device's own) plus
   thirteen drawn presets — Arrow, Chevron, Hand, Crosshair, Dot, Ring, Pen, Pencil,
   Brush, Sparkle, Star, Heart and Pixel — each in four sizes (Small to Huge) and

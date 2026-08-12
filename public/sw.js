@@ -32,10 +32,11 @@
  * always reflect the real network, and dev HMR traffic must never go stale.
  */
 
-// Bumped whenever the precached shell list changes, so existing installs pick
-// up newly added app routes (v6 adds /worldclock) instead of serving a shell
-// cache that predates them.
-const VERSION = "oneapp-v6";
+// Bumped whenever the precached shell list or the caching rules change, so
+// existing installs pick up newly added app routes instead of serving a cache
+// that predates them. v7 adds build-manifest precaching (every code-split app
+// chunk, not just the ones visited) and query-tolerant static lookups.
+const VERSION = "oneapp-v7";
 const SHELL_CACHE = `oneapp-shell-${VERSION}`;
 const STATIC_CACHE = `oneapp-static-${VERSION}`;
 const DATA_CACHE = `oneapp-data-${VERSION}`;
@@ -45,6 +46,23 @@ const OWNED_CACHES = [SHELL_CACHE, STATIC_CACHE, DATA_CACHE, MEDIA_CACHE];
 /** Serve from cache if the network hasn't answered within these budgets. */
 const NAV_TIMEOUT_MS = 3500;
 const DATA_TIMEOUT_MS = 6000;
+
+/**
+ * Stamped on API responses replayed from cache, so the page can tell a saved
+ * answer from a live one — and, more usefully, *why* it got the saved one:
+ *
+ *   "offline"  the request failed outright: there is no usable connection
+ *   "stale"    the network answered too slowly or with an error, so it is
+ *              reachable and only this response wasn't good enough
+ *
+ * Without the distinction a cached reply looks exactly like a successful
+ * request, and `src/lib/net/fetch.ts` would read it as proof the network is fine
+ * — clearing the offline state at the exact moment saved data is being served.
+ * The "offline" value is the app's most reliable offline signal, because
+ * `navigator.onLine` can claim a connection that does not work. Keep in sync
+ * with `CACHED_RESPONSE_HEADER` there.
+ */
+const CACHED_RESPONSE_HEADER = "x-oneapp-cached";
 
 /*
  * Entry caps — keeps the caches bounded on long-lived installs.
@@ -91,6 +109,17 @@ const SHELL_URLS = [
 /** Non-HTML files the workspace can't start (or edit PDFs) without. */
 const CORE_ASSET_URLS = ["/manifest.webmanifest", "/icon.svg", "/pdf.worker.min.mjs"];
 
+/**
+ * Written by `scripts/generate-precache.mjs` at build time: every JS/CSS file
+ * under `/_next/static`, including the code-split chunk for each app.
+ *
+ * This is what makes the *whole* workspace offline-ready after one online
+ * visit. Without it, an app's chunk only landed in the cache if the client
+ * warm-up had reached that app before the connection dropped — and opening an
+ * un-warmed app offline failed to load its chunk, which takes down the page.
+ */
+const BUILD_MANIFEST_URL = "/precache-manifest.json";
+
 /** Remote hosts whose images may be cached (news publisher logos, country flags). */
 const MEDIA_HOSTS = ["www.google.com", "news.google.com", "flagcdn.com"];
 
@@ -123,6 +152,79 @@ self.addEventListener("activate", (event) => {
     })(),
   );
 });
+
+/* --------------------- whole-build precaching ------------------------- */
+
+/**
+ * Connection classes where optional downloads are skipped, mirroring
+ * `src/lib/net/status.ts` — precaching the whole build behind the user's back
+ * must never spend a metered or 2g-class connection. A user who wants it anyway
+ * gets it from Settings → Offline, which forces this through.
+ */
+function connectionIsMetered() {
+  const c = self.navigator && self.navigator.connection;
+  if (!c) return false;
+  return Boolean(c.saveData) || c.effectiveType === "slow-2g" || c.effectiveType === "2g";
+}
+
+/** Once-per-worker guard, so concurrent fetch events share a single run. */
+let buildPrecache = null;
+
+/**
+ * Download every asset in the build manifest that isn't already stored.
+ *
+ * Deliberately *not* run from `install`/`activate`: their `waitUntil` gates the
+ * worker's activation, and fetch events aren't dispatched to a worker that
+ * hasn't activated — so precaching a few MB there would stall the very page
+ * that just registered the worker. It's kicked off from the first fetch event
+ * instead, where `waitUntil` keeps the worker alive without delaying any
+ * response.
+ */
+async function precacheBuild(force = false) {
+  if (!force && connectionIsMetered()) return { skipped: "metered" };
+
+  const manifest = await fetch(BUILD_MANIFEST_URL, { cache: "no-cache" })
+    .then((res) => (res && res.ok ? res.json() : null))
+    .catch(() => null);
+
+  const assets = manifest && Array.isArray(manifest.assets) ? manifest.assets : null;
+  if (!assets || assets.length === 0) return { skipped: "no-manifest" };
+
+  const cache = await caches.open(STATIC_CACHE);
+  const stored = new Set((await cache.keys()).map((request) => new URL(request.url).pathname));
+  const missing = assets.filter((url) => !stored.has(url));
+
+  // add() one at a time rather than addAll(): addAll is atomic, so a single
+  // asset that 404s after a redeploy would discard the whole batch.
+  let saved = 0;
+  await Promise.all(
+    missing.map((url) =>
+      cache
+        .add(url)
+        .then(() => {
+          saved += 1;
+        })
+        .catch(() => {}),
+    ),
+  );
+
+  // The manifest lists one build's output, which is well inside the cap; trim
+  // afterwards so the entries evicted are the previous deploy's, not this one's.
+  await trimCache(STATIC_CACHE, STATIC_MAX_ENTRIES);
+  return { saved, total: assets.length, revision: manifest.revision ?? null };
+}
+
+/** Run the build precache at most once per worker, unless forced. */
+function ensureBuildPrecached(force = false) {
+  if (force) {
+    buildPrecache = precacheBuild(true).catch(() => ({ skipped: "error" }));
+    return buildPrecache;
+  }
+  if (!buildPrecache) {
+    buildPrecache = precacheBuild(false).catch(() => ({ skipped: "error" }));
+  }
+  return buildPrecache;
+}
 
 /* ------------------------------ helpers ------------------------------- */
 
@@ -270,7 +372,18 @@ async function handleImmutable(request) {
 /** Everything else static: instant from cache, refreshed in the background. */
 async function handleRevalidating(request) {
   const cache = await caches.open(STATIC_CACHE);
-  const cached = await cache.match(request);
+  /*
+   * `ignoreSearch` on the fallback, because these URLs are versioned by query
+   * string rather than by filename: the root layout asks for `/icon.svg?v=2`
+   * while the precache stored `/icon.svg`, and an exact match misses — which
+   * offline meant a failed icon request on every single page load.
+   *
+   * Safe for this set specifically (see `isRevalidatingAsset`): it is static
+   * files and the core assets, where a query string is only ever a cache-buster
+   * and never selects different bytes.
+   */
+  const cached =
+    (await cache.match(request)) || (await cache.match(request, { ignoreSearch: true }));
   const network = fetch(request)
     .then((response) => {
       if (isStorable(response)) {
@@ -289,6 +402,11 @@ async function handleRevalidating(request) {
  * instead of an error.
  */
 async function handleApi(request) {
+  // Whether the request failed at the transport level, as opposed to being slow
+  // or answering with an error — that is the difference between "no connection"
+  // and "connection fine, this response wasn't", and the page acts on it.
+  let unreachable = false;
+
   const network = fetch(request)
     .then((response) => {
       if (response && response.ok) {
@@ -296,14 +414,39 @@ async function handleApi(request) {
       }
       return response;
     })
-    .catch(() => null);
+    .catch(() => {
+      unreachable = true;
+      return null;
+    });
 
   const fresh = await withTimeout(network, DATA_TIMEOUT_MS);
   if (fresh && fresh.ok) return fresh;
 
   const cache = await caches.open(DATA_CACHE);
   const cached = await cache.match(request, { ignoreVary: true });
-  return cached || fresh || Response.error();
+  // A timeout leaves the fetch still running, so `unreachable` is only true when
+  // it actually rejected — a slow link is reported as "stale", not offline.
+  if (cached) return labelAsCached(cached, unreachable ? "offline" : "stale");
+  return fresh || Response.error();
+}
+
+/**
+ * Copy a cached response with {@link CACHED_RESPONSE_HEADER} added, since a
+ * Response's own headers are immutable. Only used for API data, which is small
+ * JSON — buffering the body here would be the wrong trade for large assets.
+ */
+async function labelAsCached(response, reason) {
+  try {
+    const headers = new Headers(response.headers);
+    headers.set(CACHED_RESPONSE_HEADER, reason);
+    return new Response(await response.blob(), {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+  } catch {
+    return response; // labelling is a nicety; serving the data is the point
+  }
 }
 
 /** Allow-listed remote images: cache-first so they render with no network. */
@@ -325,6 +468,16 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return; // POSTs (handwriting) always go live
 
   const url = new URL(request.url);
+
+  /*
+   * First same-origin request after the worker starts: store the rest of the
+   * build in the background. `waitUntil` here only keeps the worker alive — it
+   * does not delay this response — so the page loads at full speed while every
+   * app's chunk is being saved for offline use.
+   */
+  if (url.origin === self.location.origin && !buildPrecache && !isHmrRequest(url)) {
+    event.waitUntil(ensureBuildPrecached());
+  }
 
   if (url.origin !== self.location.origin) {
     if (MEDIA_HOSTS.includes(url.hostname) && request.destination === "image") {
@@ -408,6 +561,11 @@ self.addEventListener("message", (event) => {
       break;
     case "PRECACHE":
       event.waitUntil(precache(data.urls).then(reply));
+      break;
+    // Settings → Offline: store the whole build now, metered link included —
+    // an explicit "save for offline" is the user choosing to spend the data.
+    case "PRECACHE_BUILD":
+      event.waitUntil(ensureBuildPrecached(true).then(reply));
       break;
     case "CLEAR_CACHES":
       event.waitUntil(clearCaches().then(reply));

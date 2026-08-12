@@ -14,18 +14,21 @@ import { ExternalLinkIcon } from "@/components/SketchNotes/atoms/icons";
  * the source the card falls back to the publisher initial so the layout never
  * shifts.
  *
- * The logo is a remote request, so it is skipped entirely on a metered or
- * 2g-class link, and a failed load (offline, blocked) falls back to the same
- * initial rather than a broken image.
+ * The logo is a remote request, so it is skipped entirely with no connection or
+ * on a metered or 2g-class link, and a load that fails anyway (blocked) falls
+ * back to the same initial rather than a broken image. Skipping it offline
+ * matters because saved headlines stay readable there: a page of cards would
+ * otherwise fire a logo request each, all of them doomed, for a fallback that
+ * was going to be shown either way.
  *
  * Shared across apps — the News feed and World Clock's per-country headlines
  * both render it — so a headline reads and behaves identically everywhere.
  */
 export function ArticleCard({ article }: { article: FeedArticle }) {
-  const { slow } = useNetworkStatus();
+  const { online, slow } = useNetworkStatus();
   const [logoBroken, setLogoBroken] = useState(false);
   const when = timeAgo(article.publishedAt);
-  const logo = slow || logoBroken ? null : sourceLogo(article.sourceUrl);
+  const logo = !online || slow || logoBroken ? null : sourceLogo(article.sourceUrl);
   return (
     <a
       href={article.link}

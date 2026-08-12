@@ -2,12 +2,11 @@
 
 import { useEffect, type ReactNode } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
-import { useTheme } from "@/hooks/useTheme";
 import { cx } from "@/lib/utils";
-import { THEMES } from "@/lib/themes";
-import { CheckIcon, CloseIcon } from "@/components/SketchNotes/atoms/icons";
+import { CloseIcon } from "@/components/SketchNotes/atoms/icons";
 import { OfflineSetting } from "@/components/Settings/OfflineSetting";
 import { CursorSetting } from "@/components/Settings/CursorSetting";
+import { ThemeSetting } from "@/components/Settings/ThemeSetting";
 
 /** One labelled block within the settings dialog. New settings go here. */
 function Section({
@@ -25,60 +24,6 @@ function Section({
       {description && <p className="mt-0.5 text-[12.5px] text-ink-soft">{description}</p>}
       <div className="mt-3">{children}</div>
     </section>
-  );
-}
-
-/**
- * Theme picker. Each tile is scoped with its own `data-theme` (plus `data-dark`
- * for dark palettes, exactly as the theme is applied to <body>), so it previews
- * the real palette — paper, panel, accent, grid and label ink — straight from
- * the CSS tokens, with no colour values duplicated in JS.
- */
-function ThemeSetting() {
-  const { themeId, setTheme } = useTheme();
-
-  return (
-    <div
-      role="radiogroup"
-      aria-label="Theme"
-      className="grid grid-cols-2 gap-2.5 min-[440px]:grid-cols-3"
-    >
-      {THEMES.map((t) => {
-        const active = t.id === themeId;
-        return (
-          <button
-            key={t.id}
-            role="radio"
-            aria-checked={active}
-            aria-label={t.label}
-            data-theme={t.id}
-            data-dark={t.dark ? "" : undefined}
-            onClick={() => setTheme(t.id)}
-            className={cx(
-              "relative flex flex-col gap-2.5 overflow-hidden rounded-xl border bg-paper p-3 text-left transition-all",
-              active
-                ? "border-accent ring-2 ring-accent"
-                : "border-border hover:-translate-y-0.5 hover:shadow-panel",
-            )}
-          >
-            {/* mini palette preview */}
-            <span className="flex items-center gap-1.5">
-              <span className="size-6 flex-none rounded-full bg-accent" />
-              <span className="size-6 flex-none rounded-lg border border-border bg-panel" />
-              <span className="h-1.5 flex-1 rounded-full bg-grid" />
-            </span>
-            <span className="flex items-center justify-between">
-              <span className="text-[12.5px] font-bold text-text">{t.label}</span>
-              {active && (
-                <span className="grid size-4 place-items-center rounded-full bg-accent text-on-accent">
-                  <CheckIcon size={11} />
-                </span>
-              )}
-            </span>
-          </button>
-        );
-      })}
-    </div>
   );
 }
 
@@ -143,7 +88,10 @@ export function SettingsPanel() {
         </div>
 
         <div className="flex flex-col gap-5">
-          <Section title="Theme" description="Pick a colour theme for the whole workspace.">
+          <Section
+            title="Theme"
+            description="Pick a colour theme for the whole workspace, or build one from your own colours."
+          >
             <ThemeSetting />
           </Section>
 

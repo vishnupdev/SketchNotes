@@ -236,11 +236,12 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
   {
     id: "theme",
     title: "Themes and dark mode",
-    keywords: ["theme", "themes", "dark mode", "light mode", "colour", "color", "appearance", "settings", "night", "palette"],
+    keywords: ["theme", "themes", "dark mode", "light mode", "colour", "color", "appearance", "settings", "night", "palette", "custom theme", "my own theme", "oled", "black theme"],
     answer:
-      "Open Settings from the bottom of the app launcher to pick a theme. Eight are included:\n" +
-      "• Light, Ocean, Sunset, Grape, Rose and Forest (light)\n" +
-      "• Dark and Midnight (dark)\n" +
+      "Open Settings from the bottom of the app launcher to pick a theme. Twenty-four are built in:\n" +
+      "• Light — Light, Ocean, Sky, Mint, Forest, Sunset, Clay, Sand, Olive, Rose, Grape, Lavender, Slate\n" +
+      "• Dark — Dark, Midnight, Carbon, Abyss, Matrix, Nebula, Ember, Wine, Mocha, Arctic, Noir (pure black, for OLED screens)\n" +
+      "You can also build your own: tap \"Custom theme\", choose a light or dark base, an accent and a background colour, and the rest of the palette is worked out from those. It shows the contrast ratio as you pick, so your theme stays readable, and you can keep up to twelve — each one editable and deletable later.\n" +
       "The choice applies to every app at once and is remembered on this device. Or just tell me — \"switch to Ocean\" — and I'll set it for you.",
     followUps: ["How do I switch apps?", "How do I change the mouse pointer?"],
   },

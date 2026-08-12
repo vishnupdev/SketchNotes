@@ -8,7 +8,16 @@
  * tools assume.
  */
 
+import { linearize } from "@/lib/color";
 import type { CMYK, HSL, HSV, LAB, LCH, RGB, XYZ } from "./types";
+
+/*
+ * hex parsing and the WCAG perception maths are workspace-wide concerns (the
+ * theme system mixes and grades custom palettes with them), so they live in
+ * `@/lib/color` and are re-exported here — every existing
+ * `from "@/lib/ColorLens/convert"` import keeps working.
+ */
+export { contrastRatio, hexToRgb, isHex, luminance } from "@/lib/color";
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 /** Round to `places` decimals without float dust ("0.30000000000000004"). */
@@ -25,26 +34,6 @@ const hex2 = (n: number) => clamp(Math.round(n), 0, 255).toString(16).padStart(2
 export function rgbToHex({ r, g, b }: RGB): string {
   return `#${hex2(r)}${hex2(g)}${hex2(b)}`;
 }
-
-/**
- * Parse `#rgb`, `#rrggbb` (with or without the hash) into channels. Anything
- * unparseable comes back black rather than throwing — callers are parsing user
- * input and a picked pixel is never invalid.
- */
-export function hexToRgb(hex: string): RGB {
-  let h = hex.trim().replace(/^#/, "");
-  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
-  if (!/^[0-9a-fA-F]{6}$/.test(h)) return { r: 0, g: 0, b: 0 };
-  return {
-    r: parseInt(h.slice(0, 2), 16),
-    g: parseInt(h.slice(2, 4), 16),
-    b: parseInt(h.slice(4, 6), 16),
-  };
-}
-
-/** Whether a string is a colour this app can read. */
-export const isHex = (value: string): boolean =>
-  /^#?(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value.trim());
 
 /** The 3-digit form when it round-trips exactly, else null. */
 export function shortHex(hex: string): string | null {
@@ -127,12 +116,6 @@ export function rgbToCmyk({ r, g, b }: RGB): CMYK {
 
 /* -------------------------- rgb → xyz → lab/lch -------------------------- */
 
-/** Undo the sRGB transfer function, giving linear-light 0–1. */
-const linearize = (c: number): number => {
-  const n = c / 255;
-  return n <= 0.04045 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4;
-};
-
 export function rgbToXyz(rgb: RGB): XYZ {
   const r = linearize(rgb.r);
   const g = linearize(rgb.g);
@@ -169,19 +152,8 @@ export function labToLch({ l, a, b }: LAB): LCH {
 
 /* ------------------------------ perception ------------------------------- */
 
-/** WCAG 2.x relative luminance, 0 (black) – 1 (white). */
-export function luminance({ r, g, b }: RGB): number {
-  return 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b);
-}
-
-/** WCAG contrast ratio between two colours, 1–21. Order doesn't matter. */
-export function contrastRatio(a: RGB, b: RGB): number {
-  const la = luminance(a);
-  const lb = luminance(b);
-  const light = Math.max(la, lb);
-  const dark = Math.min(la, lb);
-  return (light + 0.05) / (dark + 0.05);
-}
+/* `luminance` and `contrastRatio` are re-exported from `@/lib/color` at the top
+   of this file — they are shared with the theme system. */
 
 /** Perceived brightness 0–100 (ITU-R BT.601), the classic "is it light?" test. */
 export function brightness({ r, g, b }: RGB): number {

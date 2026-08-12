@@ -18,6 +18,9 @@ export interface OfflineCacheStatus {
 
 const REPLY_TIMEOUT_MS = 4000;
 
+/** Downloading the whole build is a multi-megabyte job, so it gets far longer. */
+const BUILD_PRECACHE_TIMEOUT_MS = 120_000;
+
 export const swSupported = (): boolean =>
   typeof navigator !== "undefined" && "serviceWorker" in navigator;
 
@@ -73,7 +76,10 @@ export async function unregisterServiceWorker(): Promise<boolean> {
 }
 
 /** Send one request to the worker and await its reply (null on any failure). */
-async function ask<T>(message: Record<string, unknown>): Promise<T | null> {
+async function ask<T>(
+  message: Record<string, unknown>,
+  timeoutMs = REPLY_TIMEOUT_MS,
+): Promise<T | null> {
   if (!swSupported()) return null;
   const worker =
     navigator.serviceWorker.controller ?? (await navigator.serviceWorker.ready).active ?? null;
@@ -84,7 +90,7 @@ async function ask<T>(message: Record<string, unknown>): Promise<T | null> {
     const timer = setTimeout(() => {
       channel.port1.close();
       resolve(null);
-    }, REPLY_TIMEOUT_MS);
+    }, timeoutMs);
     channel.port1.onmessage = (event) => {
       clearTimeout(timer);
       channel.port1.close();
@@ -106,6 +112,27 @@ export const offlineCacheStatus = (): Promise<OfflineCacheStatus | null> =>
 /** Ask the worker to download and store extra URLs (static assets). */
 export const precacheUrls = (urls: string[]): Promise<{ saved: number } | null> =>
   urls.length === 0 ? Promise.resolve({ saved: 0 }) : ask({ type: "PRECACHE", urls });
+
+/** Outcome of a whole-build precache; `skipped` says why nothing was stored. */
+export interface BuildPrecacheResult {
+  saved?: number;
+  total?: number;
+  revision?: string | null;
+  skipped?: string;
+}
+
+/**
+ * Store every asset in the build manifest — the code-split chunk for each app
+ * included — regardless of connection type.
+ *
+ * The worker already does this by itself on a normal connection; this is the
+ * explicit "save it all now" path, which is also the only one that runs on a
+ * metered link. Takes noticeably longer than the other messages (it downloads
+ * the whole build), so it deliberately doesn't wait for a reply through `ask`.
+ */
+export function precacheBuild(): Promise<BuildPrecacheResult | null> {
+  return ask<BuildPrecacheResult>({ type: "PRECACHE_BUILD" }, BUILD_PRECACHE_TIMEOUT_MS);
+}
 
 /** Drop every offline cache the workspace owns. */
 export const clearOfflineCaches = (): Promise<{ cleared: boolean } | null> =>

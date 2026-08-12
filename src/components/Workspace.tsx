@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { EditorShell } from "@/components/SketchNotes/EditorShell";
@@ -10,6 +10,7 @@ import { CursorEffect } from "@/components/Settings/CursorEffect";
 import { ReminderScheduler } from "@/components/Reminders/organisms/ReminderScheduler";
 import { ReminderAlert } from "@/components/Reminders/organisms/ReminderAlert";
 import { OfflineBanner } from "@/components/Offline/OfflineBanner";
+import { AppLoadBoundary } from "@/components/Offline/AppLoadBoundary";
 import { TOOL_IDS } from "@/components/PdfEditor/catalog";
 import { APP_LOADERS } from "@/lib/offline/app-modules";
 import type { AppId } from "@/store/useWorkspaceStore";
@@ -94,6 +95,37 @@ const pathForApp = (app: AppId, tool: string | null): string =>
   app === "pdf" && tool ? `${PDF_BASE}/${tool}` : APP_PATHS[app];
 
 /**
+ * One code-split app's slot: a full-screen scroll container that is `hidden`
+ * unless the app is active, and mounts the app only while it is.
+ *
+ * The {@link AppLoadBoundary} is the point of the wrapper. Mounting a lazy app
+ * downloads its chunk, and a chunk that fails to load throws during render — so
+ * without a boundary here, opening an app whose chunk isn't cached yet (the
+ * normal case offline before the worker has saved the build) would tear down the
+ * entire workspace instead of just that panel.
+ */
+function AppFrame({
+  active,
+  name,
+  children,
+}: {
+  active: boolean;
+  name: string;
+  children: ReactNode;
+}) {
+  const openLauncher = useWorkspaceStore((s) => s.openLauncher);
+  return (
+    <div hidden={!active} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+      {active && (
+        <AppLoadBoundary name={name} onBrowseApps={openLauncher}>
+          {children}
+        </AppLoadBoundary>
+      )}
+    </div>
+  );
+}
+
+/**
  * Top-level workspace hosting both apps natively (no iframe) and keeping the
  * browser URL in sync: Sketchnotes at `/`, the PDF editor at `/pdfeditor` and
  * `/pdfeditor/<section>`. Sketchnotes stays mounted so its canvas survives an
@@ -145,23 +177,6 @@ export function Workspace() {
     return () => window.removeEventListener("popstate", onPop);
   }, [setActiveApp, setPdfTool]);
 
-  const pdfActive = activeApp === "pdf";
-  const imageActive = activeApp === "image";
-  const boardActive = activeApp === "board";
-  const todosActive = activeApp === "todos";
-  const remindersActive = activeApp === "reminders";
-  const timerActive = activeApp === "timer";
-  const systemActive = activeApp === "system";
-  const speedActive = activeApp === "speed";
-  const newsActive = activeApp === "news";
-  const worldActive = activeApp === "world";
-  const malayalamActive = activeApp === "malayalam";
-  const translateActive = activeApp === "translate";
-  const morseActive = activeApp === "morse";
-  const soundActive = activeApp === "sound";
-  const colorActive = activeApp === "color";
-  const assistantActive = activeApp === "assistant";
-
   return (
     <>
       {/* Sketchnotes — always mounted, hidden while another app is active. */}
@@ -170,87 +185,78 @@ export function Workspace() {
       </div>
 
       {/* PDF editor — native React, its own scroll container. */}
-      <div hidden={!pdfActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {pdfActive && <PdfApp />}
-      </div>
+      <AppFrame active={activeApp === "pdf"} name="PDF Editor">
+        <PdfApp />
+      </AppFrame>
 
-      {/* Image Studio. */}
-      <div hidden={!imageActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {imageActive && <ImageStudio />}
-      </div>
+      <AppFrame active={activeApp === "image"} name="Image Studio">
+        <ImageStudio />
+      </AppFrame>
 
       {/* Board — the prompt-composed page of sections. */}
-      <div hidden={!boardActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {boardActive && <BoardApp />}
-      </div>
+      <AppFrame active={activeApp === "board"} name="Board">
+        <BoardApp />
+      </AppFrame>
 
-      {/* Todos. */}
-      <div hidden={!todosActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {todosActive && <TodoApp />}
-      </div>
+      <AppFrame active={activeApp === "todos"} name="Todos">
+        <TodoApp />
+      </AppFrame>
 
-      {/* Reminders. */}
-      <div hidden={!remindersActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {remindersActive && <ReminderApp />}
-      </div>
+      <AppFrame active={activeApp === "reminders"} name="Reminders">
+        <ReminderApp />
+      </AppFrame>
 
-      {/* Timer. */}
-      <div hidden={!timerActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {timerActive && <TimerApp />}
-      </div>
+      <AppFrame active={activeApp === "timer"} name="Timer">
+        <TimerApp />
+      </AppFrame>
 
-      {/* System Info. */}
-      <div hidden={!systemActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {systemActive && <SystemInfoApp />}
-      </div>
+      <AppFrame active={activeApp === "system"} name="System Info">
+        <SystemInfoApp />
+      </AppFrame>
 
-      {/* Network Speed. */}
-      <div hidden={!speedActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {speedActive && <NetworkSpeedApp />}
-      </div>
+      <AppFrame active={activeApp === "speed"} name="Speed Test">
+        <NetworkSpeedApp />
+      </AppFrame>
 
-      {/* News. */}
-      <div hidden={!newsActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {newsActive && <NewsApp />}
-      </div>
+      <AppFrame active={activeApp === "news"} name="News">
+        <NewsApp />
+      </AppFrame>
 
-      {/* World Clock. Unmounted on an app switch, which is what stops its
-          per-second tick from running behind another app. */}
-      <div hidden={!worldActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {worldActive && <WorldClockApp />}
-      </div>
+      {/* World Clock. Unmounted on an app switch (AppFrame mounts only while
+          active), which is what stops its per-second tick running behind
+          another app. */}
+      <AppFrame active={activeApp === "world"} name="World Clock">
+        <WorldClockApp />
+      </AppFrame>
 
-      {/* Malayalam Writer. */}
-      <div hidden={!malayalamActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {malayalamActive && <MalayalamWriterApp />}
-      </div>
+      <AppFrame active={activeApp === "malayalam"} name="Malayalam Writer">
+        <MalayalamWriterApp />
+      </AppFrame>
 
-      {/* Translate. */}
-      <div hidden={!translateActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {translateActive && <TranslateApp />}
-      </div>
+      <AppFrame active={activeApp === "translate"} name="Translate">
+        <TranslateApp />
+      </AppFrame>
 
-      {/* Morse Code. */}
-      <div hidden={!morseActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {morseActive && <MorseApp />}
-      </div>
+      <AppFrame active={activeApp === "morse"} name="Morse Code">
+        <MorseApp />
+      </AppFrame>
 
       {/* Sound Meter. Unmounting on an app switch is what releases the
           microphone, so the recording indicator never follows the user out. */}
-      <div hidden={!soundActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {soundActive && <SoundMeterApp />}
-      </div>
+      <AppFrame active={activeApp === "sound"} name="Sound Meter">
+        <SoundMeterApp />
+      </AppFrame>
 
       {/* Color Lens. Unmounted on an app switch, which is what stops the camera
           if the viewfinder was left open. */}
-      <div hidden={!colorActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {colorActive && <ColorLensApp />}
-      </div>
+      <AppFrame active={activeApp === "color"} name="Color Lens">
+        <ColorLensApp />
+      </AppFrame>
 
       {/* Assistant — the in-app AI guide. */}
-      <div hidden={!assistantActive} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
-        {assistantActive && <AssistantApp />}
-      </div>
+      <AppFrame active={activeApp === "assistant"} name="Assistant">
+        <AssistantApp />
+      </AppFrame>
 
       <AppLauncher />
       <SettingsPanel />

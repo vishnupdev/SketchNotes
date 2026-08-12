@@ -1,5 +1,12 @@
 import type { NoteDocument, NoteMeta } from "@/engine/types";
-import { isThemeId, type ThemeId } from "@/lib/themes";
+import {
+  isCustomThemeId,
+  isThemeId,
+  MAX_CUSTOM_THEMES,
+  normalizeHex,
+  type CustomTheme,
+  type ThemeId,
+} from "@/lib/themes";
 import { sDel, sGet, sSet } from "./storage";
 
 /** Storage-key helpers keep the key scheme in one place. */
@@ -7,6 +14,7 @@ const KEY = {
   index: "sknotes:index",
   note: (id: string) => `sknotes:${id}`,
   theme: "sknotes:theme",
+  customThemes: "sknotes:custom-themes",
 };
 
 /* ============ notes index ============ */
@@ -57,4 +65,41 @@ export async function fetchTheme(): Promise<ThemeId | null> {
 
 export async function saveTheme(theme: ThemeId): Promise<void> {
   await sSet(KEY.theme, theme);
+}
+
+/* ============ custom themes ============ */
+
+/**
+ * Validate one stored record. Themes are user data that survives across
+ * versions, so anything malformed is dropped rather than trusted — a bad colour
+ * would otherwise reach CSS as an invalid custom property and silently blank out
+ * the palette it belongs to.
+ */
+function parseCustomTheme(value: unknown): CustomTheme | null {
+  if (!value || typeof value !== "object") return null;
+  const raw = value as Record<string, unknown>;
+  if (typeof raw.id !== "string" || !isCustomThemeId(raw.id)) return null;
+  if (typeof raw.label !== "string" || raw.label.trim() === "") return null;
+  const accent = typeof raw.accent === "string" ? normalizeHex(raw.accent) : null;
+  const paper = typeof raw.paper === "string" ? normalizeHex(raw.paper) : null;
+  if (!accent || !paper) return null;
+  return { id: raw.id, label: raw.label, dark: raw.dark === true, accent, paper };
+}
+
+export async function fetchCustomThemes(): Promise<CustomTheme[]> {
+  try {
+    const raw = await sGet(KEY.customThemes);
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map(parseCustomTheme)
+      .filter((t): t is CustomTheme => t !== null)
+      .slice(0, MAX_CUSTOM_THEMES);
+  } catch {
+    return [];
+  }
+}
+
+export async function saveCustomThemes(themes: CustomTheme[]): Promise<void> {
+  await sSet(KEY.customThemes, JSON.stringify(themes.slice(0, MAX_CUSTOM_THEMES)));
 }

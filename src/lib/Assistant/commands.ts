@@ -109,7 +109,15 @@ export function parseCommand(question: string): Command | null {
   if (theme) {
     const named = hasPhrase(text, `${theme} mode`) || hasPhrase(text, `${theme} theme`) ||
       hasPhrase(text, "theme") || hasPhrase(text, "mode");
-    if (named || hasVerb) {
+    /*
+     * An unqualified colour word only counts as a theme instruction when the
+     * sentence names nothing better. Many palettes are everyday words — Mint,
+     * Sand, Clay, Wine, Sky — so "add a mint counter to my board" would
+     * otherwise be read as a theme switch and never reach Board. Naming an app
+     * or a PDF section is the stronger signal, so it wins; "switch to Ocean",
+     * which names neither, still switches the theme.
+     */
+    if (named || (hasVerb && !appIn(text) && !toolIn(text))) {
       const label = themeLabel(theme);
       return {
         action: { kind: "theme", label: `Switch to ${label}`, themeId: theme },

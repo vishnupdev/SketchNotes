@@ -5,8 +5,8 @@ import { SketchEngine } from "@/engine/SketchEngine";
 import type { ExportFormat, NoteDocument, SketchBackup } from "@/engine/types";
 import { saveBlob } from "@/engine/export";
 import { storageAvailable } from "@/lib/storage";
-import { fetchTheme } from "@/lib/notes-api";
-import { themeById } from "@/lib/themes";
+import { fetchCustomThemes, fetchTheme } from "@/lib/notes-api";
+import { CUSTOM_THEME_VARS, resolveTheme } from "@/lib/themes";
 import { uid } from "@/lib/utils";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useLoadNote, useNoteMutations } from "./useNotes";
@@ -126,6 +126,7 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
   const fontKey = useEditorStore((s) => s.fontKey);
   const fontSize = useEditorStore((s) => s.fontSize);
   const themeId = useEditorStore((s) => s.themeId);
+  const customThemes = useEditorStore((s) => s.customThemes);
 
   useEffect(() => {
     engineRef.current?.setTool(tool);
@@ -147,13 +148,23 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
   }, [fontSize]);
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const theme = themeById(themeId);
+    const theme = resolveTheme(themeId, customThemes);
     const body = document.body;
     // Apply the palette: `data-theme` selects the token block, `data-dark`
     // flips every `dark:` utility for any dark palette.
-    body.dataset.theme = theme.id;
+    body.dataset.theme = theme.attr;
     if (theme.dark) body.dataset.dark = "";
     else delete body.dataset.dark;
+    /*
+     * A custom palette feeds its two user-chosen colours in as inline custom
+     * properties, which the `custom-light`/`custom-dark` blocks derive the rest
+     * from. They are cleared first so switching from a custom theme to a preset
+     * cannot leave an inline `--on-accent` overriding the preset's own.
+     */
+    for (const name of CUSTOM_THEME_VARS) body.style.removeProperty(name);
+    for (const [name, value] of Object.entries(theme.vars)) {
+      body.style.setProperty(name, value);
+    }
     // Read the resolved tokens back from CSS (single source of truth) so the
     // canvas selection highlight and the address-bar colour follow the theme.
     const cs = getComputedStyle(body);
@@ -162,7 +173,7 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
     engineRef.current?.setTheme(theme.dark, accent || undefined);
     const m = document.querySelector('meta[name="theme-color"]');
     if (m && paper) m.setAttribute("content", paper);
-  }, [themeId]);
+  }, [themeId, customThemes]);
 
   /* ----------------------------- bootstrap ----------------------------- */
 
@@ -205,6 +216,11 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
       const available = storageAvailable();
       st.setStorageOK(available);
 
+      // Custom palettes first: a stored `custom:` theme id cannot resolve to a
+      // palette until they are loaded, and setting it first would flash the
+      // default theme before correcting itself.
+      const savedCustom = await fetchCustomThemes();
+      if (savedCustom.length) st.setCustomThemes(savedCustom);
       const savedTheme = await fetchTheme();
       if (savedTheme) st.setTheme(savedTheme);
 

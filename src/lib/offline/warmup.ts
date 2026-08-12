@@ -20,7 +20,7 @@
 
 import { readNetworkStatus } from "@/lib/net/status";
 import { APP_LABELS, APP_LOADERS, WARMUP_ORDER, type LazyAppId } from "./app-modules";
-import { precacheUrls, swControlling, swSupported } from "./sw-client";
+import { precacheBuild, precacheUrls, swControlling, swSupported } from "./sw-client";
 
 /** Progress for the Settings readout: 0..total steps, plus what's loading now. */
 export interface WarmupStep {
@@ -101,6 +101,13 @@ export function warmUpOffline(options: WarmupOptions = {}): Promise<WarmupResult
 
     onProgress?.({ done: apps.length, total, label: "Assets" });
     await precacheUrls(includeData ? [...EXTRA_ASSETS, ...DATA_URLS] : EXTRA_ASSETS);
+    /*
+     * Belt and braces for the explicit save: importing each app above caches the
+     * chunks this build actually loads, and this catches whatever the manifest
+     * lists but the imports didn't pull in. It also forces the download on a
+     * metered link, where the worker's own background precaching holds back.
+     */
+    if (includeData) await precacheBuild();
     loaded += 1;
 
     onProgress?.({ done: total, total, label: "Ready" });

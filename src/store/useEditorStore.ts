@@ -4,7 +4,12 @@ import { create } from "zustand";
 import type { EditorState as OverlayState } from "@/engine/SketchEngine";
 import type { Tool } from "@/engine/types";
 import { DEFAULT_FONT, DEFAULT_TEXT_SIZE, WIDTHS } from "@/engine/constants";
-import { DEFAULT_THEME_ID, themeById, type ThemeId } from "@/lib/themes";
+import {
+  DEFAULT_THEME_ID,
+  resolveTheme,
+  type CustomTheme,
+  type ThemeId,
+} from "@/lib/themes";
 
 /** Which single popover (if any) is open in the dock/header. */
 export type PopoverId =
@@ -31,6 +36,11 @@ interface EditorState {
   themeId: ThemeId;
   /** Derived from {@link themeId}: whether the active palette is dark. */
   dark: boolean;
+  /**
+   * The user's own saved palettes. Lives beside {@link themeId} because
+   * resolving that id needs them — a `custom:` id means nothing on its own.
+   */
+  customThemes: CustomTheme[];
 
   /* --- current note --- */
   curId: string | null;
@@ -62,6 +72,8 @@ interface EditorState {
   setFontSize: (px: number) => void;
   /** Switch to a named theme; keeps {@link dark} in sync. */
   setTheme: (id: ThemeId) => void;
+  /** Replace the saved custom palettes; keeps {@link dark} in sync. */
+  setCustomThemes: (themes: CustomTheme[]) => void;
 
   setCurId: (id: string | null) => void;
   setTitle: (t: string) => void;
@@ -89,7 +101,8 @@ export const useEditorStore = create<EditorState>((set) => ({
   fontKey: DEFAULT_FONT,
   fontSize: DEFAULT_TEXT_SIZE,
   themeId: DEFAULT_THEME_ID,
-  dark: themeById(DEFAULT_THEME_ID).dark,
+  dark: resolveTheme(DEFAULT_THEME_ID).dark,
+  customThemes: [],
 
   curId: null,
   title: "",
@@ -114,7 +127,12 @@ export const useEditorStore = create<EditorState>((set) => ({
   setCurrentEmoji: (currentEmoji) => set({ currentEmoji }),
   setFontKey: (fontKey) => set({ fontKey }),
   setFontSize: (fontSize) => set({ fontSize }),
-  setTheme: (themeId) => set({ themeId, dark: themeById(themeId).dark }),
+  // `dark` is resolved against the saved custom palettes, so selecting a custom
+  // dark theme flips the `dark:` utilities exactly as a preset would.
+  setTheme: (themeId) =>
+    set((s) => ({ themeId, dark: resolveTheme(themeId, s.customThemes).dark })),
+  setCustomThemes: (customThemes) =>
+    set((s) => ({ customThemes, dark: resolveTheme(s.themeId, customThemes).dark })),
 
   setCurId: (curId) => set({ curId }),
   setTitle: (title) => set({ title }),

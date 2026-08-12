@@ -2,10 +2,19 @@
  * Shared network-condition snapshot for the whole workspace: is there a
  * connection at all, and is it good enough to spend bandwidth on?
  *
- * Two signals feed it — `navigator.onLine` (reliable for "definitely offline")
- * and the Network Information API (`navigator.connection`, non-standard and
- * partially supported, so every field is optional). `slow` folds them into the
- * single question features actually ask: should we skip or defer network work?
+ * Three signals feed it — `navigator.onLine`, the Network Information API
+ * (`navigator.connection`, non-standard and partially supported, so every field
+ * is optional), and what the app's own requests actually observed. `slow` folds
+ * them into the single question features actually ask: should we skip or defer
+ * network work?
+ *
+ * Why observed failures are part of it: `navigator.onLine` only reports whether
+ * the device has *a* network interface, so it stays `true` on the connections
+ * users hit most often when nothing works — a hotel captive portal, a router
+ * with a dead WAN link, a dropped VPN. Trusting it alone means the workspace
+ * insists it is online while every request fails, and the offline states that
+ * exist for exactly that moment never appear. So a same-origin request failing
+ * at the network level also counts as evidence, and any later success clears it.
  *
  * Framework-free on purpose: the service-worker warm-up, plain libs and the
  * React hook (`useNetworkStatus`) all read the same source of truth.
@@ -60,10 +69,19 @@ function connection(): ConnectionLike | null {
   return nav.connection ?? null;
 }
 
+/**
+ * Set when one of our own same-origin requests failed at the network level, and
+ * cleared by the next success (or by the browser reporting a reconnect). Only
+ * same-origin failures feed this: a blocked third-party CDN — an ad blocker
+ * stopping a publisher logo, say — says nothing about the user's connection,
+ * and treating it as offline would mislabel a perfectly good session.
+ */
+let observedUnreachable = false;
+
 function compute(): NetworkStatus {
   if (typeof navigator === "undefined") return SERVER_STATUS;
   const c = connection();
-  const online = navigator.onLine !== false;
+  const online = navigator.onLine !== false && !observedUnreachable;
   const effectiveType = typeof c?.effectiveType === "string" ? c.effectiveType : null;
   const downlink = typeof c?.downlink === "number" ? c.downlink : null;
   const rtt = typeof c?.rtt === "number" ? c.rtt : null;
@@ -121,11 +139,37 @@ function handleChange() {
   if (refresh() !== before) for (const l of listeners) l();
 }
 
+/**
+ * Record whether one of our own same-origin requests reached the network, so the
+ * workspace can tell "no usable connection" from `navigator.onLine`'s "there is
+ * an interface". Called by {@link fetchJson}; safe to call on every request.
+ *
+ * `reachable: false` is for transport-level failures only — never for an HTTP
+ * error status, which proves the network works fine and only the request was
+ * refused.
+ */
+export function reportReachability(reachable: boolean): void {
+  const next = !reachable;
+  if (observedUnreachable === next) return;
+  observedUnreachable = next;
+  handleChange();
+}
+
+/**
+ * The browser reporting a reconnect retires whatever our requests observed
+ * before it — otherwise a session that went offline would stay flagged until
+ * something happened to make a successful request.
+ */
+function handleOnline() {
+  observedUnreachable = false;
+  handleChange();
+}
+
 /** Subscribe to connection changes. Returns an unsubscribe function. */
 export function subscribeNetworkStatus(listener: () => void): () => void {
   listeners.add(listener);
   if (listeners.size === 1 && typeof window !== "undefined") {
-    window.addEventListener("online", handleChange);
+    window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleChange);
     connection()?.addEventListener?.("change", handleChange);
     refresh();
@@ -133,7 +177,7 @@ export function subscribeNetworkStatus(listener: () => void): () => void {
   return () => {
     listeners.delete(listener);
     if (listeners.size === 0 && typeof window !== "undefined") {
-      window.removeEventListener("online", handleChange);
+      window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleChange);
       connection()?.removeEventListener?.("change", handleChange);
     }

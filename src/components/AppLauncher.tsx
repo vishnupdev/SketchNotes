@@ -567,7 +567,7 @@ export function AppLauncher() {
   return (
     <div
       className={cx(
-        "fixed inset-0 z-[80] flex items-center justify-center p-5 transition-opacity duration-200",
+        "fixed inset-0 z-[80] flex items-center justify-center p-3 transition-opacity duration-200 min-[440px]:p-5",
         open ? "opacity-100" : "pointer-events-none opacity-0",
       )}
       aria-hidden={!open}
@@ -585,11 +585,11 @@ export function AppLauncher() {
         aria-modal="true"
         aria-label="Choose an app"
         className={cx(
-          "relative flex max-h-[min(88dvh,680px)] w-[min(92vw,540px)] flex-col rounded-2xl border border-border bg-panel shadow-panel transition-transform duration-200",
+          "relative flex max-h-[min(88dvh,680px)] w-[min(96vw,540px)] flex-col rounded-2xl border border-border bg-panel shadow-panel transition-transform duration-200",
           open ? "translate-y-0" : "translate-y-3",
         )}
       >
-        <div className="flex shrink-0 items-start justify-between px-6 pb-4 pt-6">
+        <div className="flex shrink-0 items-start justify-between px-4 pb-3 pt-5 min-[440px]:px-6 min-[440px]:pb-4 min-[440px]:pt-6">
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-[18px] font-bold tracking-[.2px]">Apps</h2>
@@ -610,8 +610,11 @@ export function AppLauncher() {
           </button>
         </div>
 
-        <div ref={scrollRef} className="scroll-slim min-h-0 flex-1 overflow-y-auto px-6 pb-6">
-        <ul role="list" className="grid grid-cols-1 gap-3 min-[440px]:grid-cols-2">
+        <div
+          ref={scrollRef}
+          className="scroll-slim min-h-0 flex-1 overflow-y-auto px-2.5 pb-4 min-[440px]:px-6 min-[440px]:pb-6"
+        >
+        <ul role="list" className="grid grid-cols-2 gap-2 min-[440px]:gap-3">
           {ordered.map((app) => {
             const active = app.id === activeApp;
             const hue = `var(${app.hue})`;
@@ -622,7 +625,7 @@ export function AppLauncher() {
                 key={app.id}
                 data-app-tile={app.id}
                 className={cx(
-                  "group relative rounded-2xl transition-transform duration-150",
+                  "group relative rounded-xl transition-transform duration-150 min-[440px]:rounded-2xl",
                   dragging && "scale-[.97] opacity-60",
                 )}
               >
@@ -630,37 +633,54 @@ export function AppLauncher() {
                   onClick={() => setActiveApp(app.id)}
                   onPointerMove={dragId ? undefined : trackSpot}
                   aria-current={active}
-                  style={{ "--spot": hue } as React.CSSProperties}
+                  style={
+                    {
+                      "--spot": hue,
+                      // Phone tiles wear a faint wash of their own hue instead of
+                      // a bordered paper card, so the grid reads as colour-coded
+                      // rows; wider viewports switch back to the full card.
+                      "--tile-tint": `color-mix(in srgb, ${hue} 11%, var(--paper))`,
+                      "--chip-grad": `linear-gradient(140deg, ${hue}, color-mix(in srgb, ${hue} 78%, black))`,
+                      "--chip-shadow": `0 8px 18px -6px color-mix(in srgb, ${hue} 60%, transparent)`,
+                    } as React.CSSProperties
+                  }
                   className={cx(
-                    "hover-spot hover-sheen flex w-full flex-col items-start gap-3 rounded-2xl border p-4 pr-11 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                    "hover-spot hover-sheen flex w-full items-center gap-2 rounded-xl border p-2 pr-7 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                    "min-[440px]:flex-col min-[440px]:items-start min-[440px]:gap-3 min-[440px]:rounded-2xl min-[440px]:p-4 min-[440px]:pr-11",
                     active
                       ? "border-accent bg-accent-soft ring-1 ring-accent"
-                      : "hover-lift border-border bg-paper hover:border-accent",
+                      : "hover-lift border-transparent bg-(--tile-tint) min-[440px]:border-border min-[440px]:bg-paper min-[440px]:hover:border-accent",
                     dropTarget && "border-accent ring-2 ring-accent",
                   )}
                 >
                   <span
-                    className="grid size-12 place-items-center rounded-[14px] text-white transition-transform duration-300 ease-[cubic-bezier(.2,.7,.3,1)] group-hover:-rotate-6 group-hover:scale-110"
-                    style={{
-                      background: `linear-gradient(140deg, ${hue}, color-mix(in srgb, ${hue} 78%, black))`,
-                      boxShadow: `0 8px 18px -6px color-mix(in srgb, ${hue} 60%, transparent)`,
-                    }}
+                    className={cx(
+                      "grid size-8 shrink-0 place-items-center rounded-[10px] bg-(image:--chip-grad) text-white transition-transform duration-300 ease-[cubic-bezier(.2,.7,.3,1)] [&>svg]:size-5",
+                      "min-[440px]:size-12 min-[440px]:rounded-[14px] min-[440px]:shadow-(--chip-shadow) min-[440px]:[&>svg]:size-6",
+                      "group-hover:-rotate-6 group-hover:scale-110",
+                    )}
                   >
                     {app.icon}
                   </span>
-                  <span className="flex items-center gap-2">
-                    <span className="text-[15.5px] font-bold tracking-[.1px]">{app.name}</span>
+                  <span className="flex min-w-0 items-center gap-2">
+                    {/* Names are as long as "Malayalam Writer", so on phones the
+                        label wraps to two lines rather than being truncated. */}
+                    <span className="line-clamp-2 min-w-0 wrap-break-word text-[11.5px] font-semibold leading-[1.2] tracking-[.1px] min-[440px]:text-[15.5px] min-[440px]:font-bold min-[440px]:leading-normal">
+                      {app.name}
+                    </span>
                     {active && (
-                      <span className="rounded-full bg-accent px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-on-accent">
+                      <span className="hidden rounded-full bg-accent px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-on-accent min-[440px]:inline">
                         Current
                       </span>
                     )}
                   </span>
-                  <span className="text-[12.5px] leading-snug text-ink-soft">{app.tagline}</span>
+                  <span className="hidden text-[12.5px] leading-snug text-ink-soft min-[440px]:block">
+                    {app.tagline}
+                  </span>
                   <span
                     aria-hidden
                     className={cx(
-                      "absolute bottom-3 right-3 grid size-6 place-items-center rounded-full text-white transition-all duration-200",
+                      "absolute bottom-3 right-3 hidden size-6 place-items-center rounded-full text-white transition-all duration-200 min-[440px]:grid",
                       active
                         ? "opacity-0"
                         : "translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
@@ -682,7 +702,8 @@ export function AppLauncher() {
                   onPointerCancel={endDrag}
                   onKeyDown={(e) => reorderByKey(e, app.id)}
                   className={cx(
-                    "hover-pop absolute right-2 top-2 z-10 grid size-8 touch-none place-items-center rounded-lg text-ink-soft hover:bg-panel hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                    "hover-pop absolute right-0 top-0 z-10 grid size-7 touch-none place-items-center rounded-lg text-ink-soft opacity-70 hover:bg-panel hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-accent [&>svg]:size-3.5",
+                    "min-[440px]:right-2 min-[440px]:top-2 min-[440px]:size-8 min-[440px]:opacity-100 min-[440px]:[&>svg]:size-4.5",
                     dragging ? "cursor-grabbing" : "cursor-grab",
                   )}
                 >
@@ -693,17 +714,19 @@ export function AppLauncher() {
           })}
         </ul>
 
-        <div className="mt-5 border-t border-border pt-4">
+        <div className="mt-4 border-t border-border pt-3 min-[440px]:mt-5 min-[440px]:pt-4">
           <button
             onClick={openSettings}
-            className="tint hover-lift group flex w-full items-center gap-3 rounded-xl border border-border bg-paper px-4 py-3 text-left hover:border-accent"
+            className="tint hover-lift group flex w-full items-center gap-2.5 rounded-xl border border-border bg-paper px-3 py-2.5 text-left hover:border-accent min-[440px]:gap-3 min-[440px]:px-4 min-[440px]:py-3"
           >
-            <span className="grid size-9 place-items-center rounded-[11px] bg-accent-soft text-accent transition-transform duration-300 ease-[cubic-bezier(.2,.7,.3,1)] group-hover:rotate-45">
+            <span className="grid size-9 shrink-0 place-items-center rounded-[11px] bg-accent-soft text-accent transition-transform duration-300 ease-[cubic-bezier(.2,.7,.3,1)] group-hover:rotate-45">
               <SettingsIcon size={18} />
             </span>
             <span className="flex flex-col">
               <span className="text-[14px] font-bold tracking-[.1px]">Settings</span>
-              <span className="text-[12px] text-ink-soft">Theme and workspace preferences.</span>
+              <span className="hidden text-[12px] text-ink-soft min-[440px]:block">
+                Theme and workspace preferences.
+              </span>
             </span>
           </button>
         </div>

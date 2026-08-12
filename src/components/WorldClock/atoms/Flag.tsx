@@ -19,13 +19,18 @@ interface FlagProps {
  * `🇯🇵` renders there as a pair of boxed letters — the one platform where the
  * app would look broken. An image is the same everywhere.
  *
- * It degrades in the two ways that matter. On a metered or 2g-class link the
- * request is skipped outright, and a failed load — offline, blocked, cache
- * miss — falls back to the ISO code in a bordered tile. The tile is always the
- * same size as the image, so no fallback can shift the layout (rule #7).
+ * It degrades in the ways that matter. With no connection, or on a metered or
+ * 2g-class link, the request is skipped outright; a load that fails anyway
+ * (blocked, cache miss) falls back to the ISO code in a bordered tile. The tile
+ * is always the same size as the image, so no fallback can shift the layout
+ * (rule #7).
+ *
+ * Skipping while offline is what keeps an offline session clean: a country list
+ * renders dozens of flags, and letting each one fail put a row of failed
+ * requests in the console for a fallback that was going to be shown regardless.
  */
 export function Flag({ code, width = 32, className }: FlagProps) {
-  const { slow } = useNetworkStatus();
+  const { online, slow } = useNetworkStatus();
   const [broken, setBroken] = useState(false);
   const height = Math.round(width * 0.75);
   const lower = code.toLowerCase();
@@ -35,7 +40,7 @@ export function Flag({ code, width = 32, className }: FlagProps) {
     className,
   );
 
-  if (slow || broken) {
+  if (!online || slow || broken) {
     return (
       <span
         aria-hidden

@@ -20,11 +20,15 @@
    tokens instead of inheriting the document's. That is what lets the settings
    theme tiles preview a light palette inside a dark workspace — without it they
    inherit the dark `--text` (and the `[data-dark]` rim / `--on-accent` from
-   <body>) and their labels vanish against light `--paper`. Dark palettes are
-   excluded here and override what they flip further down; a new dark theme must
-   be added to the :not() list as well as getting its own block. */
+   <body>) and their labels vanish against light `--paper`.
+   Dark palettes are excluded by their own `data-dark` flag rather than by a list
+   of ids, so adding a dark theme needs no edit here — it just has to set
+   `data-dark` wherever it is applied, exactly as <body> and the preview tiles
+   already do. All three bases and every theme block below are single-attribute
+   selectors of equal specificity, so source order decides: light base, then dark
+   base, then the individual themes. */
 :root,
-[data-theme]:where(:not([data-theme="dark"], [data-theme="midnight"])) {
+[data-theme]:where(:not([data-dark])) {
   --paper: #f7f8f6;
   --grid: #d5dbe3;
   --ink: #1f2a33;
@@ -186,7 +190,12 @@
   --board-habit: #f472b6;
 }
 
-[data-theme="dark"] {
+/* The dark base palette — the neutral half of every dark theme (ink, states,
+   shadow depth). A dark theme block below then only restates the handful of
+   tokens that carry its character: paper, grid, panel, border, accent and the
+   editor wash. Keeping these here is what makes a new dark theme ~8 lines
+   instead of a duplicated 20. */
+[data-theme]:where([data-dark]) {
   --paper: #141a21;
   --grid: #2b3541;
   --text: #e6ecf1;
@@ -209,14 +218,99 @@
     0 28px 56px -18px rgba(0, 0, 0, 0.45);
 }
 
-/* -------- colour-accented themes (light base; only hue tokens differ) ------- */
+/* "dark" is the neutral dark palette, so the base above is already it. */
+[data-theme="dark"] {
+  --accent: #1ba38e;
+}
+
+/* -------- colour-accented themes (light base; only hue tokens differ) -------
+   Every accent here clears WCAG AA (≥4.5:1) against its own `--paper`, because
+   `--accent` is used as text and for icon glyphs, not only as a fill. The audit
+   in scripts/audit-theme-contrast.mjs checks this for all of them. */
+[data-theme="sky"] {
+  --paper: #f2f8fb;
+  --grid: #c9dfea;
+  --ink-soft: #556975;
+  --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
+  --border: #d8e8f0;
+  --accent: #06697f;
+  --accent-soft: #d5edf4;
+  --ed-bg: rgba(242, 248, 251, 0.6);
+}
+
+[data-theme="mint"] {
+  --paper: #f1faf6;
+  --grid: #c6e6d8;
+  --ink-soft: #566d63;
+  --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
+  --border: #d6ece2;
+  --accent: #0b7a5a;
+  --accent-soft: #d3f0e4;
+  --ed-bg: rgba(241, 250, 246, 0.6);
+}
+
+[data-theme="clay"] {
+  --paper: #fbf5f1;
+  --grid: #e6d2c6;
+  --ink-soft: #75625a;
+  --panel: color-mix(in srgb, #fffdfb var(--glass-opacity), transparent);
+  --border: #eedfd6;
+  --accent: #a8482c;
+  --accent-soft: #f7ddd2;
+  --ed-bg: rgba(251, 245, 241, 0.6);
+}
+
+[data-theme="sand"] {
+  --paper: #fbf7ed;
+  --grid: #e5dbc2;
+  --ink-soft: #6f6853;
+  --panel: color-mix(in srgb, #fffefa var(--glass-opacity), transparent);
+  --border: #ede5d3;
+  --accent: #8a6510;
+  --accent-soft: #f6e9c9;
+  --ed-bg: rgba(251, 247, 237, 0.6);
+}
+
+[data-theme="olive"] {
+  --paper: #f7f9ee;
+  --grid: #d9e2c3;
+  --ink-soft: #626b52;
+  --panel: color-mix(in srgb, #fdfefa var(--glass-opacity), transparent);
+  --border: #e5ecd6;
+  --accent: #4f6b12;
+  --accent-soft: #e6f0cd;
+  --ed-bg: rgba(247, 249, 238, 0.6);
+}
+
+[data-theme="lavender"] {
+  --paper: #f7f6fc;
+  --grid: #d8d3ea;
+  --ink-soft: #676180;
+  --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
+  --border: #e4e0f2;
+  --accent: #6248c4;
+  --accent-soft: #e7e1fb;
+  --ed-bg: rgba(247, 246, 252, 0.6);
+}
+
+[data-theme="slate"] {
+  --paper: #f4f6f8;
+  --grid: #d2dae1;
+  --ink-soft: #5d6b78;
+  --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
+  --border: #dfe5ea;
+  --accent: #3c5a75;
+  --accent-soft: #dfe8f0;
+  --ed-bg: rgba(244, 246, 248, 0.6);
+}
+
 [data-theme="ocean"] {
   --paper: #f3f7fc;
   --grid: #cddcee;
   --ink-soft: #5b6b7d;
   --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #dbe6f2;
-  --accent: #1f74e0;
+  --accent: #1668d2;
   --accent-soft: #dcebfb;
   --ed-bg: rgba(243, 247, 252, 0.6);
 }
@@ -227,7 +321,7 @@
   --ink-soft: #7d6a60;
   --panel: color-mix(in srgb, #fffdfc var(--glass-opacity), transparent);
   --border: #f2e3da;
-  --accent: #ef5a3c;
+  --accent: #c1401f;
   --accent-soft: #ffe3d8;
   --ed-bg: rgba(253, 246, 242, 0.6);
 }
@@ -238,7 +332,7 @@
   --ink-soft: #6b6383;
   --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #e7e0f4;
-  --accent: #8b5cf6;
+  --accent: #7038e0;
   --accent-soft: #ece3fe;
   --ed-bg: rgba(248, 246, 253, 0.6);
 }
@@ -249,7 +343,7 @@
   --ink-soft: #7d616b;
   --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #f2dde5;
-  --accent: #e14d82;
+  --accent: #c62a63;
   --accent-soft: #fde0ea;
   --ed-bg: rgba(253, 245, 248, 0.6);
 }
@@ -260,33 +354,200 @@
   --ink-soft: #5d6f60;
   --panel: color-mix(in srgb, #ffffff var(--glass-opacity), transparent);
   --border: #dbebdd;
-  --accent: #2f9e44;
+  --accent: #237e33;
   --accent-soft: #d8f3dd;
   --ed-bg: rgba(244, 249, 244, 0.6);
 }
 
-/* -------- colour-accented dark theme (full dark palette + indigo hue) ------- */
+/* -------- colour-accented dark themes (dark base + their own hues) ---------
+   Each sets only what gives it character; ink, state colours and shadow depth
+   come from the dark base. Accents are bright enough to clear AA against their
+   own paper, since `--accent` is used as text as well as a fill. */
 [data-theme="midnight"] {
   --paper: #12151f;
   --grid: #262b3d;
   --text: #e7e9f5;
-  --ink: #0b0d15;
   --ink-soft: #8b8fb0;
   --panel: color-mix(in srgb, #1a1e2e var(--glass-opacity), transparent);
   --border: #2a2f45;
-  --accent: #6d8bff;
-  --accent-soft: rgba(109, 139, 255, 0.18);
-  --prio-high: #ff6369;
-  --prio-med: #ffb224;
+  --accent: #8ba4ff;
+  --accent-soft: rgba(139, 164, 255, 0.18);
   --prio-low: #8b8fb0;
-  --success: #30b96a;
   --dock-ink: #8b8fb0;
   --ed-bg: rgba(18, 21, 31, 0.6);
-  --shadow:
-    var(--glass-edge),
-    0 1px 2px rgba(0, 0, 0, 0.4),
-    0 12px 30px -8px rgba(0, 0, 0, 0.55),
-    0 28px 56px -18px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="carbon"] {
+  --paper: #17191c;
+  --grid: #2f3338;
+  --text: #e9ebed;
+  --ink-soft: #949a9f;
+  --panel: color-mix(in srgb, #212429 var(--glass-opacity), transparent);
+  --border: #31353b;
+  --accent: #9aa6b2;
+  --accent-soft: rgba(154, 166, 178, 0.18);
+  --prio-low: #949a9f;
+  --dock-ink: #949a9f;
+  --ed-bg: rgba(23, 25, 28, 0.6);
+}
+
+[data-theme="abyss"] {
+  --paper: #0d1a24;
+  --grid: #1f333f;
+  --text: #dfeaf1;
+  --ink-soft: #7f97a5;
+  --panel: color-mix(in srgb, #14242f var(--glass-opacity), transparent);
+  --border: #223642;
+  --accent: #37c2d6;
+  --accent-soft: rgba(55, 194, 214, 0.18);
+  --prio-low: #7f97a5;
+  --dock-ink: #7f97a5;
+  --ed-bg: rgba(13, 26, 36, 0.6);
+}
+
+[data-theme="matrix"] {
+  --paper: #0f1711;
+  --grid: #24361f;
+  --text: #dfeeda;
+  --ink-soft: #85997f;
+  --panel: color-mix(in srgb, #16211a var(--glass-opacity), transparent);
+  --border: #263724;
+  --accent: #59c94a;
+  --accent-soft: rgba(89, 201, 74, 0.18);
+  --prio-low: #85997f;
+  --dock-ink: #85997f;
+  --ed-bg: rgba(15, 23, 17, 0.6);
+}
+
+[data-theme="nebula"] {
+  --paper: #16121f;
+  --grid: #2f2540;
+  --text: #e9e2f3;
+  --ink-soft: #9a8cb0;
+  --panel: color-mix(in srgb, #1e1829 var(--glass-opacity), transparent);
+  --border: #322843;
+  --accent: #b98bf5;
+  --accent-soft: rgba(185, 139, 245, 0.18);
+  --prio-low: #9a8cb0;
+  --dock-ink: #9a8cb0;
+  --ed-bg: rgba(22, 18, 31, 0.6);
+}
+
+[data-theme="ember"] {
+  --paper: #1a1310;
+  --grid: #3a2820;
+  --text: #f2e5df;
+  --ink-soft: #a89187;
+  --panel: color-mix(in srgb, #241a15 var(--glass-opacity), transparent);
+  --border: #3b2b23;
+  --accent: #ff8a5c;
+  --accent-soft: rgba(255, 138, 92, 0.18);
+  --prio-low: #a89187;
+  --dock-ink: #a89187;
+  --ed-bg: rgba(26, 19, 16, 0.6);
+}
+
+[data-theme="wine"] {
+  --paper: #1a1016;
+  --grid: #3a2230;
+  --text: #f2e0e9;
+  --ink-soft: #a98a99;
+  --panel: color-mix(in srgb, #24161e var(--glass-opacity), transparent);
+  --border: #3a2532;
+  --accent: #f472a6;
+  --accent-soft: rgba(244, 114, 166, 0.18);
+  --prio-low: #a98a99;
+  --dock-ink: #a98a99;
+  --ed-bg: rgba(26, 16, 22, 0.6);
+}
+
+[data-theme="mocha"] {
+  --paper: #1b1614;
+  --grid: #382e29;
+  --text: #efe6e0;
+  --ink-soft: #a4948b;
+  --panel: color-mix(in srgb, #251e1a var(--glass-opacity), transparent);
+  --border: #38302b;
+  --accent: #d9a86c;
+  --accent-soft: rgba(217, 168, 108, 0.18);
+  --prio-low: #a4948b;
+  --dock-ink: #a4948b;
+  --ed-bg: rgba(27, 22, 20, 0.6);
+}
+
+[data-theme="arctic"] {
+  --paper: #101a20;
+  --grid: #26363f;
+  --text: #e3eef3;
+  --ink-soft: #8ba1ab;
+  --panel: color-mix(in srgb, #18242b var(--glass-opacity), transparent);
+  --border: #27373f;
+  --accent: #7fd4e8;
+  --accent-soft: rgba(127, 212, 232, 0.18);
+  --prio-low: #8ba1ab;
+  --dock-ink: #8ba1ab;
+  --ed-bg: rgba(16, 26, 32, 0.6);
+}
+
+/* Pure black paper for OLED screens, with a warm accent to stay legible. */
+[data-theme="noir"] {
+  --paper: #000000;
+  --grid: #1f1f1f;
+  --text: #ededed;
+  --ink-soft: #8f8f8f;
+  --panel: color-mix(in srgb, #121212 var(--glass-opacity), transparent);
+  --border: #262626;
+  --accent: #f5b544;
+  --accent-soft: rgba(245, 181, 68, 0.18);
+  --prio-low: #8f8f8f;
+  --dock-ink: #8f8f8f;
+  --ed-bg: rgba(0, 0, 0, 0.6);
+}
+
+/* ------------------------- custom (user-made) themes -----------------------
+   Two blocks serve every theme the user mixes. They take the only two values
+   that came from the user — `--custom-accent` and `--custom-paper`, set as inline
+   properties by `resolveCustomTheme` in `src/lib/themes.ts` — and derive the rest
+   of the palette here, so a hand-made theme is built from the same tokens as a
+   preset and no palette maths leaks into components (rule #6).
+
+   Fallbacks match the neutral light/dark bases, so a half-applied theme (vars
+   not set yet on first paint) still renders a sane workspace rather than
+   transparent panels and invisible text. */
+[data-theme="custom-light"] {
+  --paper: var(--custom-paper, #f7f8f6);
+  --accent: var(--custom-accent, #0f7b6c);
+  --grid: color-mix(in srgb, var(--accent) 18%, color-mix(in srgb, #000000 13%, var(--paper)));
+  --border: color-mix(in srgb, var(--accent) 10%, color-mix(in srgb, #000000 7%, var(--paper)));
+  --panel: color-mix(
+    in srgb,
+    color-mix(in srgb, #ffffff 72%, var(--paper)) var(--glass-opacity),
+    transparent
+  );
+  --text: color-mix(in srgb, var(--accent) 14%, #151d25);
+  --ink: color-mix(in srgb, var(--accent) 10%, #121a20);
+  --ink-soft: color-mix(in srgb, var(--accent) 12%, #66727d);
+  --accent-soft: color-mix(in srgb, var(--accent) 15%, var(--paper));
+  --dock-ink: color-mix(in srgb, var(--accent) 10%, #7c8896);
+  --ed-bg: color-mix(in srgb, var(--paper) 60%, transparent);
+}
+
+[data-theme="custom-dark"] {
+  --paper: var(--custom-paper, #141a21);
+  --accent: var(--custom-accent, #1ba38e);
+  --grid: color-mix(in srgb, var(--accent) 14%, color-mix(in srgb, #ffffff 13%, var(--paper)));
+  --border: color-mix(in srgb, var(--accent) 8%, color-mix(in srgb, #ffffff 10%, var(--paper)));
+  --panel: color-mix(
+    in srgb,
+    color-mix(in srgb, #ffffff 7%, var(--paper)) var(--glass-opacity),
+    transparent
+  );
+  --text: color-mix(in srgb, var(--accent) 8%, #e8eef3);
+  --ink: color-mix(in srgb, #000000 45%, var(--paper));
+  --ink-soft: color-mix(in srgb, var(--accent) 10%, #8b99a6);
+  --accent-soft: color-mix(in srgb, var(--accent) 20%, transparent);
+  --dock-ink: color-mix(in srgb, var(--accent) 8%, #8b99a6);
+  --ed-bg: color-mix(in srgb, var(--paper) 60%, transparent);
 }
 
 /* ---------------- expose tokens to Tailwind utilities ---------------- */
