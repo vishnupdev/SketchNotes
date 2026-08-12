@@ -6,6 +6,7 @@ import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { EditorShell } from "@/components/SketchNotes/EditorShell";
 import { AppLauncher } from "@/components/AppLauncher";
 import { AppIntro } from "@/components/AppIntro";
+import { BootSplash } from "@/components/BootSplash";
 import { SettingsPanel } from "@/components/Settings/SettingsPanel";
 import { CursorEffect } from "@/components/Settings/CursorEffect";
 import { ReminderScheduler } from "@/components/Reminders/organisms/ReminderScheduler";
@@ -288,6 +289,12 @@ export function Workspace() {
       {/* The app's logo, played over the top whenever one opens. Sits above the
           launcher it was picked from and above the frame rising underneath. */}
       <AppIntro />
+
+      {/* The "One App" wordmark, played once over the whole workspace as it
+          boots. Above <AppIntro /> — a deep-linked cold load plays neither (see
+          the `intro: false` on init above), but the boot veil is the top layer
+          whenever both could exist. */}
+      <BootSplash />
 
       {/* Paints the chosen mouse pointer onto <body> for every app. */}
       <CursorEffect />

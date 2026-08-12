@@ -29,6 +29,9 @@ export interface EditorCommands {
   // persistence trigger (e.g. after a title edit)
   markDirty: () => void;
 
+  // save, re-read storage and repaint the canvas
+  refresh: () => Promise<void>;
+
   // export & notes
   exportAs: (fmt: ExportFormat) => Promise<void>;
   newNote: () => Promise<void>;

@@ -384,6 +384,15 @@ export class SketchEngine {
     return !!this.sel;
   }
 
+  /**
+   * Re-measure the stage and repaint both layers. The observers already do this
+   * on real size changes; this is the manual escape hatch for a mobile canvas
+   * left stale by browser chrome that resizes without firing one.
+   */
+  repaint(): void {
+    this.resize();
+  }
+
   /* ============ view / zoom ============ */
 
   private syncZoom(): void {

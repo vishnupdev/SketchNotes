@@ -1195,6 +1195,173 @@ svg {
   animation: app-intro-sheen 0.75s cubic-bezier(0.25, 0.6, 0.3, 1) 0.22s both;
 }
 
+/* ===================== boot animation ("One App") ========================
+   Played once per page load by <BootSplash />, in four beats:
+
+     1. every app's chip flies in from off-screen and collapses into one point
+     2. the point bursts (the app-opening rings above, retimed to the impact)
+     3. the "One App" wordmark unfolds out of it, from the seam outward
+     4. a drawn stroke signs under it, the tagline settles, the layer clears
+
+   Same construction as the app-opening mark — one animation per element, each
+   with its own delay, so the beats land in order and none of them has to know
+   about the others. Only opacity and transform animate (rule #7); the one
+   exception is the ink stroke, a single small path whose dash offset is what
+   makes it draw at all.
+
+   The veil ends `visibility: hidden` under a `forwards` fill, so the workspace
+   is reachable at the end of the sequence even in the case where the JS that
+   unmounts this layer never arrives.
+
+   Timings are mirrored by FULL_MS / REDUCED_MS (and the beat constants) in
+   `BootSplash.tsx`; change both together. */
+@keyframes boot-veil {
+  0%,
+  79% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+/* The flight in. `--tx`/`--ty`/`--spin` are the chip's own vector, set per tile
+   in the component; ease-in so it accelerates into the collapse rather than
+   drifting to a stop. The tail scales it away to nothing under the burst. */
+@keyframes boot-tile {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--tx), var(--ty), 0) rotate(var(--spin)) scale(1.1);
+  }
+  26% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.86);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.2);
+  }
+}
+/* The impact. Starts *at* opacity 0 rather than fading from a visible ring, so
+   the `both` fill holds nothing on screen through the delay before it fires. */
+@keyframes boot-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+  18% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+/* Each letter unfolds upward off its own baseline, then rocks back level. */
+@keyframes boot-letter {
+  0% {
+    opacity: 0;
+    transform: rotateX(-92deg) translate3d(0, 0.34em, 0);
+  }
+  20% {
+    opacity: 1;
+  }
+  68% {
+    opacity: 1;
+    transform: rotateX(11deg) translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes boot-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+@keyframes boot-ink {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes boot-tagline {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* The last beat: the settled wordmark pushes past the viewer as the veil goes,
+   so the workspace is arrived at rather than cut to. */
+@keyframes boot-mark {
+  to {
+    transform: scale(1.08);
+  }
+}
+
+/* `ease-in` for the sake of the one segment that moves — the hold is flat, so
+   the curve only shapes the hand-off, and easing *in* spends less of it in the
+   half-transparent middle where the mark and the workspace overlap. */
+.boot-splash {
+  animation: boot-veil 1.8s ease-in forwards;
+}
+/* `both`, not `backwards`: a chip ends collapsed and invisible, and its resting
+   state is a full-size chip parked over the middle of the wordmark. */
+.boot-tile {
+  animation: boot-tile 0.62s cubic-bezier(0.62, 0, 0.6, 1) both;
+}
+.boot-burst {
+  animation: boot-burst 0.72s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.boot-letter {
+  transform-origin: 50% 100%;
+  animation: boot-letter 0.58s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+}
+/* The three staggered pieces take their delay from `--boot-delay`, set per
+   element in the component. A variable and a separate longhand rather than an
+   inline `animation-delay`, so the reduced-motion block below can zero every
+   one of them just by re-declaring the `animation` shorthand — an inline delay
+   would outrank that and hold a letter back past the point the layer is torn
+   down. Declared *after* the shorthands above for the same reason: a shorthand
+   resets the longhands it contains. */
+.boot-tile,
+.boot-burst,
+.boot-letter {
+  animation-delay: var(--boot-delay, 0ms);
+}
+.boot-glow {
+  animation: boot-glow 1.05s ease-out 0.42s both;
+}
+/* Dash 1 (the whole normalised path) against a slightly longer gap, so that at
+   offset 1 the gap covers the path with room to spare. An exactly equal gap
+   would put the next dash's round cap right on the end point, leaving a dot of
+   ink sitting there for the whole beat before the stroke is drawn. */
+.boot-ink path {
+  stroke-dasharray: 1 1.2;
+  animation: boot-ink 0.42s ease-out 0.95s backwards;
+}
+.boot-tagline {
+  animation: boot-tagline 0.42s var(--nav-ease) 1.08s backwards;
+}
+.boot-mark {
+  animation: boot-mark 0.4s ease-in 1.42s forwards;
+}
+
 /* Slim, theme-aware scrollbar. Track stays invisible; the thumb picks up the
    border token at rest and the accent on hover, so it blends into any theme
    (light, dark, and the colour-accented palettes). */
@@ -1272,6 +1439,30 @@ svg {
   }
   .app-intro-ring,
   .app-intro-sheen {
+    display: none;
+  }
+  /* The boot mark keeps its *meaning* too — you still get "One App" over paper
+     before the workspace — but nothing flies, bursts, unfolds or swells: the
+     wordmark, its stroke and the tagline simply fade up together, and the veil
+     clears on the shorter REDUCED_MS beat. The chips are the one piece that
+     goes entirely: their whole content *is* the flight in. */
+  .boot-splash {
+    animation-duration: 0.42s;
+  }
+  .boot-letter,
+  .boot-tagline {
+    animation: app-intro-fade 0.2s ease both;
+  }
+  .boot-ink path {
+    animation: none;
+    stroke-dasharray: none;
+  }
+  .boot-mark {
+    animation: none;
+  }
+  .boot-tile,
+  .boot-burst,
+  .boot-glow {
     display: none;
   }
 }

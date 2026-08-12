@@ -10,6 +10,7 @@ import { CanvasStage } from "@/components/SketchNotes/organisms/CanvasStage";
 import { NotesDrawer } from "@/components/SketchNotes/organisms/NotesDrawer";
 import { SelectionChip } from "@/components/SketchNotes/molecules/SelectionChip";
 import { Zoomer } from "@/components/SketchNotes/molecules/Zoomer";
+import { RefreshButton } from "@/components/SketchNotes/molecules/RefreshButton";
 import { Toast } from "@/components/SketchNotes/atoms/Toast";
 
 /** Registers global shortcuts; kept as a child so it sits inside the context. */
@@ -36,6 +37,7 @@ export function EditorShell() {
       <CanvasStage stageRef={stageRef} bgRef={bgRef} cvRef={cvRef} />
       <SelectionChip />
       <Zoomer />
+      <RefreshButton />
       <Dock />
       <NotesDrawer />
       <Toast />

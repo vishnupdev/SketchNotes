@@ -313,6 +313,37 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
     [create, flushSave, store],
   );
 
+  /**
+   * Manual re-sync: flush anything pending, re-read the index and the current
+   * note from storage, then repaint. Cheap enough to be a user-facing action and
+   * non-destructive, unlike a page reload.
+   */
+  const refreshCmd = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    try {
+      await flushSave();
+      await refetchIndex();
+      const { curId } = store.getState();
+      if (curId) {
+        const doc = await loadNote(curId);
+        const stored = JSON.stringify(doc.els);
+        // Adopt the stored copy only when it genuinely differs — a no-op reload
+        // would throw away the undo history for nothing. An empty read over a
+        // canvas that still has work on it means the write never landed, so keep
+        // what is on screen rather than blanking it.
+        if (stored !== JSON.stringify(engine.getElements()) && (doc.els.length || engine.isEmpty())) {
+          engine.loadDocument(doc);
+          store.getState().setTitle(doc.title);
+        }
+      }
+      engine.repaint();
+      store.getState().showToast("Refreshed");
+    } catch {
+      store.getState().showToast("Refresh failed — try again");
+    }
+  }, [flushSave, loadNote, refetchIndex, store]);
+
   const exportAs = useCallback(
     async (fmt: ExportFormat) => {
       const engine = engineRef.current;
@@ -352,6 +383,7 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
       resetZoom: () => engineRef.current?.resetZoom(),
       commitText: (cancel) => engineRef.current?.commitText(cancel),
       markDirty: () => scheduleSave(),
+      refresh: refreshCmd,
       exportAs,
       newNote: createFreshNote,
       openNote: openNoteInternal,
@@ -366,6 +398,7 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
       deleteNoteCmd,
       importNoteCmd,
       flushSave,
+      refreshCmd,
       scheduleSave,
     ],
   );
