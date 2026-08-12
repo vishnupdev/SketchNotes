@@ -35,6 +35,13 @@ const TABS: BottomNavItem<MorseMode>[] = [
   },
 ];
 
+/**
+ * The tab ids in bar order. Derived from TABS rather than written out again, so
+ * the direction a panel animates in can never disagree with the order the tabs
+ * are actually shown in.
+ */
+export const MORSE_MODE_ORDER = TABS.map((t) => t.id);
+
 interface ModeTabsProps {
   mode: MorseMode;
   onMode: (mode: MorseMode) => void;

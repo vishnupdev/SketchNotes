@@ -1,8 +1,9 @@
 "use client";
 
 import { cx } from "@/lib/utils";
+import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { useNearbyDevices } from "@/hooks/useNearbyDevices";
-import type { PairableTransport } from "@/lib/SystemInfo/nearby";
+import type { PairableTransport } from "@/lib/nearby/discovery";
 import { DeviceRow } from "@/components/SystemInfo/molecules/DeviceRow";
 import { RefreshIcon } from "@/components/SystemInfo/atoms/liveIcons";
 import {
@@ -12,7 +13,7 @@ import {
   PortIcon,
   RadarIcon,
   UsbIcon,
-} from "@/components/SystemInfo/atoms/nearbyIcons";
+} from "@/components/SketchNotes/atoms/deviceIcons";
 
 /** The four transports that discover through a browser-owned device chooser. */
 const PAIRABLE: {
@@ -68,6 +69,7 @@ function Status({
  * it from the browser's own scanner.
  */
 export function NearbyDevices() {
+  const setActiveApp = useWorkspaceStore((s) => s.setActiveApp);
   const {
     support,
     adapter,
@@ -197,6 +199,17 @@ export function NearbyDevices() {
           prompt.
           {missing.length > 0 && ` Not available in this browser: ${missing.map((t) => t.api).join(", ")}.`}
         </p>
+
+        {/* This panel is the summary; the Nearby Devices app is the same scan
+            opened all the way up — descriptors, capabilities and GATT services. */}
+        <button
+          type="button"
+          onClick={() => setActiveApp("nearby")}
+          className="inline-flex w-fit items-center gap-1.5 text-[12px] font-semibold text-accent hover:underline"
+        >
+          Open Nearby Devices for full details
+          <span aria-hidden>→</span>
+        </button>
       </section>
 
       {/* ------------------------------- results ---------------------------- */}

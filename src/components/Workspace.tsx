@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { EditorShell } from "@/components/SketchNotes/EditorShell";
 import { AppLauncher } from "@/components/AppLauncher";
+import { AppIntro } from "@/components/AppIntro";
 import { SettingsPanel } from "@/components/Settings/SettingsPanel";
 import { CursorEffect } from "@/components/Settings/CursorEffect";
 import { ReminderScheduler } from "@/components/Reminders/organisms/ReminderScheduler";
@@ -31,6 +32,7 @@ const TodoApp = dynamic(APP_LOADERS.todos, { ssr: false });
 const ReminderApp = dynamic(APP_LOADERS.reminders, { ssr: false });
 const TimerApp = dynamic(APP_LOADERS.timer, { ssr: false });
 const SystemInfoApp = dynamic(APP_LOADERS.system, { ssr: false });
+const NearbyApp = dynamic(APP_LOADERS.nearby, { ssr: false });
 const NetworkSpeedApp = dynamic(APP_LOADERS.speed, { ssr: false });
 const NewsApp = dynamic(APP_LOADERS.news, { ssr: false });
 const WorldClockApp = dynamic(APP_LOADERS.world, { ssr: false });
@@ -60,6 +62,7 @@ const APP_PATHS: Record<AppId, string> = {
   reminders: "/reminders",
   timer: "/timer",
   system: "/system",
+  nearby: "/nearby",
   speed: "/speedtest",
   news: "/news",
   world: "/worldclock",
@@ -103,6 +106,11 @@ const pathForApp = (app: AppId, tool: string | null): string =>
  * without a boundary here, opening an app whose chunk isn't cached yet (the
  * normal case offline before the worker has saved the build) would tear down the
  * entire workspace instead of just that panel.
+ *
+ * Arriving here isn't animated from this end: {@link AppIntro} already plays
+ * over the top of an app switch, and its veil is opaque for most of a second.
+ * The animation that matters inside the frame is the app's own navigation
+ * between its tabs or tools — see `NavView`.
  */
 function AppFrame({
   active,
@@ -115,7 +123,15 @@ function AppFrame({
 }) {
   const openLauncher = useWorkspaceStore((s) => s.openLauncher);
   return (
-    <div hidden={!active} className="fixed inset-0 z-40 overflow-y-auto bg-paper text-text">
+    <div
+      hidden={!active}
+      /* overflow-x-hidden because the apps inside animate a full-width panel in
+         from the side when their tabs change: without it the frame would grow a
+         horizontal scrollbar for the length of every tab switch. Nothing in an
+         app scrolls the page sideways by design (rule #3), so there is nothing
+         to lose. */
+      className="fixed inset-0 z-40 overflow-y-auto overflow-x-hidden bg-paper text-text"
+    >
       {active && (
         <AppLoadBoundary name={name} onBrowseApps={openLauncher}>
           {children}
@@ -150,7 +166,9 @@ export function Workspace() {
   useEffect(() => {
     const { app, tool } = parsePath(window.location.pathname);
     if (app !== "sketchnotes") {
-      setActiveApp(app);
+      // `intro: false` because the logo animation announces an app
+      // *opening*, and on a cold load the app is simply already here.
+      setActiveApp(app, { intro: false });
       if (app === "pdf") setPdfTool(tool);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -214,6 +232,12 @@ export function Workspace() {
         <SystemInfoApp />
       </AppFrame>
 
+      {/* Nearby Devices. Unmounted on an app switch, which is what stops the
+          live BLE scan and the controller polling following the user out. */}
+      <AppFrame active={activeApp === "nearby"} name="Nearby Devices">
+        <NearbyApp />
+      </AppFrame>
+
       <AppFrame active={activeApp === "speed"} name="Speed Test">
         <NetworkSpeedApp />
       </AppFrame>
@@ -260,6 +284,10 @@ export function Workspace() {
 
       <AppLauncher />
       <SettingsPanel />
+
+      {/* The app's logo, played over the top whenever one opens. Sits above the
+          launcher it was picked from and above the frame rising underneath. */}
+      <AppIntro />
 
       {/* Paints the chosen mouse pointer onto <body> for every app. */}
       <CursorEffect />

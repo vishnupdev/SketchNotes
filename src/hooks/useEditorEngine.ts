@@ -5,8 +5,9 @@ import { SketchEngine } from "@/engine/SketchEngine";
 import type { ExportFormat, NoteDocument, SketchBackup } from "@/engine/types";
 import { saveBlob } from "@/engine/export";
 import { storageAvailable } from "@/lib/storage";
-import { fetchCustomThemes, fetchTheme } from "@/lib/notes-api";
+import { fetchCustomThemes, fetchDensity, fetchTheme, fetchUiStyle } from "@/lib/notes-api";
 import { CUSTOM_THEME_VARS, resolveTheme } from "@/lib/themes";
+import { densityById, uiStyleById } from "@/lib/ui-style";
 import { uid } from "@/lib/utils";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useLoadNote, useNoteMutations } from "./useNotes";
@@ -127,6 +128,8 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
   const fontSize = useEditorStore((s) => s.fontSize);
   const themeId = useEditorStore((s) => s.themeId);
   const customThemes = useEditorStore((s) => s.customThemes);
+  const uiStyle = useEditorStore((s) => s.uiStyle);
+  const density = useEditorStore((s) => s.density);
 
   useEffect(() => {
     engineRef.current?.setTool(tool);
@@ -174,6 +177,18 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
     const m = document.querySelector('meta[name="theme-color"]');
     if (m && paper) m.setAttribute("content", paper);
   }, [themeId, customThemes]);
+
+  /*
+   * Interface style and density. Separate from the palette effect above because
+   * they are separate choices — and because these only ever set an attribute,
+   * with all the work done by the `[data-ui]` / `[data-density]` blocks in
+   * globals.css. Nothing is read back: no engine state depends on shape.
+   */
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.dataset.ui = uiStyleById(uiStyle).id;
+    document.body.dataset.density = densityById(density).id;
+  }, [uiStyle, density]);
 
   /* ----------------------------- bootstrap ----------------------------- */
 
@@ -223,6 +238,10 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
       if (savedCustom.length) st.setCustomThemes(savedCustom);
       const savedTheme = await fetchTheme();
       if (savedTheme) st.setTheme(savedTheme);
+
+      const [savedStyle, savedDensity] = await Promise.all([fetchUiStyle(), fetchDensity()]);
+      if (savedStyle) st.setUiStyle(savedStyle);
+      if (savedDensity) st.setDensity(savedDensity);
 
       const index = (await refetchIndex()).data ?? [];
       if (index.length) {

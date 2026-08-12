@@ -13,6 +13,7 @@ import { WatermarkTool } from "@/components/PdfEditor/tools/WatermarkTool";
 import { PageNumbersTool } from "@/components/PdfEditor/tools/PageNumbersTool";
 import { MetadataTool } from "@/components/PdfEditor/tools/MetadataTool";
 import { EditTool } from "@/components/PdfEditor/tools/EditTool";
+import { NavView } from "@/components/SketchNotes/atoms/NavView";
 import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
 
@@ -100,7 +101,12 @@ export function PdfApp() {
       </header>
 
       <main className="mx-auto w-full max-w-[1080px] flex-1 px-5 pb-[70px] pt-[30px]">
-        {Active ? <Active /> : <PdfHome />}
+        {/* Opening a tool from the grid animates inward and going back out
+            animates outward, so the two directions of this navigation are told
+            apart without reading the heading. */}
+        <NavView viewKey={pdfTool ?? "home"} motion={pdfTool ? "deeper" : "shallower"}>
+          {Active ? <Active /> : <PdfHome />}
+        </NavView>
       </main>
 
       <AppFooter />

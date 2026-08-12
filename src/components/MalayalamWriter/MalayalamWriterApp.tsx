@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { useMalayalamStore } from "@/store/useMalayalamStore";
-import { MethodTabs, type InputMethod } from "@/components/MalayalamWriter/molecules/MethodTabs";
+import {
+  INPUT_METHOD_ORDER,
+  MethodTabs,
+  type InputMethod,
+} from "@/components/MalayalamWriter/molecules/MethodTabs";
+import { NavView } from "@/components/SketchNotes/atoms/NavView";
 import { ManglishInput } from "@/components/MalayalamWriter/molecules/ManglishInput";
 import { MalayalamKeyboard } from "@/components/MalayalamWriter/molecules/MalayalamKeyboard";
 import { HandwritingPad } from "@/components/MalayalamWriter/molecules/HandwritingPad";
@@ -207,11 +212,17 @@ export function MalayalamWriterApp() {
             aria-label="Input method"
             className={cx("rounded-2xl border border-border bg-panel/40 p-4")}
           >
-            {method === "manglish" && <ManglishInput onInsert={insert} />}
-            {method === "keyboard" && <MalayalamKeyboard onInsert={insert} onBackspace={backspace} />}
-            {method === "handwriting" && (
-              <HandwritingPad onInsert={insert} onPreview={preview} onPreviewEnd={endPreview} />
-            )}
+            {/* Switching method slides the new input in from the side its tab
+                sits on, so the change reads as a move along the bar. */}
+            <NavView viewKey={method} order={INPUT_METHOD_ORDER}>
+              {method === "manglish" && <ManglishInput onInsert={insert} />}
+              {method === "keyboard" && (
+                <MalayalamKeyboard onInsert={insert} onBackspace={backspace} />
+              )}
+              {method === "handwriting" && (
+                <HandwritingPad onInsert={insert} onPreview={preview} onPreviewEnd={endPreview} />
+              )}
+            </NavView>
           </section>
         </div>
       </main>

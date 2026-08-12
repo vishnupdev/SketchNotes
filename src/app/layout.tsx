@@ -48,7 +48,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body data-theme="dark" data-dark="">
+      {/* The presentation attributes are server-rendered at their defaults and
+          reconciled from storage on mount (see `useEditorEngine`), so the first
+          paint is a complete, styled workspace rather than an unstyled one. */}
+      <body data-theme="dark" data-dark="" data-ui="glass" data-density="cosy">
         <StructuredData />
         <Providers>{children}</Providers>
       </body>

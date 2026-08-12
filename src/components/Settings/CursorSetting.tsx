@@ -88,7 +88,8 @@ export function CursorSetting() {
       <div
         role="radiogroup"
         aria-label="Mouse pointer"
-        className="grid grid-cols-3 gap-2 min-[440px]:grid-cols-4"
+        // Sized against the settings section (see ThemeSetting), not the viewport.
+        className="grid grid-cols-3 gap-2 @min-[340px]:grid-cols-4"
       >
         {CURSORS.map((c) => {
           const active = c.id === settings.id;

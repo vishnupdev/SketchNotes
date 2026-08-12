@@ -23,7 +23,11 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
       <h4 className="font-mono text-[10.5px] font-bold uppercase tracking-[.12em] text-ink-soft">
         {title}
       </h4>
-      <div className="grid grid-cols-2 gap-2.5 min-[440px]:grid-cols-3">{children}</div>
+      {/* Container-relative, not viewport-relative: a section can be a full-width
+          sheet on a phone or one of two columns on a desktop. 340px is measured —
+          it is exactly how wide this block is at the old 440px viewport
+          breakpoint — so phones keep the column count they always had. */}
+      <div className="grid grid-cols-2 gap-2.5 @min-[340px]:grid-cols-3">{children}</div>
     </div>
   );
 }
@@ -103,8 +107,8 @@ export function ThemeSetting() {
   return (
     <div className="flex flex-col gap-4">
       <div role="radiogroup" aria-label="Theme" className="flex flex-col gap-4">
-        <Group title={`Light · ${LIGHT_THEMES.length}`}>{LIGHT_THEMES.map(presetTile)}</Group>
         <Group title={`Dark · ${DARK_THEMES.length}`}>{DARK_THEMES.map(presetTile)}</Group>
+        <Group title={`Light · ${LIGHT_THEMES.length}`}>{LIGHT_THEMES.map(presetTile)}</Group>
 
         {customThemes.length > 0 && (
           <Group title={`Your themes · ${customThemes.length}`}>

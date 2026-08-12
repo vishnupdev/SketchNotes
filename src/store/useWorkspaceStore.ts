@@ -18,6 +18,7 @@ export type AppId =
   | "reminders"
   | "timer"
   | "system"
+  | "nearby"
   | "speed"
   | "news"
   | "world"
@@ -40,6 +41,7 @@ const ALL_APPS: AppId[] = [
   "reminders",
   "timer",
   "system",
+  "nearby",
   "speed",
   "news",
   "world",
@@ -85,11 +87,24 @@ interface WorkspaceState {
   settingsOpen: boolean;
   /** User-defined order of launcher tiles; persisted to localStorage. */
   appOrder: AppId[];
+  /**
+   * The app whose opening animation is currently playing (null = none). Set by
+   * {@link setActiveApp} when the app actually changes, and cleared by
+   * <AppIntro /> once the animation is done.
+   */
+  appIntro: AppId | null;
   /** Chosen mouse pointer for the whole workspace. See `@/lib/cursors`. */
   cursor: CursorSettings;
 
-  setActiveApp: (app: AppId) => void;
+  /**
+   * Open an app. Plays that app's opening animation unless `intro: false` —
+   * which is what adopting a deep link on first load passes, since there the
+   * app isn't opening on top of anything.
+   */
+  setActiveApp: (app: AppId, opts?: { intro?: boolean }) => void;
   setPdfTool: (tool: string | null) => void;
+  /** Called by <AppIntro /> when the opening animation has finished. */
+  endAppIntro: () => void;
   openLauncher: () => void;
   closeLauncher: () => void;
   openSettings: () => void;
@@ -109,10 +124,19 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   launcherOpen: false,
   settingsOpen: false,
   appOrder: ALL_APPS,
+  appIntro: null,
   cursor: DEFAULT_CURSOR_SETTINGS,
 
-  setActiveApp: (app) => set({ activeApp: app, launcherOpen: false }),
+  // Re-picking the app that's already on screen closes the launcher without
+  // replaying the animation — nothing opened.
+  setActiveApp: (app, opts) =>
+    set({
+      activeApp: app,
+      launcherOpen: false,
+      appIntro: opts?.intro === false || app === get().activeApp ? get().appIntro : app,
+    }),
   setPdfTool: (pdfTool) => set({ pdfTool }),
+  endAppIntro: () => set({ appIntro: null }),
   openLauncher: () => set({ launcherOpen: true }),
   closeLauncher: () => set({ launcherOpen: false }),
   // Opening settings closes the launcher so only one overlay shows at a time.

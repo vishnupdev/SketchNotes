@@ -7,6 +7,7 @@ import {
   type CustomTheme,
   type ThemeId,
 } from "@/lib/themes";
+import { isDensityId, isUiStyleId } from "@/lib/ui-style";
 import { sDel, sGet, sSet } from "./storage";
 
 /** Storage-key helpers keep the key scheme in one place. */
@@ -15,6 +16,8 @@ const KEY = {
   note: (id: string) => `sknotes:${id}`,
   theme: "sknotes:theme",
   customThemes: "sknotes:custom-themes",
+  uiStyle: "sknotes:ui-style",
+  density: "sknotes:density",
 };
 
 /* ============ notes index ============ */
@@ -102,4 +105,24 @@ export async function fetchCustomThemes(): Promise<CustomTheme[]> {
 
 export async function saveCustomThemes(themes: CustomTheme[]): Promise<void> {
   await sSet(KEY.customThemes, JSON.stringify(themes.slice(0, MAX_CUSTOM_THEMES)));
+}
+
+/* ============ interface style + density ============ */
+
+export async function fetchUiStyle(): Promise<string | null> {
+  const v = await sGet(KEY.uiStyle);
+  return isUiStyleId(v) ? v : null;
+}
+
+export async function saveUiStyle(id: string): Promise<void> {
+  await sSet(KEY.uiStyle, id);
+}
+
+export async function fetchDensity(): Promise<string | null> {
+  const v = await sGet(KEY.density);
+  return isDensityId(v) ? v : null;
+}
+
+export async function saveDensity(id: string): Promise<void> {
+  await sSet(KEY.density, id);
 }

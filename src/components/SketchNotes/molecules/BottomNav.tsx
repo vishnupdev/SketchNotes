@@ -37,6 +37,12 @@ interface BottomNavProps<T extends string> {
  * constant, so switching tabs costs no layout and shifts nothing (rule #7). The
  * global reduced-motion rule drops the transition while keeping the raised
  * state, which is what marks the tab as current.
+ *
+ * On top of the lift, the icon of the tab that just became current gives a
+ * small pop, so the bar acknowledges the tap on the same frame the panel behind
+ * it animates in. It rides on a span of its own rather than on the raised
+ * circle, because that one is already carrying the lift and a keyframed
+ * transform would replace it outright.
  */
 export function BottomNav<T extends string>({
   label,
@@ -82,7 +88,11 @@ export function BottomNav<T extends string>({
               )}
               style={{ transition: "var(--fx)" }}
             >
-              {icon}
+              {/* The attribute exists only while this tab is selected, so
+                  selecting it is itself what starts the pop — no JS involved. */}
+              <span data-nav-tab={active ? "on" : undefined} className="grid place-items-center">
+                {icon}
+              </span>
             </span>
             <span
               className={cx(

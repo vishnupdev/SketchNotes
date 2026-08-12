@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { useWorldClockStore } from "@/store/useWorldClockStore";
-import { ModeTabs } from "@/components/WorldClock/molecules/ModeTabs";
+import { ModeTabs, WORLDCLOCK_MODE_ORDER } from "@/components/WorldClock/molecules/ModeTabs";
+import { NavView } from "@/components/SketchNotes/atoms/NavView";
 import { ClockBoard } from "@/components/WorldClock/organisms/ClockBoard";
 import { CountryPanel } from "@/components/WorldClock/organisms/CountryPanel";
 import { CountryNewsPanel } from "@/components/WorldClock/organisms/CountryNewsPanel";
@@ -71,7 +72,14 @@ export function WorldClockApp() {
           content flow and `bottom-nav-clear` keeps the last panel scrollable
           out from under it. */}
       <main className="bottom-nav-clear mx-auto w-full max-w-[820px] flex-1 px-5 pt-[22px]">
-        <div id={`worldclock-panel-${mode}`} role="tabpanel">
+        {/* Switching views slides the new panel in from the side its tab sits
+            on, so the change reads as a move along the bar. */}
+        <NavView
+          viewKey={mode}
+          order={WORLDCLOCK_MODE_ORDER}
+          id={`worldclock-panel-${mode}`}
+          role="tabpanel"
+        >
           {mode === "clocks" ? (
             <ClockBoard
               onOpenCountry={(code) => selectCountry(code)}
@@ -89,7 +97,7 @@ export function WorldClockApp() {
               onSelect={(code) => selectCountry(code, "news")}
             />
           )}
-        </div>
+        </NavView>
       </main>
 
       <ModeTabs mode={mode} onMode={setMode} />

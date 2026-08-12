@@ -48,7 +48,13 @@ export const APPS: AppEntry[] = [
   {
     path: "/system",
     name: "System Info",
-    blurb: "live device and system dashboard, with a nearby-device scanner",
+    blurb: "live device and system dashboard — processor, memory, graphics, display and battery",
+  },
+  {
+    path: "/nearby",
+    name: "Nearby Devices",
+    blurb:
+      "scan for nearby Bluetooth, USB, HID and serial devices and read each one's features — descriptors, services, capabilities and live input",
   },
   { path: "/speedtest", name: "Speed Test", blurb: "measure your network speed" },
   {
@@ -155,6 +161,15 @@ export const SITE_KEYWORDS = [
   "country information",
   "country facts",
   "meeting time planner",
+  "nearby device scanner",
+  "scan for bluetooth devices",
+  "find nearby devices online",
+  "bluetooth device info",
+  "usb device information",
+  "what device is this",
+  "ble scanner web",
+  "gamepad tester",
+  "controller tester online",
   "offline PWA",
   "free online tools no signup",
   "free ai assistant",

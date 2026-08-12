@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { useTimerStore } from "@/store/useTimerStore";
-import { ModeTabs } from "@/components/Timer/molecules/ModeTabs";
+import { ModeTabs, TIMER_MODE_ORDER } from "@/components/Timer/molecules/ModeTabs";
+import { NavView } from "@/components/SketchNotes/atoms/NavView";
 import { CountdownPanel } from "@/components/Timer/organisms/CountdownPanel";
 import { StopwatchPanel } from "@/components/Timer/organisms/StopwatchPanel";
 import { PomodoroPanel } from "@/components/Timer/organisms/PomodoroPanel";
@@ -54,7 +55,9 @@ export function TimerApp() {
       {/* ModeTabs is the floating bottom bar — outside the content flow, with
           `bottom-nav-clear` keeping the panel scrollable out from under it. */}
       <main className="bottom-nav-clear mx-auto w-full max-w-[720px] flex-1 px-5 pt-[22px]">
-        <div className="flex flex-col gap-5">
+        {/* Switching tools slides the new panel in from the side its tab sits
+            on, so the change reads as a move along the bar. */}
+        <NavView viewKey={mode} order={TIMER_MODE_ORDER} className="flex flex-col gap-5">
           {mode === "countdown" ? (
             <CountdownPanel />
           ) : mode === "stopwatch" ? (
@@ -62,7 +65,7 @@ export function TimerApp() {
           ) : (
             <PomodoroPanel />
           )}
-        </div>
+        </NavView>
       </main>
 
       <ModeTabs mode={mode} onMode={setMode} />

@@ -22,6 +22,7 @@ export const APP_LABELS: Record<AppId, string> = {
   reminders: "Reminders",
   timer: "Timer",
   system: "System Info",
+  nearby: "Nearby Devices",
   speed: "Network Speed",
   news: "News",
   world: "World Clock",
@@ -47,7 +48,21 @@ export const APP_ALIASES: Record<AppId, string[]> = {
   todos: ["todos", "todo", "to-do", "tasks", "task list", "planner"],
   reminders: ["reminders", "reminder", "alerts", "alarm", "alarms"],
   timer: ["timer", "timers", "stopwatch", "pomodoro", "countdown"],
-  system: ["system info", "system", "device info", "hardware", "specs", "nearby devices"],
+  system: ["system info", "system", "device info", "hardware", "specs"],
+  nearby: [
+    "nearby devices",
+    "nearby",
+    "device scanner",
+    "scan for devices",
+    "bluetooth scanner",
+    "bluetooth devices",
+    "ble",
+    "usb devices",
+    "peripherals",
+    "connected devices",
+    "gamepad tester",
+    "controller tester",
+  ],
   speed: ["network speed", "speed test", "speedtest", "internet speed", "bandwidth"],
   news: ["news", "headlines", "newspaper"],
   world: [
@@ -140,6 +155,7 @@ export const APP_PATHS: Record<AppId, string> = {
   reminders: "/reminders",
   timer: "/timer",
   system: "/system",
+  nearby: "/nearby",
   speed: "/speedtest",
   news: "/news",
   world: "/worldclock",
@@ -160,7 +176,9 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   todos: "tasks framed by day, week, month and year",
   reminders: "timed alerts that ring with a sound you pick",
   timer: "countdown timers, a lap stopwatch and pomodoro cycles",
-  system: "a live report on this device, browser and hardware, plus a nearby-device scan",
+  system: "a live report on this device, browser and hardware",
+  nearby:
+    "find the devices around this machine and read what each one is and can do",
   speed: "download, upload, ping and jitter measurement",
   news: "headlines by category — tech, software engineering, sports, national, state, local, world",
   world: "live time in cities worldwide, with each country's facts, specialities and news",
@@ -179,10 +197,10 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "What OneApp is",
     keywords: ["oneapp", "one app", "overview", "about", "what is this", "workspace", "summary", "purpose", "intro"],
     answer:
-      "OneApp is a single web workspace holding seventeen tools, so you never install seventeen apps.\n" +
+      "OneApp is a single web workspace holding eighteen tools, so you never install eighteen apps.\n" +
       "• Creative: Sketchnotes canvas, Image Studio, PDF Editor\n" +
       "• Planning: Board, Todos, Reminders, Timer\n" +
-      "• Info: News, World Clock, System Info, Network Speed, Sound Meter, Color Lens\n" +
+      "• Info: News, World Clock, System Info, Nearby Devices, Network Speed, Sound Meter, Color Lens\n" +
       "• Language: Translate, Malayalam Writer, Morse Code, and me — the Assistant\n" +
       "Everything is free, needs no account, and keeps your data in your own browser.",
     followUps: ["List all the apps", "Is my data private?", "Does it work offline?"],
@@ -205,9 +223,9 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     keywords: ["offline", "offline mode", "work offline", "works offline", "use it offline", "use offline", "no internet", "no connection", "without internet", "airplane mode", "slow internet", "weak connection", "save data", "data saver", "install", "pwa", "home screen", "app icon", "service worker", "download app", "save for offline"],
     answer:
       "OneApp is a PWA: after your first visit it saves itself on your device, so every app opens with no connection — including a fresh reload of any app's link.\n" +
-      "• All seventeen apps are downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
+      "• All eighteen apps are downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
       "• Install it from your browser's Install / Add to Home Screen option to get an app icon and its own window\n" +
-      "• Fully offline: Sketchnotes, PDF Editor, Image Studio, Board, Todos, Reminders, Timer, System Info, Sound Meter, Color Lens, World Clock (clocks and country details), Malayalam typing/keyboard, on-device Translate, and me\n" +
+      "• Fully offline: Sketchnotes, PDF Editor, Image Studio, Board, Todos, Reminders, Timer, System Info, Nearby Devices, Sound Meter, Color Lens, World Clock (clocks and country details), Malayalam typing/keyboard, on-device Translate, and me\n" +
       "• Needs a connection: News and World Clock headlines (saved ones still open), online translation (past phrases still open), handwriting recognition and the speed test\n" +
       "• On a weak or metered connection it serves saved content instead of stalling, and skips optional downloads like news logos",
     followUps: ["Is my data private?", "Which apps need internet?", "List all the apps"],
@@ -243,7 +261,21 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "• Dark — Dark, Midnight, Carbon, Abyss, Matrix, Nebula, Ember, Wine, Mocha, Arctic, Noir (pure black, for OLED screens)\n" +
       "You can also build your own: tap \"Custom theme\", choose a light or dark base, an accent and a background colour, and the rest of the palette is worked out from those. It shows the contrast ratio as you pick, so your theme stays readable, and you can keep up to twelve — each one editable and deletable later.\n" +
       "The choice applies to every app at once and is remembered on this device. Or just tell me — \"switch to Ocean\" — and I'll set it for you.",
-    followUps: ["How do I switch apps?", "How do I change the mouse pointer?"],
+    followUps: ["How do I change the interface style?", "How do I change the mouse pointer?"],
+  },
+  {
+    id: "interface",
+    title: "Interface style and density",
+    keywords: ["interface", "interface style", "ui style", "component style", "design", "look", "shape", "corners", "rounded", "square", "glass", "glassmorphism", "blur", "flat", "solid", "outline", "borders", "shadow", "density", "compact", "spacing", "roomy", "layout", "appearance", "settings"],
+    answer:
+      "Settings → Interface changes the *shape* of the workspace, where the theme changes its colour. Five styles:\n" +
+      "• Glass — frosted translucent panels over a soft ambient wash. The default\n" +
+      "• Solid — opaque cards with a gentle lift; no blur or tint, quicker to read\n" +
+      "• Soft — generous round corners and a wide, diffuse shadow\n" +
+      "• Sharp — square corners and a tight shadow; precise and dense\n" +
+      "• Outline — borders instead of shadows, for the least visual noise\n" +
+      "Underneath is Density — Compact, Cosy or Roomy — which tightens or opens up padding, gaps and control sizes across every app. Style and density are separate choices, so you can mix them, and both apply everywhere at once and are remembered on this device.",
+    followUps: ["How do I change the theme?", "How do I change the mouse pointer?"],
   },
   {
     id: "cursor",
@@ -269,6 +301,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "• Malayalam Writer — copy the text or download it as a file\n" +
       "• PDF Editor and Image Studio — every result downloads straight to your device\n" +
       "• System Info — export the device report\n" +
+      "• Nearby Devices — copy the whole device inventory as text\n" +
       "Because data is per-browser, a JSON export is how you move notes to another device.",
     followUps: ["Is my data private?", "What can Sketchnotes do?"],
   },
@@ -277,7 +310,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "Mobile and touch support",
     keywords: ["mobile", "phone", "tablet", "ipad", "touch", "responsive", "stylus", "pen", "finger", "small screen"],
     answer:
-      "Every screen is designed mobile-first and reflows down to about 360px wide, so all seventeen tools work on a phone.\n" +
+      "Every screen is designed mobile-first and reflows down to about 360px wide, so all eighteen tools work on a phone.\n" +
       "• Drawing, handwriting and the PDF editor accept touch and stylus input\n" +
       "• Install it to your home screen to use it like a native app\n" +
       "• Layouts widen into side-by-side panes on tablets and desktops",
@@ -447,15 +480,31 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     id: "app-system",
     title: "System Info — device and browser report",
     app: "system",
-    keywords: ["system", "device", "hardware", "cpu", "gpu", "memory", "ram", "battery", "screen", "resolution", "browser", "specs", "diagnostics", "report", "capabilities", "nearby devices", "nearby", "scan devices", "scan for devices", "bluetooth", "ble", "usb", "hid", "serial", "peripherals", "gamepad", "cast", "chromecast", "connected devices"],
+    keywords: ["system", "device", "hardware", "cpu", "gpu", "memory", "ram", "battery", "screen", "resolution", "browser", "specs", "diagnostics", "report", "capabilities"],
     answer:
       "System Info reads everything your browser will reveal about this machine and presents it as a live dashboard plus an exportable report.\n" +
       "• CPU, memory, GPU, screen, battery, storage and network details\n" +
       "• A feature matrix of what this browser supports\n" +
       "• Live meters that update as you watch\n" +
-      "• Nearby devices — scan for Bluetooth, USB, HID and serial devices, list attached microphones, cameras and gamepads, and check for cast-capable displays on your network\n" +
+      "• A short nearby-devices panel; the full scanner is its own app, Nearby Devices\n" +
       "Nothing is sent anywhere — it's all read locally.",
-    followUps: ["How do I test my internet speed?", "Is my data private?"],
+    followUps: ["What can Nearby Devices do?", "How do I test my internet speed?", "Is my data private?"],
+  },
+  {
+    id: "app-nearby",
+    title: "Nearby Devices — scan around you and read what each device is",
+    app: "nearby",
+    keywords: ["nearby", "nearby devices", "scan devices", "scan for devices", "device scanner", "find devices", "what devices are around", "bluetooth", "bluetooth devices", "ble", "ble scan", "gatt", "usb", "usb device", "hid", "serial", "com port", "peripherals", "connected devices", "gamepad", "gamepad tester", "controller", "controller tester", "test my controller", "webcam resolution", "camera capabilities", "microphone sample rate", "cast", "chromecast", "signal strength", "rssi", "firmware version", "battery level of device"],
+    answer:
+      "Nearby Devices finds the hardware around this machine and tells you what each piece of it actually is.\n" +
+      "• Scan — a button per transport (Bluetooth, USB, HID, serial) opens the browser's own picker; attached microphones, cameras, speakers and controllers appear on their own\n" +
+      "• Live BLE scan — on Chrome with experimental web features on, it streams every advertisement in range with its signal strength\n" +
+      "• Full spec sheet per device — USB configurations, interfaces and endpoints, HID collections and report layouts, camera resolutions and frame rates, microphone sample rates and channels\n" +
+      "• Bluetooth features — connect on request to read the GATT services, characteristics, firmware and hardware revisions and battery level, then it disconnects again\n" +
+      "• Controllers — a live view of every button and stick, which is the quickest way to test a gamepad\n" +
+      "• Copy report — the whole inventory as text, for a ticket or a note\n" +
+      "A web page can't sweep the airwaves by itself: each scan opens the browser's own chooser and only the device you pick becomes visible. Everything is read on-device, nothing is uploaded, and no device is opened or written to.",
+    followUps: ["What does System Info show?", "Is my data private?", "Which apps need internet?"],
   },
   {
     id: "app-speed",

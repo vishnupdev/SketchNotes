@@ -14,7 +14,7 @@ import {
   type NearbySupport,
   type PairableTransport,
   type Transport,
-} from "@/lib/SystemInfo/nearby";
+} from "@/lib/nearby/discovery";
 
 /** Grouping order for the list — wireless first, then wired, then built-in. */
 const TRANSPORT_ORDER: Transport[] = [

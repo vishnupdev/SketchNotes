@@ -11,7 +11,8 @@
 - [Todos](/todos): task and week planner
 - [Reminders](/reminders): scheduled reminders with notifications
 - [Timer](/timer): pomodoro and countdown timer
-- [System Info](/system): live device and system dashboard, plus a nearby-devices scanner that lists Bluetooth, USB, HID, serial, audio/video and gamepad hardware around this machine and detects cast-capable displays on the network
+- [System Info](/system): live device and system dashboard — OS, processor, memory, graphics, display, battery, network, storage, locale and the browser capability matrix, as live meters plus an exportable report. Carries a compact nearby-devices panel; the full scanner is its own app, below
+- [Nearby Devices](/nearby): find the hardware around this machine and read what each piece of it is. Discovery uses every route the web platform allows — devices this site was already granted over **Web Bluetooth, WebUSB, WebHID and Web Serial**, attached microphones, speakers and cameras, connected game controllers, cast-capable displays on the local network via the Presentation API, and (on Chrome with experimental web features enabled) a **live BLE advertisement scan** streaming every broadcast in range with its signal strength. A page cannot sweep the airwaves by itself: each transport button opens the *browser's own* chooser, and only the device the user picks becomes visible to the app — attached audio, video and controller hardware needs no prompt. Selecting a device opens its full sheet, read from the descriptor the platform already returned, with no device opened, claimed or written to: **USB** — manufacturer, product, vendor/product ids, device class/subclass/protocol translated to names, USB and device revisions, and every configuration with its interfaces, alternates and endpoints (direction, transfer type, packet size); **HID** — vendor/product ids, the collection tree with usage pages and usages named, and the input/output/feature report layout; **serial** — USB vendor/product ids behind the port; **cameras and microphones** — the track capabilities the hardware advertises (resolutions, frame rates, facing mode, sample rate, channels, echo cancellation and the rest) once the site holds camera/mic permission; **controllers** — layout plus a live view of every button pressure and stick axis, which doubles as a gamepad tester. **Bluetooth** features need a live link, so a per-device "Connect & read features" action walks the GATT table — every primary service and characteristic with what it permits, plus manufacturer name, model number, firmware/hardware/software revision, appearance, transmit power and battery level — then disconnects again. A browser-support matrix shows which of the eight discovery APIs exist here, and the whole inventory copies out as a plain-text report. Fully offline (the APIs are local); everything is read on-device and nothing is transmitted
 - [Speed Test](/speedtest): network speed measurement
 - [News](/news): latest headlines by category — tech, software engineering, sports, national, international, state (Kerala) and local
 - [World Clock](/worldclock): live time anywhere in the world, and the country behind each clock. Three views over one selection. **Clocks** — your own time leads a board of pinned cities (120+ cities across 68 countries and every inhabited time zone, including half- and quarter-hour offsets like India's UTC+05:30 and Nepal's UTC+05:45); each card shows the live time, the zone abbreviation, the offset relative to you, a "Tomorrow"/"Yesterday" badge whenever the date differs, a day/night glyph and a plain-language read on whether it is a reasonable hour to call. A time-shift slider moves every clock together by up to ±12 hours for planning a call or meeting across zones. Cities are searchable by name, former name, country, capital, ISO code or IANA zone ("bombay", "kerala", "GB", "asia/kolkata" all work) and the pinned board persists on the device. **Country** — capital, region, population (approximate, with density), area, currency and symbol, official languages, international dialling code, which side of the road it drives on, internet TLD and current UTC offset, plus a short profile and what the country is known for (its specialities), and the live local time in each of its cities. **News** — latest headlines from that country's own news edition in English. Time zones are computed with the browser's `Intl` API, so daylight saving always follows the platform's current tz database; the clocks, country details and specialities are all bundled and work fully offline, and only the headlines need a connection
@@ -26,7 +27,7 @@
 
 - Works 100% offline after the first visit. A service worker (/sw.js) precaches every app
   route's HTML, then stores every file in the build manifest (/precache-manifest.json) —
-  which includes the code-split chunk for each of the seventeen apps. So one online visit
+  which includes the code-split chunk for each of the eighteen apps. So one online visit
   to any single page is enough for every deep link (e.g. /todos, /pdfeditor) to cold-load
   with no connection, not just the app that was open when the network dropped.
 - An app whose code is somehow not stored (a connection lost mid-download, or a deploy
@@ -41,7 +42,8 @@
 - On a weak connection the app serves saved content rather than stalling: navigations
   fall back to the cached shell after 3.5s, API responses after 6s.
 - Fully offline: Sketch Notes, PDF Editor, Image Studio, Board, Todos, Reminders, Timer,
-  System Info, Morse Code, Sound Meter, Color Lens, Malayalam transliteration +
+  System Info, Nearby Devices (the discovery APIs are local; only cast-display detection
+  needs the local network), Morse Code, Sound Meter, Color Lens, Malayalam transliteration +
   keyboard, on-device Translate, Assistant, and World Clock apart from its News tab —
   clocks, time zones and every country detail are computed and bundled locally, and
   country flags fall back to the ISO code when the flag image has not been cached.
@@ -66,6 +68,12 @@ stored on the device.
   editor shows the accent's live contrast ratio against the background so a theme you make
   stays readable. Saved themes can be renamed, re-coloured and deleted. Everything is
   stored on the device.
+- Interface: the workspace's shape, separate from its colour. Five styles — Glass
+  (translucent frosted panels over an ambient wash, the default), Solid (opaque cards, no
+  blur), Soft (large round corners, wide diffuse shadow), Sharp (square corners, tight
+  shadow) and Outline (borders instead of shadows). Plus three densities — Compact, Cosy,
+  Roomy — which scale padding, gaps and control sizes together. Style and density are
+  independent, and both are stored on the device.
 - Pointer: replaces the mouse cursor workspace-wide. System (the device's own) plus
   thirteen drawn presets — Arrow, Chevron, Hand, Crosshair, Dot, Ring, Pen, Pencil,
   Brush, Sparkle, Star, Heart and Pixel — each in four sizes (Small to Huge) and
@@ -78,7 +86,13 @@ stored on the device.
 ## Notes
 
 - No accounts, no server storage — data is kept in the browser's localStorage.
+- Apps are switched from the launcher (the "Switch app" button in any app's header)
+  without a page load; the URL still changes to that app's path, and the app's logo plays
+  a brief opening animation over the new screen. Motion throughout the workspace is
+  dropped when the browser asks for reduced motion.
 - Device permissions are asked for only on the feature that needs one, and only from a
   click: notifications (Reminders), the microphone (Sound Meter) and the camera (Color
-  Lens). Captured audio and video are analysed in memory and discarded — never recorded
+  Lens), and the per-device choosers in Nearby Devices (Bluetooth, USB, HID, serial —
+  each granted one device at a time, by the browser, never by the page). Captured audio
+  and video are analysed in memory and discarded — never recorded
   or transmitted — and the device is released as soon as the feature is done with it.

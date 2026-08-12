@@ -10,6 +10,13 @@ const VIEWS: { id: ViewMode; label: string }[] = [
   { id: "year", label: "Year" },
 ];
 
+/**
+ * The granularities in the order the segmented control shows them, narrowest
+ * first. Derived from VIEWS so the direction the task list animates in can never
+ * disagree with the order the buttons are actually in.
+ */
+export const VIEW_ORDER = VIEWS.map((v) => v.id);
+
 interface PeriodNavProps {
   view: ViewMode;
   anchor: number;

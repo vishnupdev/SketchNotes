@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { useMorseStore } from "@/store/useMorseStore";
-import { ModeTabs } from "@/components/Morse/molecules/ModeTabs";
+import { ModeTabs, MORSE_MODE_ORDER } from "@/components/Morse/molecules/ModeTabs";
+import { NavView } from "@/components/SketchNotes/atoms/NavView";
 import { PlaybackBar } from "@/components/Morse/molecules/PlaybackBar";
 import { LearnPanel } from "@/components/Morse/organisms/LearnPanel";
 import { PracticePanel } from "@/components/Morse/organisms/PracticePanel";
@@ -70,7 +71,14 @@ export function MorseApp() {
       <main className="bottom-nav-clear mx-auto w-full max-w-[720px] flex-1 px-5 pt-[22px]">
         <div className="flex flex-col gap-4">
           <PlaybackBar />
-          <div id={`morse-panel-${mode}`} role="tabpanel">
+          {/* Switching tools slides the new panel in from the side its tab sits
+              on, so the change reads as a move along the bar. */}
+          <NavView
+            viewKey={mode}
+            order={MORSE_MODE_ORDER}
+            id={`morse-panel-${mode}`}
+            role="tabpanel"
+          >
             {mode === "learn" ? (
               <LearnPanel />
             ) : mode === "practice" ? (
@@ -80,7 +88,7 @@ export function MorseApp() {
             ) : (
               <KeyPanel />
             )}
-          </div>
+          </NavView>
         </div>
       </main>
 

@@ -6,7 +6,8 @@ import { useNews } from "@/hooks/useNews";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { NewsTabs } from "@/components/News/molecules/NewsTabs";
 import { NewsFeed } from "@/components/News/organisms/NewsFeed";
-import { newsTabById } from "@/lib/News/catalog";
+import { NEWS_TAB_ORDER, newsTabById } from "@/lib/News/catalog";
+import { NavView } from "@/components/SketchNotes/atoms/NavView";
 import { cx } from "@/lib/utils";
 import { AppsIcon, NewsIcon, RefreshIcon } from "@/components/SketchNotes/atoms/icons";
 import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
@@ -68,8 +69,11 @@ export function NewsApp() {
 
       <main className="mx-auto w-full max-w-[900px] flex-1 px-5 pb-[80px] pt-5">
         <h2 className="sr-only">{tabLabel} headlines</h2>
-        {/* Keyed by tab so each category mounts its own cached feed. */}
-        <NewsFeed key={activeTab} tabId={activeTab} />
+        {/* Keyed by tab so each category mounts its own cached feed, and wrapped
+            so the new category slides in from the side its chip sits on. */}
+        <NavView viewKey={activeTab} order={NEWS_TAB_ORDER}>
+          <NewsFeed key={activeTab} tabId={activeTab} />
+        </NavView>
       </main>
 
       <AppFooter />

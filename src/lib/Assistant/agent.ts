@@ -99,7 +99,7 @@ function fallbackReply(): AgentReply {
   return {
     engine: "local",
     text:
-      "I didn't catch which part of the workspace you mean. I can explain any of the seventeen apps, and things like privacy, offline use, backups, themes and keyboard shortcuts.\n" +
+      "I didn't catch which part of the workspace you mean. I can explain any of the eighteen apps, and things like privacy, offline use, backups, themes and keyboard shortcuts.\n" +
       "Try naming a tool — \"what can the PDF Editor do?\" — or tell me to do something, like \"open the timer\" or \"turn on dark mode\".",
     actions: [],
     suggestions: STARTER_QUESTIONS.slice(0, 4),

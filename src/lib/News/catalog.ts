@@ -39,6 +39,13 @@ export const NEWS_TABS: NewsTab[] = [
 
 export const DEFAULT_NEWS_TAB = NEWS_TABS[0].id;
 
+/**
+ * Tab ids in the order the category bar shows them. Derived from NEWS_TABS so
+ * the direction the feed animates in can never disagree with where the chips
+ * actually sit.
+ */
+export const NEWS_TAB_ORDER = NEWS_TABS.map((t) => t.id);
+
 export function newsTabById(id: string): NewsTab | undefined {
   return NEWS_TABS.find((t) => t.id === id);
 }

@@ -1,18 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useWorkspaceStore, type AppId } from "@/store/useWorkspaceStore";
 import { cx, trackSpot } from "@/lib/utils";
 import { CloseIcon, SettingsIcon } from "@/components/SketchNotes/atoms/icons";
-
-interface AppEntry {
-  id: AppId;
-  name: string;
-  tagline: string;
-  icon: ReactNode;
-  /** CSS custom-property name holding this app's brand hue (see globals.css). */
-  hue: string;
-}
+import { APPS, APP_MAP, chipGradient, type AppEntry } from "@/components/AppCatalog";
 
 const ArrowIcon = (
   <svg
@@ -28,282 +20,6 @@ const ArrowIcon = (
   </svg>
 );
 
-const SketchGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <path d="M4.5 19.5 8 18.5 19 7.5a2 2 0 0 0-2.9-2.9L5 15.6 4 19a.4.4 0 0 0 .5.5Z" />
-    <path d="M14.5 6.6 17.4 9.5" />
-  </svg>
-);
-
-const PdfGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <path d="M7 3.5h6.2L18 8.3V19a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z" />
-    <path d="M13 3.6V8.5H17.9" />
-    <path d="M8.6 12.5h6.8M8.6 15.4h6.8M8.6 18.2h4.2" />
-  </svg>
-);
-
-const ImageGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
-    <circle cx="8.5" cy="9.5" r="1.6" />
-    <path d="M4 17l4.5-4.5a2 2 0 0 1 2.8 0L17 18" />
-  </svg>
-);
-
-const BoardGlyph = (
-  // Cards on a page with a spark at the corner: sections you conjure by typing.
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <rect x="3.2" y="3.5" width="7.6" height="7" rx="1.6" />
-    <rect x="13.2" y="3.5" width="7.6" height="11" rx="1.6" />
-    <rect x="3.2" y="13" width="7.6" height="7.5" rx="1.6" />
-    <path d="M15 18.4h5.8M17.9 15.6v5.6" />
-  </svg>
-);
-
-const TodoGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <rect x="4" y="4.5" width="16" height="15.5" rx="2.4" />
-    <path d="M8 3v3M16 3v3" />
-    <path d="M7.5 12l1.6 1.6 3-3.4" />
-    <path d="M13.5 12.5h4M7.5 16.4l1.6 1.6 3-3.4M13.5 16h4" />
-  </svg>
-);
-
-const ReminderGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2H4.5z" />
-    <path d="M9.5 19.5a2.5 2.5 0 0 0 5 0" />
-  </svg>
-);
-
-const TimerGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <circle cx="12" cy="13.5" r="7.5" />
-    <path d="M12 13.5V9M9.5 2.5h5M12 2.5V6M18.5 7l1.4-1.4" />
-  </svg>
-);
-
-const SystemGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <rect x="4.5" y="4.5" width="15" height="15" rx="2.5" />
-    <rect x="9" y="9" width="6" height="6" rx="1" />
-    <path d="M9 2.8v1.7M15 2.8v1.7M9 19.5v1.7M15 19.5v1.7M2.8 9h1.7M2.8 15h1.7M19.5 9h1.7M19.5 15h1.7" />
-  </svg>
-);
-
-const SpeedGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <path d="M4 16a8 8 0 1 1 16 0" />
-    <path d="M12 16 15.5 9.5" />
-    <circle cx="12" cy="16" r="1.3" fill="currentColor" stroke="none" />
-  </svg>
-);
-
-const NewsGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <path d="M4 5.5h11.5v13H6a2 2 0 0 1-2-2z" />
-    <path d="M15.5 8.5H18a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2" />
-    <path d="M7 9h5.5M7 12h5.5M7 15h3.5" />
-  </svg>
-);
-
-const WorldClockGlyph = (
-  // A globe with a clock set into it: the two halves of the app in one mark.
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <path d="M20.9 13.4A9 9 0 1 1 10.6 3.1" />
-    <path d="M3.5 9h8.2M3.5 15h6.1" />
-    <path d="M11.5 3.2A14 14 0 0 0 9.4 20.6" />
-    <circle cx="17" cy="17" r="4.5" />
-    <path d="M17 14.9V17l1.5 1.1" />
-  </svg>
-);
-
-const MalayalamGlyph = (
-  // Geometrically centered at (12,12) so the glyph sits dead-centre regardless
-  // of the font's line metrics; overflow-visible keeps its tall parts uncropped.
-  <svg viewBox="0 0 24 24" className="size-6 overflow-visible" aria-hidden>
-    <text
-      x="12"
-      y="12"
-      textAnchor="middle"
-      dominantBaseline="central"
-      fontSize="17"
-      fontWeight="700"
-      fill="currentColor"
-    >
-      അ
-    </text>
-  </svg>
-);
-
-const TranslateGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <path d="M4 5h7M7.5 5v1.5" />
-    <path d="M9.5 7c-.6 3.2-2.8 6-5.5 7.5M5.5 8.5c.7 2 2.4 3.8 4.5 4.7" />
-    <path d="M12.5 20l3.75-9h.5L20.5 20M13.9 16.5h5.2" />
-  </svg>
-);
-
-const AssistantGlyph = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <path d="M20 12.5a7 7 0 0 1-7 7H8.8L5 21.5v-4.2A7 7 0 0 1 9.5 5.6" />
-    <path d="M16.5 2.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" />
-    <path d="M9.5 13h6" />
-  </svg>
-);
-
-const MorseGlyph = (
-  // Filled marks rather than strokes, so the 1:3 dit-to-dah ratio that defines
-  // the code stays readable at tile size.
-  <svg viewBox="0 0 24 24" fill="currentColor" className="size-6" aria-hidden>
-    <circle cx="4.5" cy="6.5" r="1.9" />
-    <rect x="9" y="4.6" width="10.5" height="3.8" rx="1.9" />
-    <rect x="2.6" y="10.1" width="10.5" height="3.8" rx="1.9" />
-    <circle cx="17.5" cy="12" r="1.9" />
-    <circle cx="4.5" cy="17.5" r="1.9" />
-    <circle cx="10" cy="17.5" r="1.9" />
-    <rect x="14" y="15.6" width="7.4" height="3.8" rx="1.9" />
-  </svg>
-);
-
-const SoundGlyph = (
-  // A tuning fork over a level trace: the two things the app measures, pitch
-  // and loudness, in one mark.
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <path d="M3 12v3M6.5 9.5v8M10 6v12M13.5 9v6M17 4.5v15M20.5 10.5v4" />
-  </svg>
-);
-
-const ColorGlyph = (
-  // An eyedropper over a colour drop: the action (sample) and the result
-  // (a colour) in one mark.
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.75}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-6"
-  >
-    <path d="M16 3.6a2.2 2.2 0 0 1 3.1 0l1.3 1.3a2.2 2.2 0 0 1 0 3.1L18.6 9.8 14.2 5.4z" />
-    <path d="M13.2 6.4 4.6 15a2 2 0 0 0-.55 1.05L3.5 19.2a1 1 0 0 0 1.15 1.15l3.15-.55A2 2 0 0 0 8.85 19.25L17.6 10.8z" />
-  </svg>
-);
-
 const GripGlyph = (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className="size-4.5">
     <circle cx="9" cy="6" r="1.5" />
@@ -314,131 +30,6 @@ const GripGlyph = (
     <circle cx="15" cy="18" r="1.5" />
   </svg>
 );
-
-const APPS: AppEntry[] = [
-  {
-    id: "sketchnotes",
-    name: "Sketchnotes",
-    tagline: "Sketch ideas and jot notes on an infinite canvas.",
-    icon: SketchGlyph,
-    hue: "--app-sketchnotes",
-  },
-  {
-    id: "assistant",
-    name: "Assistant",
-    tagline: "Ask what this workspace can do — a free, private guide to every app.",
-    icon: AssistantGlyph,
-    hue: "--app-assistant",
-  },
-  {
-    id: "pdf",
-    name: "PDF Editor",
-    tagline: "Edit, merge, split & sign — every PDF tool, zero uploads.",
-    icon: PdfGlyph,
-    hue: "--app-pdf",
-  },
-  {
-    id: "image",
-    name: "Image Studio",
-    tagline: "Crop, resize & compress images to any size or upload preset.",
-    icon: ImageGlyph,
-    hue: "--app-image",
-  },
-  {
-    id: "board",
-    name: "Board",
-    tagline: "Build your own page by prompting — add, edit & remove sections.",
-    icon: BoardGlyph,
-    hue: "--app-board",
-  },
-  {
-    id: "todos",
-    name: "Todos",
-    tagline: "Plan & track tasks by day, week, month & year.",
-    icon: TodoGlyph,
-    hue: "--app-todos",
-  },
-  {
-    id: "reminders",
-    name: "Reminders",
-    tagline: "Timed alerts with a notification sound you pick.",
-    icon: ReminderGlyph,
-    hue: "--app-reminders",
-  },
-  {
-    id: "timer",
-    name: "Timer",
-    tagline: "Countdown timers, a lap stopwatch & pomodoro focus cycles.",
-    icon: TimerGlyph,
-    hue: "--app-timer",
-  },
-  {
-    id: "system",
-    name: "System Info",
-    tagline: "Analyze this device & browser, and scan for nearby devices.",
-    icon: SystemGlyph,
-    hue: "--app-system",
-  },
-  {
-    id: "speed",
-    name: "Network Speed",
-    tagline: "Measure download, upload, ping & jitter on your connection.",
-    icon: SpeedGlyph,
-    hue: "--app-speed",
-  },
-  {
-    id: "news",
-    name: "News",
-    tagline: "Latest headlines — tech, sports, India, Kerala, world & more.",
-    icon: NewsGlyph,
-    hue: "--app-news",
-  },
-  {
-    id: "world",
-    name: "World Clock",
-    tagline: "Live times worldwide — plus each country's facts & news.",
-    icon: WorldClockGlyph,
-    hue: "--app-world",
-  },
-  {
-    id: "malayalam",
-    name: "Malayalam Writer",
-    tagline: "Type, tap or handwrite Malayalam — transliteration, keyboard & ink.",
-    icon: MalayalamGlyph,
-    hue: "--app-malayalam",
-  },
-  {
-    id: "translate",
-    name: "Translate",
-    tagline: "Convert text between languages — online, or fully offline on-device.",
-    icon: TranslateGlyph,
-    hue: "--app-translate",
-  },
-  {
-    id: "morse",
-    name: "Morse Code",
-    tagline: "Learn, practise & send Morse — chart, drills and a real key.",
-    icon: MorseGlyph,
-    hue: "--app-morse",
-  },
-  {
-    id: "sound",
-    name: "Sound Meter",
-    tagline: "Measure sound frequency, pitch, note & loudness from your mic.",
-    icon: SoundGlyph,
-    hue: "--app-sound",
-  },
-  {
-    id: "color",
-    name: "Color Lens",
-    tagline: "Read any colour from a photo — hex, RGB, HSL, palette & contrast.",
-    icon: ColorGlyph,
-    hue: "--app-color",
-  },
-];
-
-/** id → entry, so a persisted order (list of ids) can be resolved to tiles. */
-const APP_MAP = Object.fromEntries(APPS.map((a) => [a.id, a])) as Record<AppId, AppEntry>;
 
 /** Move the item at `from` to index `to`, returning a new array. */
 function moveItem<T>(list: T[], from: number, to: number): T[] {
@@ -585,26 +176,52 @@ export function AppLauncher() {
         aria-modal="true"
         aria-label="Choose an app"
         className={cx(
+          // Phones keep the compact sheet; from tablet up the dialog stretches
+          // into a wide, multi-column gallery.
           "relative flex max-h-[min(88dvh,680px)] w-[min(96vw,540px)] flex-col rounded-2xl border border-border bg-panel shadow-panel transition-transform duration-200",
+          "min-[720px]:max-h-[min(90dvh,780px)] min-[720px]:w-[min(94vw,900px)] min-[720px]:rounded-[26px]",
+          "min-[1100px]:w-[min(92vw,1120px)] min-[1440px]:w-[min(90vw,1280px)]",
           open ? "translate-y-0" : "translate-y-3",
         )}
       >
-        <div className="flex shrink-0 items-start justify-between px-4 pb-3 pt-5 min-[440px]:px-6 min-[440px]:pb-4 min-[440px]:pt-6">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-[18px] font-bold tracking-[.2px]">Apps</h2>
-              <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent">
+        {/* Ambient accent haze — desktop-only decoration behind the content. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 hidden overflow-hidden rounded-[26px] min-[720px]:block"
+        >
+          <div className="absolute -left-24 -top-32 size-80 rounded-full bg-accent-soft opacity-70 blur-3xl" />
+          <div className="absolute -bottom-28 -right-24 size-72 rounded-full bg-accent-soft opacity-50 blur-3xl" />
+        </div>
+
+        <div className="relative z-10 flex shrink-0 items-start justify-between px-4 pb-3 pt-5 min-[440px]:px-6 min-[440px]:pb-4 min-[440px]:pt-6 min-[720px]:px-8 min-[720px]:pb-5 min-[720px]:pt-7">
+          <div className="min-[720px]:flex-1 min-[720px]:pr-6">
+            <div className="flex items-center gap-2 min-[720px]:gap-3">
+              <h2 className="text-[18px] font-bold tracking-[.2px] min-[720px]:text-[24px] min-[720px]:tracking-[-.2px]">
+                Apps
+              </h2>
+              <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent min-[720px]:px-2.5 min-[720px]:text-[12px]">
                 {APPS.length}
               </span>
+              {/* Hairline rule that fills the space a wide header opens up. */}
+              <span
+                aria-hidden
+                className="hidden h-px flex-1 bg-(image:--rule-grad) min-[720px]:block"
+                style={
+                  {
+                    "--rule-grad":
+                      "linear-gradient(90deg, var(--border), color-mix(in srgb, var(--border) 20%, transparent))",
+                  } as React.CSSProperties
+                }
+              />
             </div>
-            <p className="mt-1 text-[13px] text-ink-soft">
+            <p className="mt-1 text-[13px] text-ink-soft min-[720px]:mt-1.5 min-[720px]:text-[13.5px]">
               Pick a workspace to open — drag <span aria-hidden>⠿</span> to reorder.
             </p>
           </div>
           <button
             aria-label="Close"
             onClick={closeLauncher}
-            className="tint hover-pop -mr-1 -mt-1 grid size-9 place-items-center rounded-[10px] text-ink-soft hover:text-text"
+            className="tint hover-pop -mr-1 -mt-1 grid size-9 place-items-center rounded-[10px] text-ink-soft hover:text-text min-[720px]:size-10 min-[720px]:rounded-xl min-[720px]:border min-[720px]:border-border"
           >
             <CloseIcon size={18} />
           </button>
@@ -612,9 +229,12 @@ export function AppLauncher() {
 
         <div
           ref={scrollRef}
-          className="scroll-slim min-h-0 flex-1 overflow-y-auto px-2.5 pb-4 min-[440px]:px-6 min-[440px]:pb-6"
+          className="scroll-slim relative z-10 min-h-0 flex-1 overflow-y-auto px-2.5 pb-4 min-[440px]:px-6 min-[440px]:pb-6 min-[720px]:px-8 min-[720px]:pb-8"
         >
-        <ul role="list" className="grid grid-cols-2 gap-2 min-[440px]:gap-3">
+        <ul
+          role="list"
+          className="grid grid-cols-2 gap-2 min-[440px]:gap-2.5 min-[720px]:grid-cols-3 min-[1100px]:grid-cols-4"
+        >
           {ordered.map((app) => {
             const active = app.id === activeApp;
             const hue = `var(${app.hue})`;
@@ -636,63 +256,69 @@ export function AppLauncher() {
                   style={
                     {
                       "--spot": hue,
-                      // Phone tiles wear a faint wash of their own hue instead of
-                      // a bordered paper card, so the grid reads as colour-coded
-                      // rows; wider viewports switch back to the full card.
-                      "--tile-tint": `color-mix(in srgb, ${hue} 11%, var(--paper))`,
-                      "--chip-grad": `linear-gradient(140deg, ${hue}, color-mix(in srgb, ${hue} 78%, black))`,
-                      "--chip-shadow": `0 8px 18px -6px color-mix(in srgb, ${hue} 60%, transparent)`,
+                      // The small chip is the only place the app's hue lands;
+                      // the card itself stays paper-plain.
+                      "--chip-grad": chipGradient(app.hue),
                     } as React.CSSProperties
                   }
                   className={cx(
-                    "hover-spot hover-sheen flex w-full items-center gap-2 rounded-xl border p-2 pr-7 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
-                    "min-[440px]:flex-col min-[440px]:items-start min-[440px]:gap-3 min-[440px]:rounded-2xl min-[440px]:p-4 min-[440px]:pr-11",
+                    // One structure at every width: a single compact row —
+                    // hue chip, then name over tagline. No tall card, no rails.
+                    "hover-spot flex h-full w-full items-center gap-2.5 rounded-xl border p-2 pr-7 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                    "min-[440px]:gap-3 min-[440px]:p-2.5 min-[440px]:pr-8",
+                    "min-[720px]:rounded-[14px] min-[720px]:px-3 min-[720px]:py-3 min-[720px]:pr-9",
                     active
-                      ? "border-accent bg-accent-soft ring-1 ring-accent"
-                      : "hover-lift border-transparent bg-(--tile-tint) min-[440px]:border-border min-[440px]:bg-paper min-[440px]:hover:border-accent",
+                      ? "border-accent bg-accent-soft"
+                      : "hover-lift border-border bg-paper hover:border-accent",
                     dropTarget && "border-accent ring-2 ring-accent",
                   )}
                 >
                   <span
                     className={cx(
-                      "grid size-8 shrink-0 place-items-center rounded-[10px] bg-(image:--chip-grad) text-white transition-transform duration-300 ease-[cubic-bezier(.2,.7,.3,1)] [&>svg]:size-5",
-                      "min-[440px]:size-12 min-[440px]:rounded-[14px] min-[440px]:shadow-(--chip-shadow) min-[440px]:[&>svg]:size-6",
-                      "group-hover:-rotate-6 group-hover:scale-110",
+                      "grid size-9 shrink-0 place-items-center rounded-[10px] bg-(image:--chip-grad) text-white transition-transform duration-300 ease-[cubic-bezier(.2,.7,.3,1)] [&>svg]:size-4.5",
+                      "min-[720px]:size-10 min-[720px]:rounded-xl min-[720px]:[&>svg]:size-5",
+                      "group-hover:scale-105",
                     )}
                   >
                     {app.icon}
                   </span>
-                  <span className="flex min-w-0 items-center gap-2">
-                    {/* Names are as long as "Malayalam Writer", so on phones the
-                        label wraps to two lines rather than being truncated. */}
-                    <span className="line-clamp-2 min-w-0 wrap-break-word text-[11.5px] font-semibold leading-[1.2] tracking-[.1px] min-[440px]:text-[15.5px] min-[440px]:font-bold min-[440px]:leading-normal">
+                  {/* Active marker: a corner dot, so it costs the label no width
+                      on phones where "Malayalam Writer" already needs both lines. */}
+                  {active && (
+                    <span
+                      aria-hidden
+                      className="absolute right-2 top-2 size-1.5 rounded-full bg-accent min-[720px]:right-2.5 min-[720px]:top-2.5"
+                    />
+                  )}
+                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="line-clamp-2 min-w-0 wrap-break-word text-[12px] font-semibold leading-tight tracking-[.1px] min-[440px]:text-[13px] min-[720px]:text-[14px] min-[720px]:tracking-normal">
                       {app.name}
                     </span>
-                    {active && (
-                      <span className="hidden rounded-full bg-accent px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-on-accent min-[440px]:inline">
-                        Current
+                    {/* Wrapper owns the show/hide so `hidden` never races the
+                        display line-clamp-2 sets on the text itself. */}
+                    <span className="hidden min-[440px]:block">
+                      <span className="line-clamp-2 text-[11px] leading-[1.35] text-ink-soft min-[720px]:text-[12px]">
+                        {app.tagline}
                       </span>
-                    )}
-                  </span>
-                  <span className="hidden text-[12.5px] leading-snug text-ink-soft min-[440px]:block">
-                    {app.tagline}
+                    </span>
                   </span>
                   <span
                     aria-hidden
                     className={cx(
-                      "absolute bottom-3 right-3 hidden size-6 place-items-center rounded-full text-white transition-all duration-200 min-[440px]:grid",
+                      "hidden shrink-0 text-ink-soft transition-all duration-200 min-[720px]:block",
                       active
                         ? "opacity-0"
-                        : "translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
+                        : "-translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
                     )}
-                    style={{ background: hue }}
                   >
                     {ArrowIcon}
                   </span>
                 </button>
 
                 {/* Drag handle — a sibling of the tile button (never nested, so
-                    the markup stays valid) and the only reorder affordance. */}
+                    the markup stays valid) and the only reorder affordance. It
+                    sits centred on the row's right edge and stays out of the way
+                    on pointer devices until the row is hovered or focused. */}
                 <button
                   type="button"
                   aria-label={`Reorder ${app.name}. Drag, or press arrow keys to move.`}
@@ -702,8 +328,8 @@ export function AppLauncher() {
                   onPointerCancel={endDrag}
                   onKeyDown={(e) => reorderByKey(e, app.id)}
                   className={cx(
-                    "hover-pop absolute right-0 top-0 z-10 grid size-7 touch-none place-items-center rounded-lg text-ink-soft opacity-70 hover:bg-panel hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-accent [&>svg]:size-3.5",
-                    "min-[440px]:right-2 min-[440px]:top-2 min-[440px]:size-8 min-[440px]:opacity-100 min-[440px]:[&>svg]:size-4.5",
+                    "hover-pop absolute right-0.5 top-1/2 z-10 grid size-7 -translate-y-1/2 touch-none place-items-center rounded-lg text-ink-soft opacity-60 hover:text-text focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-accent [&>svg]:size-3.5",
+                    "min-[720px]:right-1 min-[720px]:size-8 min-[720px]:opacity-0 min-[720px]:group-hover:opacity-100 min-[720px]:[&>svg]:size-4",
                     dragging ? "cursor-grabbing" : "cursor-grab",
                   )}
                 >
@@ -714,10 +340,10 @@ export function AppLauncher() {
           })}
         </ul>
 
-        <div className="mt-4 border-t border-border pt-3 min-[440px]:mt-5 min-[440px]:pt-4">
+        <div className="mt-4 border-t border-border pt-3 min-[440px]:mt-5 min-[440px]:pt-4 min-[720px]:mt-6 min-[720px]:flex min-[720px]:items-center min-[720px]:justify-between min-[720px]:gap-4 min-[720px]:pt-5">
           <button
             onClick={openSettings}
-            className="tint hover-lift group flex w-full items-center gap-2.5 rounded-xl border border-border bg-paper px-3 py-2.5 text-left hover:border-accent min-[440px]:gap-3 min-[440px]:px-4 min-[440px]:py-3"
+            className="tint hover-lift group flex w-full items-center gap-2.5 rounded-xl border border-border bg-paper px-3 py-2.5 text-left hover:border-accent min-[440px]:gap-3 min-[440px]:px-4 min-[440px]:py-3 min-[720px]:w-auto min-[720px]:min-w-75 min-[720px]:rounded-2xl"
           >
             <span className="grid size-9 shrink-0 place-items-center rounded-[11px] bg-accent-soft text-accent transition-transform duration-300 ease-[cubic-bezier(.2,.7,.3,1)] group-hover:rotate-45">
               <SettingsIcon size={18} />
@@ -729,6 +355,17 @@ export function AppLauncher() {
               </span>
             </span>
           </button>
+          {/* Room only a wide dialog has: spell out the shortcuts. */}
+          <p className="hidden items-center gap-1.5 text-[12px] text-ink-soft min-[720px]:flex">
+            <kbd className="rounded-md border border-border bg-paper px-1.5 py-0.5 font-sans text-[11px] font-semibold">
+              Esc
+            </kbd>
+            to close ·
+            <kbd className="rounded-md border border-border bg-paper px-1.5 py-0.5 font-sans text-[11px] font-semibold">
+              ↑ ↓
+            </kbd>
+            on <span aria-hidden>⠿</span> to reorder
+          </p>
         </div>
         </div>
       </div>

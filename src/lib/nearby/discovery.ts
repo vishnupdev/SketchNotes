@@ -1,5 +1,6 @@
 /**
- * Nearby-device discovery for the System Info app.
+ * Nearby-device discovery — shared by the Nearby Devices app and the compact
+ * panel in System Info.
  *
  * A web page can't sweep the local network or the airwaves the way a native
  * scanner does — the platform deliberately puts a user-consent step in front of
@@ -13,133 +14,52 @@
  * - stream live BLE advertisements (name + signal strength) where Chrome's
  *   experimental scanning API is enabled.
  *
+ * Each normalised device also carries the full spec sheet `inspect.ts` can build
+ * from the descriptor the API returned — no extra permission, no open session.
+ * Bluetooth is the exception: its features need a GATT connection, so they live
+ * behind the explicit action in `gatt.ts`.
+ *
  * Every probe is guarded and returns empty/null rather than throwing, so a
  * missing API only shrinks the result. All are browser-only.
  */
 
-/** Which platform API a discovered device came through. */
-export type Transport =
-  | "bluetooth"
-  | "usb"
-  | "hid"
-  | "serial"
-  | "mic"
-  | "speaker"
-  | "camera"
-  | "gamepad";
+import { GATT_OPTIONAL_SERVICES, rememberBluetoothDevice } from "./gatt";
+import {
+  bluetoothSpec,
+  gamepadSpec,
+  hidSpec,
+  mediaSpec,
+  serialSpec,
+  usbSpec,
+} from "./inspect";
+import { hexId, hidKind, joinDetail } from "./labels";
+import type {
+  AdvertisementEventLike,
+  BluetoothDeviceLike,
+  HidDeviceLike,
+  MediaDeviceInfoLike,
+  NearbyDevice,
+  NearbyScan,
+  NearbySupport,
+  PairResult,
+  PairableTransport,
+  PresentationRequestCtor,
+  NearbyNavigator,
+  SerialPortLike,
+  Transport,
+  UsbDeviceLike,
+} from "./types";
 
-/** Transports that surface a picker the user can pair a new device from. */
-export type PairableTransport = "bluetooth" | "usb" | "hid" | "serial";
-
-/** One discovered device, normalised across every transport. */
-export interface NearbyDevice {
-  /** Stable list key — transport plus the API's own identifier. */
-  key: string;
-  name: string;
-  transport: Transport;
-  /** Secondary line: vendor/product ids, port info, device class. */
-  detail?: string;
-  /** Live link state, when the transport reports one. */
-  connected?: boolean;
-  /** Advertised signal strength in dBm — live BLE scan only. */
-  rssi?: number;
-}
-
-/** Which discovery routes this browser offers. */
-export interface NearbySupport {
-  bluetooth: boolean;
-  /** Experimental passive BLE advertisement scanning. */
-  leScan: boolean;
-  usb: boolean;
-  hid: boolean;
-  serial: boolean;
-  media: boolean;
-  gamepad: boolean;
-  cast: boolean;
-  /** False when the browser exposes no discovery API at all. */
-  any: boolean;
-}
-
-/** Outcome of opening a device chooser. */
-export type PairResult =
-  | { ok: true; devices: NearbyDevice[] }
-  | { ok: false; cancelled: boolean; message: string };
-
-/* ------------------------------------------------------------------ *
- * Minimal typings for the peripheral APIs. Declared locally (and read
- * through a single `unknown` cast) so this file needs no DOM lib that
- * ships them and the rest of the codebase stays lib-dom clean.
- * ------------------------------------------------------------------ */
-
-interface BluetoothDeviceLike {
-  id: string;
-  name?: string;
-  gatt?: { connected: boolean };
-}
-interface BluetoothLEScanLike {
-  active: boolean;
-  stop: () => void;
-}
-interface AdvertisementEventLike extends Event {
-  device: BluetoothDeviceLike;
-  name?: string;
-  rssi?: number;
-  txPower?: number;
-}
-interface BluetoothLike extends EventTarget {
-  getAvailability?: () => Promise<boolean>;
-  getDevices?: () => Promise<BluetoothDeviceLike[]>;
-  requestDevice: (opts: {
-    acceptAllDevices?: boolean;
-    optionalServices?: string[];
-  }) => Promise<BluetoothDeviceLike>;
-  requestLEScan?: (opts: { acceptAllAdvertisements?: boolean }) => Promise<BluetoothLEScanLike>;
-}
-interface UsbDeviceLike {
-  vendorId: number;
-  productId: number;
-  productName?: string;
-  manufacturerName?: string;
-  serialNumber?: string;
-  opened?: boolean;
-}
-interface UsbLike extends EventTarget {
-  getDevices: () => Promise<UsbDeviceLike[]>;
-  requestDevice: (opts: { filters: unknown[] }) => Promise<UsbDeviceLike>;
-}
-interface HidDeviceLike {
-  vendorId: number;
-  productId: number;
-  productName?: string;
-  opened?: boolean;
-  collections?: { usagePage?: number; usage?: number }[];
-}
-interface HidLike extends EventTarget {
-  getDevices: () => Promise<HidDeviceLike[]>;
-  requestDevice: (opts: { filters: unknown[] }) => Promise<HidDeviceLike[]>;
-}
-interface SerialPortLike {
-  getInfo?: () => { usbVendorId?: number; usbProductId?: number };
-}
-interface SerialLike extends EventTarget {
-  getPorts: () => Promise<SerialPortLike[]>;
-  requestPort: (opts?: { filters?: unknown[] }) => Promise<SerialPortLike>;
-}
-interface PresentationAvailabilityLike extends EventTarget {
-  value: boolean;
-}
-interface PresentationRequestCtor {
-  new (urls: string[]): { getAvailability: () => Promise<PresentationAvailabilityLike> };
-}
-
-interface NearbyNavigator {
-  bluetooth?: BluetoothLike;
-  usb?: UsbLike;
-  hid?: HidLike;
-  serial?: SerialLike;
-  mediaDevices?: MediaDevices;
-  getGamepads?: () => (Gamepad | null)[];
-}
+export type {
+  NearbyDevice,
+  NearbyScan,
+  NearbySupport,
+  PairResult,
+  PairableTransport,
+  SpecField,
+  SpecGroup,
+  Transport,
+} from "./types";
 
 const nav = (): NearbyNavigator | null =>
   typeof navigator === "undefined" ? null : (navigator as unknown as NearbyNavigator);
@@ -149,14 +69,6 @@ const presentationCtor = (): PresentationRequestCtor | null => {
   const w = window as unknown as { PresentationRequest?: PresentationRequestCtor };
   return w.PresentationRequest ?? null;
 };
-
-/* ------------------------------- helpers -------------------------------- */
-
-/** `0x1D6B`-style id, the form vendor/product ids are usually quoted in. */
-const hexId = (n: number): string => `0x${n.toString(16).toUpperCase().padStart(4, "0")}`;
-
-const joinDetail = (...parts: (string | false | null | undefined)[]): string | undefined =>
-  parts.filter(Boolean).join(" · ") || undefined;
 
 /**
  * A cancelled chooser is the normal way to close a picker, so it's reported as
@@ -178,14 +90,23 @@ function toPairFailure(err: unknown): PairResult {
 
 /* ------------------------------ normalisers ------------------------------ */
 
-const btDevice = (d: BluetoothDeviceLike, rssi?: number): NearbyDevice => ({
-  key: `bluetooth:${d.id}`,
-  name: d.name?.trim() || "Unnamed Bluetooth device",
-  transport: "bluetooth",
-  detail: joinDetail(rssi != null && `${rssi} dBm`, `ID ${d.id.slice(0, 12)}`),
-  connected: d.gatt?.connected ?? undefined,
-  rssi,
-});
+function btDevice(
+  d: BluetoothDeviceLike,
+  ad?: { rssi?: number; txPower?: number },
+): NearbyDevice {
+  const key = `bluetooth:${d.id}`;
+  // File the live object away so a detail view can walk its GATT table later.
+  rememberBluetoothDevice(key, d);
+  return {
+    key,
+    name: d.name?.trim() || "Unnamed Bluetooth device",
+    transport: "bluetooth",
+    detail: joinDetail(ad?.rssi != null && `${ad.rssi} dBm`, `ID ${d.id.slice(0, 12)}`),
+    connected: d.gatt?.connected ?? undefined,
+    rssi: ad?.rssi,
+    spec: bluetoothSpec(d, ad),
+  };
+}
 
 const usbDevice = (d: UsbDeviceLike): NearbyDevice => ({
   key: `usb:${d.vendorId}:${d.productId}:${d.serialNumber ?? ""}`,
@@ -198,29 +119,20 @@ const usbDevice = (d: UsbDeviceLike): NearbyDevice => ({
     d.serialNumber && `SN ${d.serialNumber}`,
   ),
   connected: d.opened ?? undefined,
+  spec: usbSpec(d),
 });
-
-/** HID usage page/id → the human name for that class of peripheral. */
-function hidKind(d: HidDeviceLike): string | undefined {
-  for (const c of d.collections ?? []) {
-    if (c.usagePage === 0x01) {
-      if (c.usage === 0x06) return "Keyboard";
-      if (c.usage === 0x02) return "Mouse";
-      if (c.usage === 0x04 || c.usage === 0x05) return "Gamepad / joystick";
-      if (c.usage === 0x07) return "Keypad";
-    }
-    if (c.usagePage === 0x0c) return "Consumer control";
-    if (c.usagePage === 0x0d) return "Pen / digitizer";
-  }
-  return undefined;
-}
 
 const hidDevice = (d: HidDeviceLike): NearbyDevice => ({
   key: `hid:${d.vendorId}:${d.productId}:${d.productName ?? ""}`,
   name: d.productName?.trim() || `HID device ${hexId(d.vendorId)}:${hexId(d.productId)}`,
   transport: "hid",
-  detail: joinDetail(hidKind(d), `VID ${hexId(d.vendorId)}`, `PID ${hexId(d.productId)}`),
+  detail: joinDetail(
+    hidKind(d.collections ?? []),
+    `VID ${hexId(d.vendorId)}`,
+    `PID ${hexId(d.productId)}`,
+  ),
   connected: d.opened ?? undefined,
+  spec: hidSpec(d),
 });
 
 const serialPort = (p: SerialPortLike, index: number): NearbyDevice => {
@@ -240,6 +152,7 @@ const serialPort = (p: SerialPortLike, index: number): NearbyDevice => {
     name: info.usbVendorId != null ? "USB serial port" : "Serial port",
     transport: "serial",
     detail: usb,
+    spec: serialSpec(info),
   };
 };
 
@@ -305,13 +218,6 @@ export async function watchCastAvailability(
   }
 }
 
-/** Result of one permission-free sweep. */
-export interface NearbyScan {
-  devices: NearbyDevice[];
-  /** True when media devices exist but the browser is withholding their names. */
-  namesHidden: boolean;
-}
-
 /**
  * List everything visible without prompting: devices this site was already
  * granted, attached audio/video hardware, and connected gamepads. Nothing here
@@ -326,7 +232,7 @@ export async function scanNearbyDevices(): Promise<NearbyScan> {
     n.usb?.getDevices().catch(() => []) ?? Promise.resolve([]),
     n.hid?.getDevices().catch(() => []) ?? Promise.resolve([]),
     n.serial?.getPorts().catch(() => []) ?? Promise.resolve([]),
-    n.mediaDevices?.enumerateDevices().catch(() => []) ?? Promise.resolve([]),
+    n.mediaDevices?.enumerateDevices?.().catch(() => []) ?? Promise.resolve([]),
   ]);
 
   const devices: NearbyDevice[] = [
@@ -338,7 +244,7 @@ export async function scanNearbyDevices(): Promise<NearbyScan> {
 
   // Windows repeats each audio endpoint as "default" and "communications";
   // those aren't separate devices, so they're dropped.
-  const realMedia = media.filter(
+  const realMedia = (media as MediaDeviceInfoLike[]).filter(
     (d) => d.deviceId && d.deviceId !== "default" && d.deviceId !== "communications",
   );
   let namesHidden = false;
@@ -354,6 +260,7 @@ export async function scanNearbyDevices(): Promise<NearbyScan> {
       // there's something extra to say.
       detail: !d.label ? "name hidden until permission is granted" : undefined,
       connected: true,
+      spec: mediaSpec(d),
     });
   }
 
@@ -365,10 +272,24 @@ export async function scanNearbyDevices(): Promise<NearbyScan> {
       transport: "gamepad",
       detail: joinDetail(`${pad.buttons.length} buttons`, `${pad.axes.length} axes`),
       connected: pad.connected,
+      padIndex: pad.index,
+      spec: gamepadSpec(pad),
     });
   }
 
   return { devices, namesHidden };
+}
+
+/** Whether this browser reports per-track capabilities for media hardware. */
+export function getSupportedMediaConstraints(): string[] {
+  try {
+    const supported = nav()?.mediaDevices?.getSupportedConstraints?.() ?? {};
+    return Object.entries(supported)
+      .filter(([, on]) => on)
+      .map(([name]) => name);
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -402,6 +323,10 @@ export async function revealDeviceNames(): Promise<boolean> {
  * scans — it lists what's in range and returns only the device the user picks,
  * which is then permanently visible to {@link scanNearbyDevices}. Must be called
  * from a user gesture.
+ *
+ * Bluetooth requests the standard GATT services up front: permission for those
+ * can only be granted at pick time, and without it a device's own features stay
+ * unreadable for the rest of the session.
  */
 export async function pairDevice(transport: PairableTransport): Promise<PairResult> {
   const n = nav();
@@ -409,7 +334,10 @@ export async function pairDevice(transport: PairableTransport): Promise<PairResu
     switch (transport) {
       case "bluetooth": {
         if (!n?.bluetooth) throw new Error("Web Bluetooth isn't available.");
-        const d = await n.bluetooth.requestDevice({ acceptAllDevices: true });
+        const d = await n.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: GATT_OPTIONAL_SERVICES,
+        });
         return { ok: true, devices: [btDevice(d)] };
       }
       case "usb": {
@@ -449,7 +377,7 @@ export async function startLeScan(
   const onAdvertisement = (event: Event) => {
     const ad = event as AdvertisementEventLike;
     if (!ad.device) return;
-    const device = btDevice(ad.device, ad.rssi);
+    const device = btDevice(ad.device, { rssi: ad.rssi, txPower: ad.txPower });
     // The advertisement's own name beats the paired-device record's.
     if (ad.name?.trim()) device.name = ad.name.trim();
     onDevice(device);

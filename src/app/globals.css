@@ -29,6 +29,11 @@
    base, then the individual themes. */
 :root,
 [data-theme]:where(:not([data-dark])) {
+  /* The colour a cast shadow is made of. Pulled out as its own token so the
+     interface styles below can rebuild `--shadow` at whatever depth they like
+     and still darken correctly on a dark palette. */
+  --shadow-ink: 15, 23, 32;
+  --shadow-strength: 1;
   --paper: #f7f8f6;
   --grid: #d5dbe3;
   --ink: #1f2a33;
@@ -114,6 +119,18 @@
   /* Specular streak swept across a surface on hover. Dimmed for dark palettes. */
   --fx-streak: rgba(255, 255, 255, 0.38);
 
+  /* ------------------------ navigation motion ------------------------- */
+  /* Timing for the view-entry animations near the bottom of this file. One
+     duration and one curve for the whole workspace, so switching apps, moving
+     between an app's tabs and drilling into a tool all move the same way. */
+  --nav-dur: 0.3s;
+  --nav-ease: cubic-bezier(0.22, 0.72, 0.24, 1);
+  /* How far a view travels on its way in: sideways for a move between peers,
+     up for arriving at a new app. Both deliberately small — the animation is a
+     hint at which way you went, not a journey. */
+  --nav-shift: 20px;
+  --nav-rise: 12px;
+
   /* Modal / launcher backdrop scrim. */
   --scrim: rgba(15, 20, 26, 0.55);
 
@@ -126,6 +143,7 @@
   --app-reminders: #e8930c;
   --app-timer: #e14d82;
   --app-system: #2f9e44;
+  --app-nearby: #0369a1;
   --app-speed: #6d8bff;
   --app-news: #c2410c;
   --app-world: #1d63b8;
@@ -149,6 +167,9 @@
 /* Dark palettes: brighten the scrim + app hues so glyphs stay legible on
    dark panels. Applies to every dark flag (`dark`, `midnight`, …). */
 [data-dark] {
+  /* Shadows on a dark palette need to be both black and heavier to read at all. */
+  --shadow-ink: 0, 0, 0;
+  --shadow-strength: 2.6;
   --scrim: rgba(0, 0, 0, 0.6);
   /* A bright rim/sheen blows out on dark glass — dim both right down. */
   --glass-edge:
@@ -174,6 +195,7 @@
   --app-reminders: #ffb224;
   --app-timer: #ff6f9c;
   --app-system: #40c463;
+  --app-nearby: #38bdf8;
   --app-speed: #8ba4ff;
   --app-news: #fb7141;
   --app-world: #5a9dfb;
@@ -550,6 +572,120 @@
   --ed-bg: color-mix(in srgb, var(--paper) 60%, transparent);
 }
 
+/* ======================= interface styles (data-ui) =======================
+   The workspace's shape, independent of its colour. `data-ui` is written onto
+   <body> next to `data-theme` (and onto the preview tiles in Settings, which is
+   why every rule here is written to work on a scoped element too).
+
+   These blocks come *after* the palettes on purpose: both land on <body> with
+   equal specificity, so source order decides, and elevation belongs to the style
+   rather than the theme. Depth still follows the palette, because the shadows are
+   built from `--shadow-ink` / `--shadow-strength`, which `[data-dark]` sets.
+
+   The reach of a style is Tailwind's radius scale — `rounded-md/lg/xl/2xl`, which
+   is what the cards, dialogs, buttons and panels use. The ~50 places that ask for
+   an exact radius (`rounded-[10px]` on small icon chips) keep it, and
+   `rounded-full` stays a circle everywhere, which is deliberate: a pill toggle
+   reads as a toggle in every style.
+
+   `--ui-backdrop`, `--ui-sheen` and `--ui-bevel` are consumed by the .bg-panel
+   rules further down; the defaults here are the glass language, so an unknown
+   `data-ui` value degrades to the original look rather than to nothing. */
+[data-ui] {
+  --ui-backdrop: blur(var(--glass-blur)) saturate(180%);
+  --ui-sheen: var(--glass-sheen);
+  --ui-bevel: var(--glass-edge);
+}
+
+/* Frosted glass over the ambient field — the workspace's original material. */
+[data-ui="glass"] {
+  --shadow:
+    var(--glass-edge),
+    0 1px 2px rgba(var(--shadow-ink), calc(0.05 * var(--shadow-strength))),
+    0 12px 30px -8px rgba(var(--shadow-ink), calc(0.1 * var(--shadow-strength))),
+    0 28px 56px -18px rgba(var(--shadow-ink), calc(0.08 * var(--shadow-strength)));
+}
+
+/* Opaque cards. `--glass-opacity: 100%` makes every --panel color-mix resolve to
+   its fully opaque base, so no rule needs to know a colour. */
+[data-ui="solid"] {
+  --glass-opacity: 100%;
+  --ui-backdrop: none;
+  --ui-sheen: none;
+  --ui-bevel: none;
+  --ambient: none;
+  --shadow:
+    0 1px 2px rgba(var(--shadow-ink), calc(0.06 * var(--shadow-strength))),
+    0 8px 20px -6px rgba(var(--shadow-ink), calc(0.1 * var(--shadow-strength)));
+}
+
+/* Rounder and softer: wide diffuse shadow, no hard edges. */
+[data-ui="soft"] {
+  --glass-opacity: 100%;
+  --ui-backdrop: none;
+  --ui-sheen: none;
+  --ui-bevel: none;
+  --ambient: none;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+  --shadow:
+    0 2px 6px rgba(var(--shadow-ink), calc(0.05 * var(--shadow-strength))),
+    0 18px 40px -10px rgba(var(--shadow-ink), calc(0.12 * var(--shadow-strength)));
+}
+
+/* Squared off, with a tight shadow — precise and dense. */
+[data-ui="sharp"] {
+  --glass-opacity: 100%;
+  --ui-backdrop: none;
+  --ui-sheen: none;
+  --ui-bevel: none;
+  --ambient: none;
+  --radius-md: 0px;
+  --radius-lg: 1px;
+  --radius-xl: 2px;
+  --radius-2xl: 3px;
+  --shadow:
+    0 1px 0 rgba(var(--shadow-ink), calc(0.08 * var(--shadow-strength))),
+    0 4px 10px -4px rgba(var(--shadow-ink), calc(0.12 * var(--shadow-strength)));
+}
+
+/* Edges instead of elevation: a crisp inset ring doing the work a shadow did,
+   so surfaces are defined without any depth cue at all. */
+[data-ui="outline"] {
+  --glass-opacity: 100%;
+  --ui-backdrop: none;
+  --ui-sheen: none;
+  --ambient: none;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.625rem;
+  /* Mixed up towards the secondary ink rather than using `--border` straight:
+     the border colour is tuned to be a quiet hairline *alongside* a shadow, and
+     with the shadow gone it is too faint to define a surface on its own —
+     especially on the dark palettes, where borders sit close to the paper. */
+  --ui-edge: color-mix(in srgb, var(--border) 55%, var(--ink-soft));
+  --ui-bevel: inset 0 0 0 1px var(--ui-edge);
+  --shadow: inset 0 0 0 1px var(--ui-edge);
+}
+
+/* ====================== density (data-density) ============================
+   Tailwind derives every padding, gap, margin and `size-*` utility from
+   `--spacing`, so scaling it moves the whole ramp together. The steps are kept
+   small on purpose: this multiplies control sizes as well as gaps, and shrinking
+   too far would take tap targets below a usable size. */
+[data-density="compact"] {
+  --spacing: 0.235rem;
+}
+[data-density="cosy"] {
+  --spacing: 0.25rem;
+}
+[data-density="roomy"] {
+  --spacing: 0.28rem;
+}
+
 /* ---------------- expose tokens to Tailwind utilities ---------------- */
 @theme inline {
   --color-paper: var(--paper);
@@ -673,9 +809,9 @@ svg {
    the tint. -webkit- prefix covers iOS/Safari. Inline background-image on a
    component (e.g. the launcher tiles) wins over this, so it's non-intrusive. */
 .bg-panel {
-  background-image: var(--glass-sheen);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  background-image: var(--ui-sheen, var(--glass-sheen));
+  backdrop-filter: var(--ui-backdrop, blur(var(--glass-blur)) saturate(180%));
+  -webkit-backdrop-filter: var(--ui-backdrop, blur(var(--glass-blur)) saturate(180%));
   transition: var(--fx);
 }
 /* Give the glass bevel to panels that don't already use shadow-panel.
@@ -683,13 +819,18 @@ svg {
    those are excluded here to preserve their drop shadow. No bg-panel element
    in the app sets a bespoke box-shadow, so this never clobbers one. */
 .bg-panel:not(.shadow-panel) {
-  box-shadow: var(--glass-edge);
+  box-shadow: var(--ui-bevel, var(--glass-edge));
 }
 /* Respect users who ask for less transparency: solid panels, no blur, flat
    paper. --glass-opacity flips to 100%, so every --panel color-mix resolves to
-   its fully-opaque base. */
+   its fully-opaque base.
+   `[data-ui]` is listed alongside `:root` because the interface styles declare
+   --glass-opacity on <body>, and a value declared there would otherwise beat the
+   one inherited from :root — silently defeating this preference for anyone whose
+   style sets it. Same specificity, later in the file, so this wins. */
 @media (prefers-reduced-transparency: reduce) {
-  :root {
+  :root,
+  [data-ui] {
     --glass-opacity: 100%;
   }
   .bg-panel {
@@ -847,6 +988,213 @@ svg {
   }
 }
 
+/* ------------------------ navigation motion ------------------------- */
+/* Every navigation in the workspace animates the view that *arrives*, so a
+   change of screen reads as a move rather than a jump cut. Which motion plays
+   is chosen by the `data-nav` attribute written by `NavView` / `playNav`
+   (see `SketchNotes/atoms/NavView.tsx`):
+
+     forward / back      moving along a row of peers — an app's bottom tabs, a
+                         news category, a Todos period. Enters from the side the
+                         new view sits on, so the direction matches the tap.
+     deeper / shallower  drilling into a tool and coming back out.
+     rise                arriving somewhere else entirely — an app switch.
+     fade                anything with no meaningful direction.
+
+   Only transform and opacity animate, so a navigation costs no layout work
+   (rule #7). The fill is `backwards` rather than `both` on purpose: it puts the
+   element in its starting position before the animation runs, then leaves no
+   animated value behind at all afterwards. A transform lingering on a
+   full-screen app frame would make it the containing block for the `fixed`
+   bottom nav inside it, which is not a bill an entry animation should leave. */
+@keyframes nav-forward {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--nav-shift), 0, 0);
+  }
+}
+@keyframes nav-back {
+  from {
+    opacity: 0;
+    transform: translate3d(calc(var(--nav-shift) * -1), 0, 0);
+  }
+}
+@keyframes nav-deeper {
+  from {
+    opacity: 0;
+    transform: scale(0.965);
+  }
+}
+@keyframes nav-shallower {
+  from {
+    opacity: 0;
+    transform: scale(1.035);
+  }
+}
+@keyframes nav-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--nav-rise), 0);
+  }
+}
+@keyframes nav-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+[data-nav] {
+  animation-duration: var(--nav-dur);
+  animation-timing-function: var(--nav-ease);
+  animation-fill-mode: backwards;
+  animation-name: nav-fade;
+}
+[data-nav="forward"] {
+  animation-name: nav-forward;
+}
+[data-nav="back"] {
+  animation-name: nav-back;
+}
+[data-nav="deeper"] {
+  animation-name: nav-deeper;
+}
+[data-nav="shallower"] {
+  animation-name: nav-shallower;
+}
+[data-nav="rise"] {
+  animation-name: nav-rise;
+}
+
+/* The tab that just became current in a BottomNav gives a small pop, so the bar
+   acknowledges the tap at the same moment the panel behind it changes.
+   Entirely attribute-driven — the attribute exists only while the tab is
+   selected, so selecting it is what starts the animation and no JS is involved.
+   It sits on a span *inside* the raised circle, never on the circle itself:
+   that one carries the lift, and an animation would override its transform
+   outright. */
+@keyframes nav-tab-pop {
+  0% {
+    transform: scale(0.72);
+  }
+  55% {
+    transform: scale(1.13);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+[data-nav-tab="on"] {
+  animation: nav-tab-pop 0.34s var(--nav-ease) backwards;
+}
+
+/* ===================== app opening animation =============================
+   Played by <AppIntro /> when an app is opened: the app's logo chip blooms out
+   of a hue-washed veil with two rings behind it and its name below, then the
+   whole layer clears to reveal the app.
+
+   The pieces are separate animations on separate elements rather than one long
+   one, so each can carry its own delay and the beats land in order: veil, chip,
+   glyph, name. Only opacity and transform animate — no layout, no paint of the
+   page behind (rule #7) — and the layer is removed by JS as the last frame
+   plays, so nothing here runs on an idle workspace.
+
+   Timings are mirrored by FULL_MS / REDUCED_MS in `AppIntro.tsx`; change both
+   together. */
+@keyframes app-intro-veil {
+  0% {
+    opacity: 0;
+  }
+  14%,
+  62% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes app-intro-chip {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  72% {
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes app-intro-ring {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+}
+@keyframes app-intro-glyph {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-14deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes app-intro-label {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes app-intro-sheen {
+  0% {
+    opacity: 0;
+    transform: translate3d(-130%, 0, 0);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(130%, 0, 0);
+  }
+}
+
+.app-intro {
+  animation: app-intro-veil 0.98s ease-out forwards;
+}
+.app-intro-chip {
+  animation: app-intro-chip 0.62s var(--nav-ease) backwards;
+}
+/* `forwards` on the two that fade out: they end invisible, and their resting
+   state is not. */
+.app-intro-ring {
+  animation: app-intro-ring 0.86s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.app-intro-glyph {
+  animation: app-intro-glyph 0.44s var(--nav-ease) 0.16s backwards;
+}
+.app-intro-label {
+  animation: app-intro-label 0.44s var(--nav-ease) 0.24s backwards;
+}
+.app-intro-sheen {
+  background: linear-gradient(105deg, transparent 38%, var(--fx-streak) 50%, transparent 62%);
+  animation: app-intro-sheen 0.75s cubic-bezier(0.25, 0.6, 0.3, 1) 0.22s both;
+}
+
 /* Slim, theme-aware scrollbar. Track stays invisible; the thumb picks up the
    border token at rest and the accent on hover, so it blends into any theme
    (light, dark, and the colour-accented palettes). */
@@ -903,5 +1251,33 @@ svg {
   /* A streak that can't animate is just a stripe across the content. */
   .hover-sheen::after {
     display: none;
+  }
+  /* A navigation animation is movement and nothing else — there is no state it
+     carries that has to survive, so drop it outright. The view still changes;
+     it just arrives without travelling. */
+  [data-nav],
+  [data-nav-tab] {
+    animation: none !important;
+  }
+  /* The opening mark keeps its *meaning* — you still see which app you asked
+     for — but loses every moving part: no travel, no scaling, no expanding
+     rings, and a shorter hold to match REDUCED_MS in `AppIntro.tsx`. */
+  .app-intro {
+    animation-duration: 0.4s;
+  }
+  .app-intro-chip,
+  .app-intro-glyph,
+  .app-intro-label {
+    animation: app-intro-fade 0.2s ease both;
+  }
+  .app-intro-ring,
+  .app-intro-sheen {
+    display: none;
+  }
+}
+
+@keyframes app-intro-fade {
+  from {
+    opacity: 0;
   }
 }

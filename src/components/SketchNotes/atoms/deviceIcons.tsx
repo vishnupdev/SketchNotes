@@ -1,9 +1,12 @@
 import type { SVGProps } from "react";
 
 /**
- * Icons for the Nearby Devices panel — one per transport, plus the radar mark
- * for the section itself. Local to the System Info app and drawn to the same
- * 24×24 grid and 1.75 stroke weight as {@link file://./liveIcons.tsx}.
+ * Peripheral icons — one per device transport, plus the radar mark for a scan.
+ * Drawn to the same 24×24 grid and 1.75 stroke weight as {@link file://./icons.tsx}.
+ *
+ * Shared rather than app-local: both the Nearby Devices app and the compact
+ * nearby panel inside System Info list the same set of transports, and a device
+ * should not change its glyph depending on which app is showing it.
  */
 type IconProps = SVGProps<SVGSVGElement> & { size?: number };
 
@@ -112,5 +115,22 @@ export const CastIcon = (p: IconProps) => (
 export const SignalIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d="M4 18v-3M9.3 18v-6M14.7 18v-9M20 18V6" />
+  </Svg>
+);
+
+/** Revealing a name a permission is currently hiding. */
+export const EyeIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12S18 18.2 12 18.2 2.5 12 2.5 12Z" />
+    <circle cx="12" cy="12" r="2.9" />
+  </Svg>
+);
+
+/** A GATT link — two nodes joined, for connecting to read a device's services. */
+export const LinkDeviceIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M9.4 14.6 14.6 9.4" />
+    <path d="M12.9 6.6l1.4-1.4a3.6 3.6 0 0 1 5.1 5.1l-1.4 1.4" />
+    <path d="M11.1 17.4l-1.4 1.4a3.6 3.6 0 0 1-5.1-5.1l1.4-1.4" />
   </Svg>
 );

@@ -10,6 +10,7 @@ import {
   type CustomTheme,
   type ThemeId,
 } from "@/lib/themes";
+import { DEFAULT_DENSITY, DEFAULT_UI_STYLE } from "@/lib/ui-style";
 
 /** Which single popover (if any) is open in the dock/header. */
 export type PopoverId =
@@ -41,6 +42,10 @@ interface EditorState {
    * resolving that id needs them — a `custom:` id means nothing on its own.
    */
   customThemes: CustomTheme[];
+  /** Interface style — the workspace's shape. See `@/lib/ui-style`. */
+  uiStyle: string;
+  /** How tightly the workspace is packed. See `@/lib/ui-style`. */
+  density: string;
 
   /* --- current note --- */
   curId: string | null;
@@ -74,6 +79,10 @@ interface EditorState {
   setTheme: (id: ThemeId) => void;
   /** Replace the saved custom palettes; keeps {@link dark} in sync. */
   setCustomThemes: (themes: CustomTheme[]) => void;
+  /** Switch the interface style. */
+  setUiStyle: (id: string) => void;
+  /** Switch the interface density. */
+  setDensity: (id: string) => void;
 
   setCurId: (id: string | null) => void;
   setTitle: (t: string) => void;
@@ -103,6 +112,8 @@ export const useEditorStore = create<EditorState>((set) => ({
   themeId: DEFAULT_THEME_ID,
   dark: resolveTheme(DEFAULT_THEME_ID).dark,
   customThemes: [],
+  uiStyle: DEFAULT_UI_STYLE,
+  density: DEFAULT_DENSITY,
 
   curId: null,
   title: "",
@@ -133,6 +144,8 @@ export const useEditorStore = create<EditorState>((set) => ({
     set((s) => ({ themeId, dark: resolveTheme(themeId, s.customThemes).dark })),
   setCustomThemes: (customThemes) =>
     set((s) => ({ customThemes, dark: resolveTheme(s.themeId, customThemes).dark })),
+  setUiStyle: (uiStyle) => set({ uiStyle }),
+  setDensity: (density) => set({ density }),
 
   setCurId: (curId) => set({ curId }),
   setTitle: (title) => set({ title }),

@@ -6,7 +6,8 @@ import { useTodoStore } from "@/store/useTodoStore";
 import { useTodos, useTodoMutations } from "@/hooks/useTodos";
 import { inRange, matchesQuery, statsFor, visible } from "@/lib/Todos/selectors";
 import { periodRange, startOfDay } from "@/lib/Todos/dates";
-import { PeriodNav } from "@/components/Todos/molecules/PeriodNav";
+import { PeriodNav, VIEW_ORDER } from "@/components/Todos/molecules/PeriodNav";
+import { NavView, navDirection, type NavMotion } from "@/components/SketchNotes/atoms/NavView";
 import { FilterBar } from "@/components/Todos/molecules/FilterBar";
 import { StatsBar } from "@/components/Todos/molecules/StatsBar";
 import { DayView } from "@/components/Todos/organisms/DayView";
@@ -17,6 +18,21 @@ import { TaskEditor } from "@/components/Todos/organisms/TaskEditor";
 import { AppsIcon, PlusIcon } from "@/components/SketchNotes/atoms/icons";
 import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
+
+/**
+ * Which way the task list moved, for a key of `<view>:<anchor>`.
+ *
+ * Two navigations share one view here and both should animate: changing
+ * granularity moves along the segmented control, while the stepper moves along
+ * time. Widening the frame (day → week) and going to a later period both read
+ * as forward.
+ */
+function periodMotion(from: string, to: string): NavMotion {
+  const [fromView, fromAnchor] = from.split(":");
+  const [toView, toAnchor] = to.split(":");
+  if (fromView !== toView) return navDirection(VIEW_ORDER, fromView, toView);
+  return Number(toAnchor) > Number(fromAnchor) ? "forward" : "back";
+}
 
 /**
  * Todos — a task manager with day / week / month / year framing over one
@@ -117,17 +133,21 @@ export function TodoApp() {
             )}
           </div>
 
-          {isLoading ? (
-            <p className="py-10 text-center text-[13px] text-ink-soft">Loading tasks…</p>
-          ) : view === "day" ? (
-            <DayView pool={pool} anchor={anchor} todayStart={todayStart} />
-          ) : view === "week" ? (
-            <WeekView pool={pool} anchor={anchor} todayStart={todayStart} />
-          ) : view === "month" ? (
-            <MonthView pool={pool} anchor={anchor} todayStart={todayStart} />
-          ) : (
-            <YearView pool={pool} anchor={anchor} todayStart={todayStart} />
-          )}
+          {/* Both ways of moving through the calendar animate: switching
+              granularity, and stepping to the next or previous period. */}
+          <NavView viewKey={`${view}:${anchor}`} motion={periodMotion}>
+            {isLoading ? (
+              <p className="py-10 text-center text-[13px] text-ink-soft">Loading tasks…</p>
+            ) : view === "day" ? (
+              <DayView pool={pool} anchor={anchor} todayStart={todayStart} />
+            ) : view === "week" ? (
+              <WeekView pool={pool} anchor={anchor} todayStart={todayStart} />
+            ) : view === "month" ? (
+              <MonthView pool={pool} anchor={anchor} todayStart={todayStart} />
+            ) : (
+              <YearView pool={pool} anchor={anchor} todayStart={todayStart} />
+            )}
+          </NavView>
         </div>
       </main>
 

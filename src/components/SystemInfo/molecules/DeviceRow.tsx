@@ -1,5 +1,5 @@
 import { cx } from "@/lib/utils";
-import type { NearbyDevice, Transport } from "@/lib/SystemInfo/nearby";
+import type { NearbyDevice, Transport } from "@/lib/nearby/discovery";
 import {
   BluetoothIcon,
   CameraIcon,
@@ -10,7 +10,7 @@ import {
   SignalIcon,
   SpeakerIcon,
   UsbIcon,
-} from "@/components/SystemInfo/atoms/nearbyIcons";
+} from "@/components/SketchNotes/atoms/deviceIcons";
 
 const TRANSPORT_META: Record<Transport, { label: string; Icon: typeof UsbIcon }> = {
   bluetooth: { label: "Bluetooth", Icon: BluetoothIcon },
