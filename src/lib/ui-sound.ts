@@ -106,28 +106,36 @@ interface CueSpec {
  * and because a tab's tone comes from its position, moving right up a tab bar
  * rises and moving back down falls without either being spelled out.
  *
- * The chime's four notes are spaced to land on the boot animation's beats (see
- * `BootSplash.tsx`): three as the app chips converge, the fourth on the impact
- * the wordmark unfolds out of, and its tail rings on under the wordmark.
+ * Deliberately plain: three notes to open the workspace and one to open an app,
+ * and nothing that is not a note. A start-up sound is heard on every load and an
+ * app's tone several times a session, which is the whole argument — anything with
+ * a build, a texture or a sequence to it is a performance the second time and an
+ * imposition by the tenth. What is left is short, quiet and out of the way.
+ *
+ * The chime's three notes are spaced across the boot animation's opening beats
+ * (see `BootSplash.tsx`) as the app chips converge, and its tail rings on under
+ * the wordmark that unfolds after them.
  */
 const CUES: Record<UiCue, CueSpec> = {
-  // C5 E5 G5 C6 — a major triad closing on the octave.
+  // C5 E5 C6 — a major triad with the fifth left out, so it reads as a rise
+  // rather than as a chord: up a third, then up to the octave.
   boot: {
     notes: [
       [0, 0],
-      [0.1, 2],
-      [0.2, 3],
-      [0.44, 5],
+      [0.12, 2],
+      [0.24, 5],
     ],
     root: 7,
-    ring: 1.25,
-    peak: 0.095,
+    // Short enough that the chime is over well before the veil clears, rather
+    // than ringing into the workspace behind it.
+    ring: 0.75,
+    peak: 0.09,
     partials: [
       [0.5, 0.32],
       [2, 0.1],
     ],
   },
-  // An opening app, on its own note.
+  // An opening app, on its own note: one tone, struck and gone.
   app: {
     notes: [[0, 0]],
     root: 9,
@@ -135,7 +143,10 @@ const CUES: Record<UiCue, CueSpec> = {
     // the scale's length rather than the catalog's: a nineteenth app would wrap
     // back onto the first app's note, and the fix then is another scale step.
     band: [0, SCALE.length],
-    ring: 1.35,
+    // A soft tone, not a held one: the app is open by the time the veil clears,
+    // and a note still ringing after that belongs to the app rather than to the
+    // opening of it.
+    ring: 0.85,
     peak: 0.07,
     // Only the octave below. A single sustained note *is* the app's identity, and
     // one note needs no headroom above it — an interval would run off the top of
@@ -143,12 +154,13 @@ const CUES: Record<UiCue, CueSpec> = {
     // octave *below* their own, which sounds like a different app entirely.
     partials: [[0.5, 0.3]],
   },
-  // An app switch seen from inside a view rather than from the launcher.
+  // An app switch seen from inside a view rather than from the launcher. Kept in
+  // step with `app` above: it is the same arrival, reached another way.
   rise: {
     notes: [[0, 0]],
     root: 9,
     band: [0, SCALE.length],
-    ring: 1.35,
+    ring: 0.85,
     peak: 0.07,
     partials: [[0.5, 0.3]],
   },
