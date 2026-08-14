@@ -37,7 +37,7 @@
 // that predates them. v7 added build-manifest precaching (every code-split app
 // chunk, not just the ones visited) and query-tolerant static lookups; v8 adds
 // the /nearby route.
-const VERSION = "oneapp-v8";
+const VERSION = "oneapp-v9";
 const SHELL_CACHE = `oneapp-shell-${VERSION}`;
 const STATIC_CACHE = `oneapp-static-${VERSION}`;
 const DATA_CACHE = `oneapp-data-${VERSION}`;
@@ -96,6 +96,7 @@ const SHELL_URLS = [
   "/reminders",
   "/timer",
   "/system",
+  "/resources",
   "/nearby",
   "/speedtest",
   "/news",

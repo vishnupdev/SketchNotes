@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useWorkspaceStore, type AppId } from "@/store/useWorkspaceStore";
 import { cx, trackSpot } from "@/lib/utils";
+import { playCue } from "@/lib/ui-sound";
 import { CloseIcon, SettingsIcon } from "@/components/SketchNotes/atoms/icons";
 import { APPS, APP_MAP, chipGradient, type AppEntry } from "@/components/AppCatalog";
 
@@ -67,6 +68,16 @@ export function AppLauncher() {
   useEffect(() => {
     hydrateAppOrder();
   }, [hydrateAppOrder]);
+
+  // The switcher opening, heard. Keyed on the state rather than wired to the
+  // button, so every way in announces itself the same way: the header, the PDF
+  // editor's own Apps button, and the "browse apps" offer a failed app chunk
+  // puts up. `open` starts false, so mounting is silent — only the transition
+  // into it plays. Closing is silent: picking a tile is already announced by the
+  // app that opens, and dismissing the panel goes back to where you were.
+  useEffect(() => {
+    if (open) playCue("launcher");
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;

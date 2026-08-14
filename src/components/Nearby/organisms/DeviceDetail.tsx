@@ -15,9 +15,9 @@ import { ChevronLeftIcon } from "@/components/SketchNotes/atoms/icons";
 const PROVENANCE: Record<Transport, string> = {
   bluetooth:
     "A Bluetooth device only reveals its name and id until you connect: everything it can do lives in its GATT table, which is read on request above.",
-  usb: "Read straight from the USB descriptor — the device is not opened and no interface is claimed, so nothing here interrupts whatever it is already doing.",
-  hid: "Read from the HID report descriptor. It describes every input the device can send, which is why a keyboard lists far more than keys.",
-  serial: "A serial port exposes only its USB vendor and product ids; anything more would mean opening the port and talking to whatever is on the other end.",
+  usb: "Read straight from the USB descriptor — reading it opens nothing and claims no interface, so this sheet never interrupts whatever the device is already doing. Use Connect above to open a session.",
+  hid: "Read from the HID report descriptor. It describes every input the device can send, which is why a keyboard lists far more than keys. Reports only actually flow once the device is connected above.",
+  serial: "A serial port exposes only its USB vendor and product ids; anything more would mean opening the port and talking to whatever is on the other end — which is what Connect above does, at a line speed you choose.",
   gamepad: "Live from the Gamepad API. Values are sampled while this view is open and stop the moment you leave it.",
   mic: "From the Media Devices API. Detailed capabilities — sample rates, channels, processing — appear once this site has microphone permission.",
   speaker:
@@ -127,7 +127,8 @@ export function DeviceDetail({
             <>
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-[11.5px] text-ink-soft">
-                  Read over GATT, then disconnected — the link isn&apos;t held open.
+                  Read over GATT. The link is dropped again afterwards, unless you connected this
+                  device above — then it stays yours to close.
                 </p>
                 <button
                   type="button"

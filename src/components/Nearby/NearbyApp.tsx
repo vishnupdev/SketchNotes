@@ -4,10 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { cx } from "@/lib/utils";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { useNearbyDevices } from "@/hooks/useNearbyDevices";
+import { useDeviceConnections } from "@/hooks/useDeviceConnections";
 import { getSupportedMediaConstraints } from "@/lib/nearby/discovery";
 import { nearbyReportToText } from "@/lib/nearby/report";
 import { ApiMatrix } from "@/components/Nearby/molecules/ApiMatrix";
 import { ScanPanel } from "@/components/Nearby/organisms/ScanPanel";
+import { ConnectPanel } from "@/components/Nearby/organisms/ConnectPanel";
 import { DeviceList } from "@/components/Nearby/organisms/DeviceList";
 import { DeviceDetail } from "@/components/Nearby/organisms/DeviceDetail";
 import { RadarIcon } from "@/components/SketchNotes/atoms/deviceIcons";
@@ -26,8 +28,13 @@ import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
  * microphone sample rates, controller layout — plus the two things that need a
  * live link: a Bluetooth GATT walk and a controller's real-time input.
  *
- * Everything is read on-device through browser APIs. Nothing is transmitted, and
- * no device is opened, claimed or written to.
+ * The page reads in three passes, and the layout follows them: Scan finds what's
+ * around, Connect opens a real session with whatever can hold one, and the
+ * master/detail below reads a single device in full. Only Connect touches
+ * anything — everything else is descriptor-reading that leaves hardware alone.
+ *
+ * All of it happens on-device through browser APIs. Nothing is transmitted, and
+ * nothing is ever written to a device.
  */
 export function NearbyApp() {
   const openLauncher = useWorkspaceStore((s) => s.openLauncher);
@@ -46,6 +53,8 @@ export function NearbyApp() {
     toggleLeScan,
     revealNames,
   } = useNearbyDevices();
+
+  const links = useDeviceConnections(devices);
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -121,6 +130,18 @@ export function NearbyApp() {
             onCopy={() => void copyReport()}
           />
 
+          <ConnectPanel
+            devices={links.connectable}
+            openCount={links.openCount}
+            link={links.link}
+            baudRate={links.baudRate}
+            onBaudRate={links.setBaudRate}
+            onConnect={links.connect}
+            onDisconnect={links.disconnect}
+            onDisconnectAll={links.disconnectAll}
+            anySupport={support.bluetooth || support.usb || support.hid || support.serial}
+          />
+
           {/* Master/detail. One column on a phone, where picking a device swaps
               the list out for its sheet; side by side from 900px up. */}
           <div className="grid grid-cols-1 gap-4 min-[900px]:grid-cols-[minmax(0,21rem)_minmax(0,1fr)] min-[900px]:items-start">
@@ -153,9 +174,9 @@ export function NearbyApp() {
           <ApiMatrix support={support} mediaConstraints={mediaConstraints} />
 
           <p className="text-center text-[11px] leading-relaxed text-ink-soft">
-            Every reading is taken in this browser and stays here — no device is opened, written to
-            or paired on your behalf, and nothing is uploaded. A Bluetooth read connects only when
-            you ask, and disconnects as soon as it has the answer.
+            Every reading is taken in this browser and stays here — nothing is uploaded, and no
+            device is written to or paired on your behalf. A device is only ever opened when you
+            press Connect, and every link is closed when you disconnect or leave the page.
           </p>
         </div>
       </main>

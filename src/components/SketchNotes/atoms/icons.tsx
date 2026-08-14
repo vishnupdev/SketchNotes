@@ -785,3 +785,130 @@ export const HelpIcon = (p: IconProps) => (
     <path d="M12 17.1h.01" />
   </Svg>
 );
+
+/* ---- Resource Monitor app ---- */
+
+/** A shield — a resource the browser gates behind permission. */
+export const ShieldIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 2.9 4.8 5.7v5.6c0 4.3 2.9 8.3 7.2 9.8 4.3-1.5 7.2-5.5 7.2-9.8V5.7z" />
+  </Svg>
+);
+
+/** A shield with a tick — this resource is allowed. */
+export const ShieldCheckIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 2.9 4.8 5.7v5.6c0 4.3 2.9 8.3 7.2 9.8 4.3-1.5 7.2-5.5 7.2-9.8V5.7z" />
+    <path d="M8.9 11.9 11.2 14.2 15.3 9.8" />
+  </Svg>
+);
+
+/** An open eye — what can be watched, and what is being watched. */
+export const EyeIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M2.5 12s3.6-6 9.5-6 9.5 6 9.5 6-3.6 6-9.5 6-9.5-6-9.5-6Z" />
+    <circle cx="12" cy="12" r="2.8" />
+  </Svg>
+);
+
+/** A heartbeat trace — live, in-use-right-now. */
+export const PulseIcon = (p: IconProps) => (
+  <Svg {...p}><path d="M2.5 12.5h4l2-6 3.4 12 2.6-8 1.8 4h5.2" /></Svg>
+);
+
+/** A filled square — release the resource being held. */
+export const StopIcon = (p: IconProps) => (
+  <Svg {...p} fill="currentColor" stroke="none">
+    <rect x="6.5" y="6.5" width="11" height="11" rx="2" />
+  </Svg>
+);
+
+/** A display with an arrow leaving it — screen capture / recording. */
+export const ScreenShareIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.5 5.5h17v10a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z" />
+    <path d="M9 20.5h6" />
+    <path d="M12 13.5v-5M9.6 10.9 12 8.4l2.4 2.5" />
+  </Svg>
+);
+
+/** A map pin — where this device is. */
+export const LocationIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 21.5s6.5-5.9 6.5-10.4a6.5 6.5 0 1 0-13 0C5.5 15.6 12 21.5 12 21.5Z" />
+    <circle cx="12" cy="10.8" r="2.5" />
+  </Svg>
+);
+
+/** A clipboard — read or write what you last copied. */
+export const ClipboardIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M9 4.5H7A1.5 1.5 0 0 0 5.5 6v13A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V6A1.5 1.5 0 0 0 17 4.5h-2" />
+    <rect x="9" y="2.8" width="6" height="3.4" rx="1.2" />
+  </Svg>
+);
+
+/** A closed padlock — hold something open, or keep it shut. */
+export const LockIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="5" y="10.5" width="14" height="10" rx="2.2" />
+    <path d="M8.4 10.5V7.8a3.6 3.6 0 0 1 7.2 0v2.7" />
+  </Svg>
+);
+
+/** Letterforms — the list of fonts installed on this machine. */
+export const FontIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.5 18 7.8 7h.6L12.7 18M5.3 14.4h6" />
+    <path d="M14.5 12.6a2.9 2.9 0 0 1 5.2 1.8V18M19.7 15.4h-2.4a2 2 0 0 0 0 4c1.4 0 2.4-1.1 2.4-2.6" />
+  </Svg>
+);
+
+/** A tilted device with motion arcs — accelerometer and gyroscope. */
+export const SensorIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="7.5" y="3.5" width="9" height="14" rx="2.2" transform="rotate(18 12 10.5)" />
+    <path d="M3.6 18.4a5 5 0 0 0 2.2 2.1M20.4 18.4a5 5 0 0 1-2.2 2.1" />
+  </Svg>
+);
+
+/** Piano keys — attached instruments and controllers. */
+export const MidiIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="2.8" y="7" width="18.4" height="10" rx="1.8" />
+    <path d="M8.9 7v6.2M15.1 7v6.2M12 7v6.2" />
+  </Svg>
+);
+
+/** The Bluetooth rune. */
+export const BluetoothIcon = (p: IconProps) => (
+  <Svg {...p}><path d="M7 7.5 17 16.5 12 21V3l5 4.5L7 16.5" /></Svg>
+);
+
+/** The USB trident. */
+export const UsbIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 21V5" />
+    <path d="M12 3.2 10.2 6h3.6z" fill="currentColor" />
+    <path d="M12 15.5 16.5 11V8.2M12 12 7.5 8.2v-2" />
+    <circle cx="16.5" cy="7" r="1.5" />
+    <rect x="6" y="4.2" width="3" height="2.6" rx="0.6" />
+  </Svg>
+);
+
+/** A biscuit with crumbs — stored and cross-site cookies. */
+export const CookieIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M20.4 11.2a8.5 8.5 0 1 1-7.6-7.6 3.4 3.4 0 0 0 3.3 3.4 1 1 0 0 1 1 1 3.4 3.4 0 0 0 3.3 3.2Z" />
+    <path d="M8.6 10.4h.01M11.8 14.6h.01M15.4 12.8h.01M7.9 15.6h.01" />
+  </Svg>
+);
+
+/** Stacked platters — a database on this device. */
+export const DatabaseIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <ellipse cx="12" cy="6.2" rx="7.5" ry="2.9" />
+    <path d="M4.5 6.2v11.6c0 1.6 3.4 2.9 7.5 2.9s7.5-1.3 7.5-2.9V6.2" />
+    <path d="M4.5 12c0 1.6 3.4 2.9 7.5 2.9s7.5-1.3 7.5-2.9" />
+  </Svg>
+);

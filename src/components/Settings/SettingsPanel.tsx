@@ -8,6 +8,7 @@ import { OfflineSetting } from "@/components/Settings/OfflineSetting";
 import { CursorSetting } from "@/components/Settings/CursorSetting";
 import { ThemeSetting } from "@/components/Settings/ThemeSetting";
 import { InterfaceSetting } from "@/components/Settings/InterfaceSetting";
+import { SoundSetting } from "@/components/Settings/SoundSetting";
 
 /**
  * One labelled block within the settings dialog. New settings go here.
@@ -128,7 +129,7 @@ export function SettingsPanel() {
           </button>
         </div>
 
-        {/* Columns rather than a grid: the four sections differ wildly in height,
+        {/* Columns rather than a grid: the sections differ wildly in height,
             and column balancing packs them without leaving a tall gap under the
             short ones. */}
         <div className="flex flex-col gap-5 min-[720px]:block min-[720px]:columns-2 min-[720px]:gap-5 min-[720px]:[&>section]:mb-5">
@@ -151,6 +152,13 @@ export function SettingsPanel() {
             description="Swap the mouse pointer — a drawn preset in your theme colours, or an image of your own. Touch input is unaffected."
           >
             <CursorSetting />
+          </Section>
+
+          <Section
+            title="Sound"
+            description="Quiet tones for opening the workspace and for arriving somewhere in it — each app and each page has its own note. Nothing else in the workspace makes a sound unless you ask it to."
+          >
+            <SoundSetting />
           </Section>
 
           <Section

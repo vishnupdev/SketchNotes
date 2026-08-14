@@ -22,6 +22,7 @@ export const APP_LABELS: Record<AppId, string> = {
   reminders: "Reminders",
   timer: "Timer",
   system: "System Info",
+  resources: "Resource Monitor",
   nearby: "Nearby Devices",
   speed: "Network Speed",
   news: "News",
@@ -49,6 +50,30 @@ export const APP_ALIASES: Record<AppId, string[]> = {
   reminders: ["reminders", "reminder", "alerts", "alarm", "alarms"],
   timer: ["timer", "timers", "stopwatch", "pomodoro", "countdown"],
   system: ["system info", "system", "device info", "hardware", "specs"],
+  // Deliberately narrow on the bare words: "camera" and "microphone" alone
+  // belong to Color Lens and Sound Meter, which *use* them. This app is asked
+  // for by the question "what is using them".
+  resources: [
+    "resource monitor",
+    "resources",
+    "permissions",
+    "app permissions",
+    "site permissions",
+    "camera permission",
+    "microphone permission",
+    "privacy monitor",
+    "privacy dashboard",
+    "what uses my camera",
+    "what is using my microphone",
+    "screen recording",
+    "location access",
+    "tracking",
+    "trackers",
+    "fingerprint",
+    "storage usage",
+    "ram usage",
+    "memory usage",
+  ],
   nearby: [
     "nearby devices",
     "nearby",
@@ -155,6 +180,7 @@ export const APP_PATHS: Record<AppId, string> = {
   reminders: "/reminders",
   timer: "/timer",
   system: "/system",
+  resources: "/resources",
   nearby: "/nearby",
   speed: "/speedtest",
   news: "/news",
@@ -177,8 +203,10 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   reminders: "timed alerts that ring with a sound you pick",
   timer: "countdown timers, a lap stopwatch and pomodoro cycles",
   system: "a live report on this device, browser and hardware",
+  resources:
+    "what uses your camera, mic, screen, location, memory and storage — live, and app by app",
   nearby:
-    "find the devices around this machine and read what each one is and can do",
+    "find the devices around this machine, read what each one is and can do, and connect to them",
   speed: "download, upload, ping and jitter measurement",
   news: "headlines by category — tech, software engineering, sports, national, state, local, world",
   world: "live time in cities worldwide, with each country's facts, specialities and news",
@@ -197,10 +225,10 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "What OneApp is",
     keywords: ["oneapp", "one app", "overview", "about", "what is this", "workspace", "summary", "purpose", "intro"],
     answer:
-      "OneApp is a single web workspace holding eighteen tools, so you never install eighteen apps.\n" +
+      "OneApp is a single web workspace holding nineteen tools, so you never install nineteen apps.\n" +
       "• Creative: Sketchnotes canvas, Image Studio, PDF Editor\n" +
       "• Planning: Board, Todos, Reminders, Timer\n" +
-      "• Info: News, World Clock, System Info, Nearby Devices, Network Speed, Sound Meter, Color Lens\n" +
+      "• Info: News, World Clock, System Info, Resource Monitor, Nearby Devices, Network Speed, Sound Meter, Color Lens\n" +
       "• Language: Translate, Malayalam Writer, Morse Code, and me — the Assistant\n" +
       "Everything is free, needs no account, and keeps your data in your own browser.",
     followUps: ["List all the apps", "Is my data private?", "Does it work offline?"],
@@ -223,7 +251,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     keywords: ["offline", "offline mode", "work offline", "works offline", "use it offline", "use offline", "no internet", "no connection", "without internet", "airplane mode", "slow internet", "weak connection", "save data", "data saver", "install", "pwa", "home screen", "app icon", "service worker", "download app", "save for offline"],
     answer:
       "OneApp is a PWA: after your first visit it saves itself on your device, so every app opens with no connection — including a fresh reload of any app's link.\n" +
-      "• All eighteen apps are downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
+      "• All nineteen apps are downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
       "• Install it from your browser's Install / Add to Home Screen option to get an app icon and its own window\n" +
       "• Fully offline: Sketchnotes, PDF Editor, Image Studio, Board, Todos, Reminders, Timer, System Info, Nearby Devices, Sound Meter, Color Lens, World Clock (clocks and country details), Malayalam typing/keyboard, on-device Translate, and me\n" +
       "• Needs a connection: News and World Clock headlines (saved ones still open), online translation (past phrases still open), handwriting recognition and the speed test\n" +
@@ -310,7 +338,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "Mobile and touch support",
     keywords: ["mobile", "phone", "tablet", "ipad", "touch", "responsive", "stylus", "pen", "finger", "small screen"],
     answer:
-      "Every screen is designed mobile-first and reflows down to about 360px wide, so all eighteen tools work on a phone.\n" +
+      "Every screen is designed mobile-first and reflows down to about 360px wide, so all nineteen tools work on a phone.\n" +
       "• Drawing, handwriting and the PDF editor accept touch and stylus input\n" +
       "• Install it to your home screen to use it like a native app\n" +
       "• Layouts widen into side-by-side panes on tablets and desktops",
@@ -491,19 +519,34 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     followUps: ["What can Nearby Devices do?", "How do I test my internet speed?", "Is my data private?"],
   },
   {
+    id: "app-resources",
+    title: "Resource Monitor — what uses your camera, mic, storage and data",
+    app: "resources",
+    keywords: ["resource monitor", "resources", "permissions", "permission", "app permissions", "site permissions", "allowed", "blocked", "camera permission", "microphone permission", "what uses my camera", "what is using my microphone", "is my camera on", "screen recording", "screen capture", "voice recording", "location", "geolocation", "location tracking", "tracking", "trackers", "fingerprint", "fingerprinting", "do not track", "cookies", "storage usage", "how much storage", "ram usage", "memory usage", "data usage", "privacy monitor", "privacy dashboard", "who is watching"],
+    answer:
+      "Resource Monitor shows what is using this device, and which app in the workspace is doing it. Four views:\n" +
+      "• Live — open the camera, microphone, screen capture or a location watch and see exactly what a site gets: the picture, the level, the source, how long it has been held, and one button to release it. Alongside it, live meters for memory, storage, processor, battery, network and data pulled\n" +
+      "• Access — every resource a site can ask for, with this browser's current answer (allowed, blocked or asks first) and which apps here would ever use it\n" +
+      "• Apps — all nineteen apps broken out of the single browser origin they share, each with the resources it can reach and the storage it is actually holding\n" +
+      "• Privacy — the signals your browser sends, every host this page has contacted, what is stored on the device, and the long list of things any site can read with no prompt at all\n" +
+      "It only reads: nothing is written, deleted or uploaded, and anything it opens is released the moment you switch apps. A web page can only see its own use of the camera, mic, screen and location, so it reports on OneApp — not on your other tabs or other applications.",
+    followUps: ["Which apps use my camera?", "Is my data private?", "What does System Info show?"],
+  },
+  {
     id: "app-nearby",
     title: "Nearby Devices — scan around you and read what each device is",
     app: "nearby",
-    keywords: ["nearby", "nearby devices", "scan devices", "scan for devices", "device scanner", "find devices", "what devices are around", "bluetooth", "bluetooth devices", "ble", "ble scan", "gatt", "usb", "usb device", "hid", "serial", "com port", "peripherals", "connected devices", "gamepad", "gamepad tester", "controller", "controller tester", "test my controller", "webcam resolution", "camera capabilities", "microphone sample rate", "cast", "chromecast", "signal strength", "rssi", "firmware version", "battery level of device"],
+    keywords: ["nearby", "nearby devices", "scan devices", "scan for devices", "device scanner", "find devices", "what devices are around", "devices available to connect", "connect to device", "connect bluetooth device", "pair device", "disconnect device", "open serial port", "baud rate", "bluetooth", "bluetooth devices", "ble", "ble scan", "gatt", "usb", "usb device", "hid", "serial", "com port", "peripherals", "connected devices", "gamepad", "gamepad tester", "controller", "controller tester", "test my controller", "webcam resolution", "camera capabilities", "microphone sample rate", "cast", "chromecast", "signal strength", "rssi", "firmware version", "battery level of device"],
     answer:
-      "Nearby Devices finds the hardware around this machine and tells you what each piece of it actually is.\n" +
+      "Nearby Devices finds the hardware around this machine, tells you what each piece of it actually is, and connects to the ones that can hold a link.\n" +
       "• Scan — a button per transport (Bluetooth, USB, HID, serial) opens the browser's own picker; attached microphones, cameras, speakers and controllers appear on their own\n" +
+      "• Available to connect — every Bluetooth, USB, HID and serial device you've picked, each with a Connect button, live link state, how long it has been connected, and Disconnect (serial ports let you choose the baud rate first)\n" +
       "• Live BLE scan — on Chrome with experimental web features on, it streams every advertisement in range with its signal strength\n" +
       "• Full spec sheet per device — USB configurations, interfaces and endpoints, HID collections and report layouts, camera resolutions and frame rates, microphone sample rates and channels\n" +
-      "• Bluetooth features — connect on request to read the GATT services, characteristics, firmware and hardware revisions and battery level, then it disconnects again\n" +
+      "• Bluetooth features — connect on request to read the GATT services, characteristics, firmware and hardware revisions and battery level\n" +
       "• Controllers — a live view of every button and stick, which is the quickest way to test a gamepad\n" +
       "• Copy report — the whole inventory as text, for a ticket or a note\n" +
-      "A web page can't sweep the airwaves by itself: each scan opens the browser's own chooser and only the device you pick becomes visible. Everything is read on-device, nothing is uploaded, and no device is opened or written to.",
+      "A web page can't sweep the airwaves by itself: each scan opens the browser's own chooser and only the device you pick becomes visible. Everything is read on-device and nothing is uploaded. A device is only opened when you press Connect, no data is ever written to it, and every link closes when you disconnect or leave the page.",
     followUps: ["What does System Info show?", "Is my data private?", "Which apps need internet?"],
   },
   {

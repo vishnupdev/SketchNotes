@@ -3,6 +3,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { APPS, chipGradient } from "@/components/AppCatalog";
 import { SITE_TAGLINE } from "@/lib/site";
+import { armBootChime } from "@/lib/ui-sound";
 
 /**
  * How long the whole sequence runs before the layer is torn down. Kept in step
@@ -85,8 +86,25 @@ export function BootSplash() {
     const reduced =
       typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const id = window.setTimeout(() => setDone(true), reduced ? REDUCED_MS : FULL_MS);
-    return () => window.clearTimeout(id);
+    // The chime, if the browser will allow one — see `armBootChime`. Disposing
+    // it with the layer is deliberate: the chime belongs to the animation, so
+    // once the animation is gone it is not owed to the user any more.
+    const disarm = armBootChime();
+    // Disarmed on the same beat the layer is dropped, not in the cleanup below:
+    // rendering `null` doesn't unmount this component, so the cleanup would not
+    // run until the whole workspace went away — and a chime left armed until
+    // then would fire on whatever the user first touched, minutes later.
+    const id = window.setTimeout(
+      () => {
+        disarm();
+        setDone(true);
+      },
+      reduced ? REDUCED_MS : FULL_MS,
+    );
+    return () => {
+      window.clearTimeout(id);
+      disarm();
+    };
   }, []);
 
   if (done) return null;

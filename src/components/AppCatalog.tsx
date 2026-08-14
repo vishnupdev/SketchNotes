@@ -315,6 +315,24 @@ const ColorGlyph = (
   </svg>
 );
 
+const ResourceGlyph = (
+  // A shield with an eye set into it: what the browser gates, and what is
+  // watching through it.
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <path d="M12 2.6 4.4 5.6v5.8c0 4.5 3.1 8.7 7.6 10.2 4.5-1.5 7.6-5.7 7.6-10.2V5.6z" />
+    <path d="M7.6 11.6s2-3 4.4-3 4.4 3 4.4 3-2 3-4.4 3-4.4-3-4.4-3Z" />
+    <circle cx="12" cy="11.6" r="1.2" fill="currentColor" stroke="none" />
+  </svg>
+);
+
 export const APPS: AppEntry[] = [
   {
     id: "sketchnotes",
@@ -378,6 +396,13 @@ export const APPS: AppEntry[] = [
     tagline: "Inspect device & browser",
     icon: SystemGlyph,
     hue: "--app-system",
+  },
+  {
+    id: "resources",
+    name: "Resource Monitor",
+    tagline: "See what uses camera, mic & data",
+    icon: ResourceGlyph,
+    hue: "--app-resources",
   },
   {
     id: "nearby",

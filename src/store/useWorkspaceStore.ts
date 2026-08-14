@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { sGet, sSet } from "@/lib/storage";
+import { setUiSoundEnabled, UI_SOUND_KEY } from "@/lib/ui-sound";
 import {
   DEFAULT_CURSOR_SETTINGS,
   normalizeCursorSettings,
@@ -27,6 +28,7 @@ export type AppId =
   | "morse"
   | "sound"
   | "color"
+  | "resources"
   | "assistant";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
@@ -41,6 +43,7 @@ const ALL_APPS: AppId[] = [
   "reminders",
   "timer",
   "system",
+  "resources",
   "nearby",
   "speed",
   "news",
@@ -95,6 +98,12 @@ interface WorkspaceState {
   appIntro: AppId | null;
   /** Chosen mouse pointer for the whole workspace. See `@/lib/cursors`. */
   cursor: CursorSettings;
+  /**
+   * Whether the interface sounds play — the boot chime and the movement tones.
+   * On by default. Mirrored into `@/lib/ui-sound`, which is where the cues are
+   * actually gated, so a non-React caller (`playNav`) needn't reach the store.
+   */
+  soundOn: boolean;
 
   /**
    * Open an app. Plays that app's opening animation unless `intro: false` —
@@ -116,6 +125,10 @@ interface WorkspaceState {
   hydrateCursor: () => void;
   /** Change part of the pointer setup (preset, size, colour or custom image). */
   updateCursor: (patch: Partial<CursorSettings>) => void;
+  /** Merge the persisted sound choice in after mount (avoids SSR mismatch). */
+  hydrateSound: () => void;
+  /** Turn the interface sounds on or off for the whole workspace. */
+  setSoundOn: (on: boolean) => void;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
@@ -126,6 +139,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   appOrder: ALL_APPS,
   appIntro: null,
   cursor: DEFAULT_CURSOR_SETTINGS,
+  soundOn: true,
 
   // Re-picking the app that's already on screen closes the launcher without
   // replaying the animation — nothing opened.
@@ -175,5 +189,21 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     const next = normalizeCursorSettings({ ...get().cursor, ...patch });
     set({ cursor: next });
     void sSet(CURSOR_KEY, JSON.stringify(next));
+  },
+
+  // Stored as "on"/"off" rather than JSON: `@/lib/ui-sound` reads the same key
+  // synchronously to gate a cue that fires before this hydration lands, and a
+  // bare flag is the one shape both readers can agree on without parsing.
+  hydrateSound: async () => {
+    const raw = await sGet(UI_SOUND_KEY);
+    if (raw === null) return;
+    const on = raw !== "off";
+    set({ soundOn: on });
+    setUiSoundEnabled(on);
+  },
+  setSoundOn: (on) => {
+    set({ soundOn: on });
+    setUiSoundEnabled(on);
+    void sSet(UI_SOUND_KEY, on ? "on" : "off");
   },
 }));

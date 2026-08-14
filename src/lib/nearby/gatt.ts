@@ -316,8 +316,27 @@ export function rememberBluetoothDevice(key: string, device: BluetoothDeviceLike
   handles.set(key, device);
 }
 
+/** The live object behind a device key, for the connection manager. */
+export const getBluetoothHandle = (key: string): BluetoothDeviceLike | undefined =>
+  handles.get(key);
+
 /** Whether a GATT walk is possible for this device in this page load. */
 export const canInspectGatt = (key: string): boolean => !!handles.get(key)?.gatt;
+
+/**
+ * Devices whose link is being deliberately held open by `connect.ts`.
+ *
+ * {@link readGatt} normally hangs up as soon as it has its answer, which is the
+ * right default for a one-off read. When the user has explicitly connected the
+ * device, though, that hang-up would silently tear down *their* link — so the
+ * held set turns the disconnect off and leaves ownership with whoever opened it.
+ */
+const held = new Set<string>();
+
+export function setGattHeld(key: string, on: boolean): void {
+  if (on) held.add(key);
+  else held.delete(key);
+}
 
 /**
  * Connect to a device, read its services, characteristics and standard values,
@@ -391,11 +410,15 @@ export async function readGatt(key: string): Promise<GattReport> {
     };
   } finally {
     // The link is only needed for the read. Holding it open would keep the
-    // peripheral awake (and block whatever else wants to pair with it).
-    try {
-      gatt.disconnect();
-    } catch {
-      /* already disconnected */
+    // peripheral awake (and block whatever else wants to pair with it) — unless
+    // the user has connected the device themselves, in which case the link is
+    // theirs to close.
+    if (!held.has(key)) {
+      try {
+        gatt.disconnect();
+      } catch {
+        /* already disconnected */
+      }
     }
   }
 }

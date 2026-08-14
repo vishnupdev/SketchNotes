@@ -33,6 +33,7 @@ const TodoApp = dynamic(APP_LOADERS.todos, { ssr: false });
 const ReminderApp = dynamic(APP_LOADERS.reminders, { ssr: false });
 const TimerApp = dynamic(APP_LOADERS.timer, { ssr: false });
 const SystemInfoApp = dynamic(APP_LOADERS.system, { ssr: false });
+const ResourceMonitorApp = dynamic(APP_LOADERS.resources, { ssr: false });
 const NearbyApp = dynamic(APP_LOADERS.nearby, { ssr: false });
 const NetworkSpeedApp = dynamic(APP_LOADERS.speed, { ssr: false });
 const NewsApp = dynamic(APP_LOADERS.news, { ssr: false });
@@ -63,6 +64,7 @@ const APP_PATHS: Record<AppId, string> = {
   reminders: "/reminders",
   timer: "/timer",
   system: "/system",
+  resources: "/resources",
   nearby: "/nearby",
   speed: "/speedtest",
   news: "/news",
@@ -231,6 +233,13 @@ export function Workspace() {
 
       <AppFrame active={activeApp === "system"} name="System Info">
         <SystemInfoApp />
+      </AppFrame>
+
+      {/* Resource Monitor. Unmounted on an app switch — which is what hands
+          back any camera, microphone, screen share or location watch it was
+          holding, so the monitor can never become the thing being monitored. */}
+      <AppFrame active={activeApp === "resources"} name="Resource Monitor">
+        <ResourceMonitorApp />
       </AppFrame>
 
       {/* Nearby Devices. Unmounted on an app switch, which is what stops the

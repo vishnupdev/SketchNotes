@@ -7,6 +7,7 @@ import {
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from "react";
+import { playCue } from "@/lib/ui-sound";
 
 /**
  * How a view arrives on screen. Each value has a matching `[data-nav="…"]`
@@ -40,8 +41,14 @@ const useNavLayoutEffect = typeof window === "undefined" ? useEffect : useLayout
  * Clearing the animation name, reading a layout property to force the style to
  * be recomputed, and handing it back to the stylesheet is what replays it.
  */
-export function playNav(el: HTMLElement | null, motion: NavMotion) {
+export function playNav(el: HTMLElement | null, motion: NavMotion, section?: number) {
   if (!el) return;
+  // The one place every in-app navigation passes through, so it is also where
+  // the navigation is heard. The cue names *are* the motion names, and `section`
+  // — the view's index among its peers — is what gives each of an app's pages
+  // its own tone. Muting and the browser's autoplay rules are the sound
+  // module's business, not this one's.
+  playCue(motion, section);
   el.dataset.nav = motion;
   el.style.animationName = "none";
   void el.offsetWidth;
@@ -111,6 +118,10 @@ export function NavView({ viewKey, order, motion, children, ...rest }: NavViewPr
       typeof motion === "function"
         ? motion(from, viewKey)
         : motion ?? (order ? navDirection(order, from, viewKey) : "fade"),
+      // Where the peers are declared, the view's place among them is its tone.
+      // Views that aren't a fixed list (Todos stepping through weeks) have no
+      // position to give, and fall back to their cue's own note.
+      order?.indexOf(viewKey),
     );
   }, [viewKey, order, motion]);
 

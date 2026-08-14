@@ -123,6 +123,13 @@ export interface BluetoothDeviceLike {
   id: string;
   name?: string;
   gatt?: BluetoothGattLike;
+  /**
+   * `BluetoothDevice` is an `EventTarget`, but only `gattserverdisconnected` is
+   * used here — a peripheral that drops the link (out of range, powered off)
+   * must be able to correct the UI without being polled.
+   */
+  addEventListener?: (type: string, listener: () => void) => void;
+  removeEventListener?: (type: string, listener: () => void) => void;
 }
 export interface BluetoothLEScanLike {
   active: boolean;
@@ -188,6 +195,10 @@ export interface UsbDeviceLike {
   deviceVersionSubminor?: number;
   configuration?: UsbConfigurationLike | null;
   configurations?: UsbConfigurationLike[];
+  /** Opening starts a session with the device; it claims no interface on its own. */
+  open?: () => Promise<void>;
+  close?: () => Promise<void>;
+  selectConfiguration?: (configurationValue: number) => Promise<void>;
 }
 export interface UsbLike extends EventTarget {
   getDevices: () => Promise<UsbDeviceLike[]>;
@@ -222,6 +233,8 @@ export interface HidDeviceLike {
   productName?: string;
   opened?: boolean;
   collections?: HidCollectionLike[];
+  open?: () => Promise<void>;
+  close?: () => Promise<void>;
 }
 export interface HidLike extends EventTarget {
   getDevices: () => Promise<HidDeviceLike[]>;
@@ -234,6 +247,11 @@ export interface SerialPortInfoLike {
 }
 export interface SerialPortLike {
   getInfo?: () => SerialPortInfoLike;
+  /** A serial port can't be opened without a line speed, so one is always passed. */
+  open?: (options: { baudRate: number }) => Promise<void>;
+  close?: () => Promise<void>;
+  /** Present once open. Only checked for a stream lock before closing. */
+  readable?: { locked?: boolean } | null;
 }
 export interface SerialLike extends EventTarget {
   getPorts: () => Promise<SerialPortLike[]>;

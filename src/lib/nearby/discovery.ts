@@ -23,6 +23,11 @@
  * missing API only shrinks the result. All are browser-only.
  */
 
+import {
+  rememberHidDevice,
+  rememberSerialPort,
+  rememberUsbDevice,
+} from "./connect";
 import { GATT_OPTIONAL_SERVICES, rememberBluetoothDevice } from "./gatt";
 import {
   bluetoothSpec,
@@ -108,32 +113,41 @@ function btDevice(
   };
 }
 
-const usbDevice = (d: UsbDeviceLike): NearbyDevice => ({
-  key: `usb:${d.vendorId}:${d.productId}:${d.serialNumber ?? ""}`,
-  name: d.productName?.trim() || `USB device ${hexId(d.vendorId)}:${hexId(d.productId)}`,
-  transport: "usb",
-  detail: joinDetail(
-    d.manufacturerName,
-    `VID ${hexId(d.vendorId)}`,
-    `PID ${hexId(d.productId)}`,
-    d.serialNumber && `SN ${d.serialNumber}`,
-  ),
-  connected: d.opened ?? undefined,
-  spec: usbSpec(d),
-});
+const usbDevice = (d: UsbDeviceLike): NearbyDevice => {
+  const key = `usb:${d.vendorId}:${d.productId}:${d.serialNumber ?? ""}`;
+  // Keep the live object so `connect.ts` can open a session without re-prompting.
+  rememberUsbDevice(key, d);
+  return {
+    key,
+    name: d.productName?.trim() || `USB device ${hexId(d.vendorId)}:${hexId(d.productId)}`,
+    transport: "usb",
+    detail: joinDetail(
+      d.manufacturerName,
+      `VID ${hexId(d.vendorId)}`,
+      `PID ${hexId(d.productId)}`,
+      d.serialNumber && `SN ${d.serialNumber}`,
+    ),
+    connected: d.opened ?? undefined,
+    spec: usbSpec(d),
+  };
+};
 
-const hidDevice = (d: HidDeviceLike): NearbyDevice => ({
-  key: `hid:${d.vendorId}:${d.productId}:${d.productName ?? ""}`,
-  name: d.productName?.trim() || `HID device ${hexId(d.vendorId)}:${hexId(d.productId)}`,
-  transport: "hid",
-  detail: joinDetail(
-    hidKind(d.collections ?? []),
-    `VID ${hexId(d.vendorId)}`,
-    `PID ${hexId(d.productId)}`,
-  ),
-  connected: d.opened ?? undefined,
-  spec: hidSpec(d),
-});
+const hidDevice = (d: HidDeviceLike): NearbyDevice => {
+  const key = `hid:${d.vendorId}:${d.productId}:${d.productName ?? ""}`;
+  rememberHidDevice(key, d);
+  return {
+    key,
+    name: d.productName?.trim() || `HID device ${hexId(d.vendorId)}:${hexId(d.productId)}`,
+    transport: "hid",
+    detail: joinDetail(
+      hidKind(d.collections ?? []),
+      `VID ${hexId(d.vendorId)}`,
+      `PID ${hexId(d.productId)}`,
+    ),
+    connected: d.opened ?? undefined,
+    spec: hidSpec(d),
+  };
+};
 
 const serialPort = (p: SerialPortLike, index: number): NearbyDevice => {
   const info = (() => {
@@ -147,8 +161,10 @@ const serialPort = (p: SerialPortLike, index: number): NearbyDevice => {
     info.usbVendorId != null
       ? `VID ${hexId(info.usbVendorId)}${info.usbProductId != null ? ` · PID ${hexId(info.usbProductId)}` : ""}`
       : "Platform serial port";
+  const key = `serial:${info.usbVendorId ?? "x"}:${info.usbProductId ?? "x"}:${index}`;
+  rememberSerialPort(key, p);
   return {
-    key: `serial:${info.usbVendorId ?? "x"}:${info.usbProductId ?? "x"}:${index}`,
+    key,
     name: info.usbVendorId != null ? "USB serial port" : "Serial port",
     transport: "serial",
     detail: usb,

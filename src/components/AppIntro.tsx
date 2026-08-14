@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
-import { APP_MAP, chipGradient } from "@/components/AppCatalog";
+import { APP_MAP, APPS, chipGradient } from "@/components/AppCatalog";
+import { playCue } from "@/lib/ui-sound";
 
 /**
  * How long the whole sequence runs before the overlay is torn down. Kept in
@@ -36,6 +37,11 @@ export function AppIntro() {
   // shortened, replaced by the reduced-motion rules, or dropped entirely.
   useEffect(() => {
     if (!appIntro) return;
+    // Heard here rather than in the store, so every route into an app — a
+    // launcher tile, the assistant, browser back/forward — sounds the same, and
+    // only an app that actually opens makes a sound. The app's place in the
+    // catalog is its tone, so each app announces itself with its own note.
+    playCue("app", APPS.findIndex((a) => a.id === appIntro));
     const reduced =
       typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
