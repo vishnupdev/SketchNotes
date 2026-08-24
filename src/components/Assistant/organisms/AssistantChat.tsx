@@ -112,6 +112,19 @@ export function AssistantChat() {
     [addMessage, isPending, mutate, runAction],
   );
 
+  /*
+   * A question handed over from the command palette, asked as soon as this app
+   * is on screen. Taken from the store (which clears it) rather than read, so a
+   * re-render — or coming back to the app later — can never re-ask it.
+   */
+  const takePending = useAssistantStore((s) => s.takePending);
+  const pending = useAssistantStore((s) => s.pending);
+  useEffect(() => {
+    if (pending === null || isPending) return;
+    const question = takePending();
+    if (question) ask(question);
+  }, [ask, isPending, pending, takePending]);
+
   const thinkingLabel =
     download !== null ? `Downloading the on-device model… ${Math.round(download * 100)}%` : undefined;
 

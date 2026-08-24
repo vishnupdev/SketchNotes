@@ -42,6 +42,9 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   sound: () => import("@/components/SoundMeter/SoundMeterApp").then((m) => m.SoundMeterApp),
   color: () => import("@/components/ColorLens/ColorLensApp").then((m) => m.ColorLensApp),
   assistant: () => import("@/components/Assistant/AssistantApp").then((m) => m.AssistantApp),
+  qr: () => import("@/components/QrTool/QrToolApp").then((m) => m.QrToolApp),
+  handoff: () => import("@/components/Handoff/HandoffApp").then((m) => m.HandoffApp),
+  drop: () => import("@/components/FileDrop/FileDropApp").then((m) => m.FileDropApp),
 };
 
 /**
@@ -58,6 +61,9 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "morse",
   "sound",
   "color",
+  "qr",
+  "handoff",
+  "drop",
   "translate",
   "malayalam",
   "image",
@@ -89,5 +95,8 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   morse: "Morse Code",
   sound: "Sound Meter",
   color: "Color Lens",
+  qr: "QR Codes",
+  handoff: "Handoff",
+  drop: "File Drop",
   assistant: "Assistant",
 };

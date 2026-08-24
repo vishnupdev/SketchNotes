@@ -102,6 +102,24 @@ export const APPS: AppEntry[] = [
       "pick any colour from a photo or your camera and get its hex, RGB, HSL, CMYK and LAB codes, colour name, contrast grades and image palette",
   },
   {
+    path: "/qr",
+    name: "QR Codes",
+    blurb:
+      "scan a QR code with your camera or from a picture, and create codes for links, Wi-Fi, contacts, email and locations",
+  },
+  {
+    path: "/handoff",
+    name: "Handoff",
+    blurb:
+      "move your notes, tasks and boards to another device by camera — no account, no upload, no cable",
+  },
+  {
+    path: "/drop",
+    name: "File Drop",
+    blurb:
+      "send files of any size from any device to any device — peer-to-peer, with no upload and no account",
+  },
+  {
     path: "/assistant",
     name: "Assistant",
     blurb: "a free AI guide that answers what every app in the workspace can do",
@@ -194,6 +212,22 @@ export const SITE_KEYWORDS = [
   "controller tester online",
   "offline PWA",
   "free online tools no signup",
+  "qr code scanner online",
+  "qr code generator free",
+  "scan qr from image",
+  "wifi qr code generator",
+  "vcard qr code",
+  "read qr code on my screen",
+  "transfer data between devices offline",
+  "send notes to my phone",
+  "share data without internet",
+  "qr file transfer",
+  "send large files without uploading",
+  "peer to peer file transfer browser",
+  "share files between devices offline",
+  "send a file to another device",
+  "webrtc file transfer",
+  "no upload file sharing",
   "free ai assistant",
   "in-app ai guide",
   "on-device ai chat",

@@ -22,7 +22,7 @@ const FILTERS: { id: Filter; label: string }[] = [
 /**
  * The Apps tab — the one view no browser can produce.
  *
- * A browser's site settings see a single origin; this workspace is nineteen
+ * A browser's site settings see a single origin; this workspace is twenty-one
  * apps behind that origin, so "oneappready.vercel.app may use your camera" is
  * true and useless. Here the same question is answered per app, and the storage
  * figures are attributed by walking this browser's own keys rather than being
@@ -76,7 +76,7 @@ export function AppsPanel() {
         </p>
         {audit && (
           <p className="mt-1 text-[12.5px] leading-snug text-ink-soft">
-            {formatBytes(audit.local.bytes)} is stored across {audit.local.keys} keys, plus{" "}
+            {formatBytes(audit.saved.bytes)} is stored across {audit.saved.keys} keys, plus{" "}
             {formatBytes(audit.settings.bytes)} of workspace preferences. Sizes are close
             approximations — the browser reports no exact per-key figure.
           </p>

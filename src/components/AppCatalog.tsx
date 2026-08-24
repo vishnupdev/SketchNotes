@@ -333,6 +333,52 @@ const ResourceGlyph = (
   </svg>
 );
 
+const QrGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3.5" y="3.5" width="6" height="6" rx="1.2" />
+    <rect x="14.5" y="3.5" width="6" height="6" rx="1.2" />
+    <rect x="3.5" y="14.5" width="6" height="6" rx="1.2" />
+    <path d="M14.5 14.5h2.5v2.5h-2.5zM20.5 14.5h-1M14.5 20.5h2.5M20 18.5v2M20.5 20.5h-1" />
+  </svg>
+);
+
+const HandoffGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="2.6" y="5" width="7.4" height="10.5" rx="1.6" />
+    <rect x="14" y="8.5" width="7.4" height="10.5" rx="1.6" />
+    <path d="M10.6 10.6h4.2M13.2 8.9l1.9 1.7-1.9 1.7" />
+  </svg>
+);
+
+const DropGlyph = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M13.4 3.5H7.5A1.6 1.6 0 0 0 6 5.1v13.8a1.6 1.6 0 0 0 1.5 1.6h9a1.6 1.6 0 0 0 1.5-1.6V8.2z" />
+    <path d="M13.2 3.6v4.6h4.7" />
+    <path d="M12 11.4v5.2M9.9 14.4l2.1 2.2 2.1-2.2" />
+  </svg>
+);
+
 export const APPS: AppEntry[] = [
   {
     id: "sketchnotes",
@@ -466,6 +512,27 @@ export const APPS: AppEntry[] = [
     tagline: "Read colours from a photo",
     icon: ColorGlyph,
     hue: "--app-color",
+  },
+  {
+    id: "qr",
+    name: "QR Codes",
+    tagline: "Scan one, or make one",
+    icon: QrGlyph,
+    hue: "--app-qr",
+  },
+  {
+    id: "handoff",
+    name: "Handoff",
+    tagline: "Send data to another device",
+    icon: HandoffGlyph,
+    hue: "--app-handoff",
+  },
+  {
+    id: "drop",
+    name: "File Drop",
+    tagline: "Send any file, device to device",
+    icon: DropGlyph,
+    hue: "--app-drop",
   },
 ];
 

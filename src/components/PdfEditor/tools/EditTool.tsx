@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PDFDocument, degrees } from "pdf-lib";
 import { baseName, fmtSize, friendly, isPdf } from "@/lib/PdfEditor/helpers";
 import { getPdfjs } from "@/lib/PdfEditor/pdfjs";
@@ -16,6 +16,8 @@ import {
   useToolState,
 } from "@/components/PdfEditor/ui";
 import { cx } from "@/lib/utils";
+import { useIntakeStore } from "@/store/useIntakeStore";
+import { PDF_KIND, canPickFiles, pickOpenFiles, saveFile } from "@/lib/download";
 
 const smGhost = cx(btnSm, "border-border bg-panel text-text hover:border-accent hover:text-accent");
 const smSolid = cx(btnSm, "border-accent bg-accent text-white");
@@ -23,12 +25,49 @@ const smSolid = cx(btnSm, "border-accent bg-accent text-white");
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function EditTool() {
   const { file, load, clear } = useSinglePdf();
-  const { status, setStatus, results, clearResults, deliver } = useToolState();
+  const { status, setStatus, results, clearResults, deliver, listResult } = useToolState();
+
+  /*
+   * The file on disk this document came from, when it came from one — the
+   * picker below, or the operating system opening a PDF with OneApp. Keeping the
+   * handle is what turns "apply" into a real save: the edits go back into the
+   * very file the user opened, instead of arriving as `document (3).pdf` in the
+   * downloads folder. A dropped or shared file has no handle, and falls back to
+   * being asked where to put the result.
+   */
+  const handleRef = useRef<FileSystemFileHandle | null>(null);
+  const [savedAs, setSavedAs] = useState<string | null>(null);
+
+  /**
+   * Write the finished PDF the best way available: over the original file when
+   * we have it, otherwise through the picker, otherwise as a download. Always
+   * also listed under the tool, so it can be saved again elsewhere.
+   */
+  const saveEdited = useCallback(
+    async (data: Uint8Array, name: string) => {
+      const blob = new Blob([data as BlobPart], { type: "application/pdf" });
+      const into = handleRef.current;
+      const outcome = await saveFile(blob, name, PDF_KIND, into);
+      if (outcome.kind === "written") {
+        handleRef.current = outcome.handle;
+        setSavedAs(outcome.name);
+        setStatus(`Saved to ${outcome.name}.`, "ok");
+      } else if (outcome.kind === "downloaded") {
+        setStatus(`Downloaded ${outcome.name}.`, "ok");
+      } else {
+        setStatus("Not saved — the file dialog was closed.", "");
+      }
+      // Listed either way, so "Save as…" can put a second copy somewhere else.
+      listResult(data, outcome.kind === "written" ? outcome.name : name);
+      return outcome.kind !== "cancelled";
+    },
+    [listResult, setStatus],
+  );
 
   // Imperative editor API (populated once on mount) + latest callbacks.
   const api = useRef<{ init: (i: any) => void; clear: () => void; apply: () => void } | null>(null);
-  const cb = useRef({ setStatus, clearResults, deliver });
-  cb.current = { setStatus, clearResults, deliver };
+  const cb = useRef({ setStatus, clearResults, deliver, saveEdited });
+  cb.current = { setStatus, clearResults, deliver, saveEdited };
 
   useEffect(() => {
     const $ = (id: string) => document.getElementById(id)!;
@@ -754,11 +793,12 @@ export function EditTool() {
           else pg.drawImage(png, { x: X, y: Y, width: W, height: H });
         }
         const bytes = await doc.save();
-        cb.current.deliver(bytes, baseName(EDITFILE.name) + "-edited.pdf");
-        cb.current.setStatus(
-          "Done — edits flattened onto " + keys.length + " page" + (keys.length !== 1 ? "s" : "") + ".",
-          "ok",
-        );
+        const pages = keys.length + " page" + (keys.length !== 1 ? "s" : "");
+        cb.current.setStatus("Edits flattened onto " + pages + " — saving…", "busy");
+        // Back into the file it came from where we hold the handle; otherwise the
+        // picker, otherwise a download. `saveEdited` reports the outcome itself,
+        // since only it knows which of the three happened.
+        await cb.current.saveEdited(bytes, baseName(EDITFILE.name) + "-edited.pdf");
       } catch (e) {
         cb.current.setStatus(friendly(e), "err");
       }
@@ -773,8 +813,11 @@ export function EditTool() {
     };
   }, []);
 
-  const onFiles = async (files: File[]) => {
+  const onFiles = async (files: File[], handle?: FileSystemFileHandle | null) => {
     setStatus("Reading " + files[0].name + "…", "busy");
+    // A new document means the previous document's file is no longer the target.
+    handleRef.current = handle ?? null;
+    setSavedAs(null);
     try {
       const it = await load(files[0]);
       clearResults();
@@ -783,6 +826,41 @@ export function EditTool() {
       setStatus(friendly(e), "err");
     }
   };
+
+  /**
+   * Open a PDF through the browser's file picker, which — unlike a drop or the
+   * file input — hands back a handle. That handle is the whole point: applying
+   * edits afterwards writes back to this file rather than making a copy.
+   */
+  const openFromDisk = async () => {
+    const [handle] = await pickOpenFiles(PDF_KIND);
+    if (!handle) return;
+    try {
+      await onFiles([await handle.getFile()], handle);
+    } catch (e) {
+      setStatus(friendly(e), "err");
+    }
+  };
+
+  /*
+   * A PDF the operating system handed to OneApp — double-clicked on the desktop,
+   * or shared in from another app. The shell parks it in `useIntakeStore` and
+   * opens this section; taking it here is what makes the file appear already
+   * loaded, instead of asking the user to browse for the file they just opened.
+   *
+   * `take` removes it, so a re-mount cannot reopen the same document.
+   */
+  const takeIntake = useIntakeStore((s) => s.take);
+  const pendingPdf = useIntakeStore((s) => s.pending.some((i) => i.kind === "pdf"));
+  useEffect(() => {
+    if (!pendingPdf || file) return;
+    const item = takeIntake("pdf");
+    // The handle comes with it when the platform opened the file for us, so
+    // applying edits saves straight back to the document that was opened.
+    if (item?.file) void onFiles([item.file], item.handle ?? null);
+    // `onFiles` is redefined every render; the effect is driven by the queue.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingPdf, file, takeIntake]);
 
   return (
     <ToolFrame
@@ -805,6 +883,19 @@ export function EditTool() {
           hint="or tap to browse"
           onFiles={onFiles}
         />
+        {/* Only where the browser has a picker that returns a handle. Worth its
+            own button: this is the route that lets "apply" save the edits back
+            into the same file instead of downloading a new one. */}
+        {canPickFiles() && (
+          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+            <button type="button" onClick={() => void openFromDisk()} className={smGhost}>
+              Open a file…
+            </button>
+            <span className="text-[12px] text-ink-soft">
+              Opening this way lets edits save straight back to the same file.
+            </span>
+          </div>
+        )}
       </div>
       <div className={file ? "" : "hidden"}>
         <FileChip
@@ -817,8 +908,21 @@ export function EditTool() {
             clear();
             clearResults();
             setStatus("", "");
+            handleRef.current = null;
+            setSavedAs(null);
           }}
         />
+        {/* Where "apply" will put the result, said before it happens — so nobody
+            has to guess whether their original file is about to change. */}
+        {file && (
+          <p className="mt-1.5 font-mono text-[11px] text-ink-soft">
+            {handleRef.current
+              ? `Applying saves to ${savedAs ?? handleRef.current.name}`
+              : canPickFiles()
+                ? "Applying will ask where to save the result"
+                : "Applying downloads the edited copy"}
+          </p>
+        )}
       </div>
 
       {/* editor UI — always in the DOM so the controller can bind to it */}

@@ -1,63 +1,26 @@
 import type { AppId } from "@/store/useWorkspaceStore";
+import { DB_NAME, STORE_NAME, storageBackend, type StorageBackend } from "@/lib/storage";
+import { classifyKey, pairBytes } from "@/lib/storage-keys";
 
 /**
  * What this site is actually keeping on the device, and which app put it there.
  *
- * The workspace stores everything under a single `sknotes:` prefix in
- * localStorage, so the only way to say "Todos is using 4 KB" is to know the key
- * scheme. {@link OWNERS} is that knowledge, written out once here. It is read
- * strictly top-to-bottom, so a prefix rule can be listed after the exact keys it
- * would otherwise swallow.
+ * The workspace stores everything under a single `sknotes:` prefix in one
+ * key/value store, so the only way to say "Todos is using 4 KB" is to know the
+ * key scheme. That knowledge lives in `lib/storage-keys.ts`, shared with
+ * backup/restore, which needs the very same classification.
+ *
+ * Both stores are walked, because which one holds the data depends on the
+ * browser: IndexedDB is the primary store (see `lib/storage.ts`) with
+ * localStorage as the fallback — and just after an upgrade localStorage can
+ * still hold keys the migration has not swept yet. `saved` is their union, so
+ * the user is shown what is on the device rather than what is in one API.
  *
  * Nothing in this module writes or deletes. The monitor reports; clearing data
- * stays where it already lives (Settings → Offline, and the browser's own site
- * settings), so a glance at a number can never cost someone their notes.
+ * lives where it already did (Settings → Offline, Settings → Data, and the
+ * browser's own site settings), so a glance at a number can never cost someone
+ * their notes.
  */
-
-/** Keys that belong to the workspace shell rather than to any one app. */
-const SETTINGS_KEYS = new Set([
-  "sknotes:theme",
-  "sknotes:custom-themes",
-  "sknotes:ui-style",
-  "sknotes:density",
-  "sknotes:app-order",
-  "sknotes:cursor",
-]);
-
-interface OwnerRule {
-  app: AppId;
-  match: (key: string) => boolean;
-}
-
-const exact =
-  (...keys: string[]) =>
-  (k: string): boolean =>
-    keys.includes(k);
-const prefix =
-  (p: string) =>
-  (k: string): boolean =>
-    k.startsWith(p);
-
-const OWNERS: OwnerRule[] = [
-  { app: "todos", match: exact("sknotes:todos") },
-  { app: "reminders", match: exact("sknotes:reminders") },
-  { app: "timer", match: exact("sknotes:timer") },
-  { app: "board", match: exact("sknotes:board") },
-  { app: "morse", match: exact("sknotes:morse") },
-  { app: "assistant", match: exact("sknotes:assistant") },
-  { app: "translate", match: exact("sknotes:translate-prefs") },
-  { app: "color", match: exact("sknotes:colorlens-picks") },
-  { app: "sound", match: prefix("sknotes:sound:") },
-  { app: "world", match: prefix("sknotes:worldclock:") },
-  { app: "speed", match: prefix("sknotes:netspeed:") },
-  { app: "malayalam", match: prefix("sknotes:malayalam-") },
-  // Sketchnotes keys a note by its bare id (`sknotes:<id>`) plus one index, so
-  // it can only be identified last — as "every remaining workspace key".
-  { app: "sketchnotes", match: prefix("sknotes:") },
-];
-
-/** localStorage holds UTF-16, so a stored pair costs about two bytes a char. */
-const pairBytes = (key: string, value: string): number => (key.length + value.length) * 2;
 
 export interface AppStorageRow {
   app: AppId;
@@ -73,11 +36,14 @@ export interface CacheRow {
 export interface StorageAudit {
   /** The browser's own figure for this origin, when it will give one. */
   estimate: { usage: number; quota: number } | null;
-  local: { bytes: number; keys: number; available: boolean };
+  /** Everything the workspace has saved, across both key/value stores. */
+  saved: { bytes: number; keys: number; available: boolean };
+  /** Which store is answering reads and writes in this browser. */
+  backend: StorageBackend;
   session: { bytes: number; keys: number };
   /** Data attributed to a specific app, largest first. */
   byApp: AppStorageRow[];
-  /** Theme, pointer and launcher preferences — shell, not app. */
+  /** Theme, pointer, sound and launcher preferences — shell, not app. */
   settings: { bytes: number; keys: number };
   /** Keys under some other prefix entirely (an extension, an older build). */
   foreign: { bytes: number; keys: number };
@@ -92,9 +58,6 @@ export interface StorageAudit {
   /** Whether this origin's data is exempt from automatic eviction. */
   persisted: boolean | null;
 }
-
-const owner = (key: string): AppId | null =>
-  OWNERS.find((rule) => rule.match(key))?.app ?? null;
 
 /** Size one Storage area, tolerating a browser that blocks it outright. */
 function measure(area: Storage | null): { bytes: number; keys: number } {
@@ -123,6 +86,48 @@ const safeArea = (pick: () => Storage): Storage | null => {
 };
 
 /**
+ * Read every key/value pair the workspace's IndexedDB store holds.
+ *
+ * Read-only and versionless — a monitor must never be the thing that creates or
+ * upgrades a database — so a browser where the store does not exist yet simply
+ * contributes nothing.
+ */
+async function readDbRows(): Promise<Array<[string, string]>> {
+  if (typeof indexedDB === "undefined") return [];
+  try {
+    const db = await new Promise<IDBDatabase | null>((resolve) => {
+      const req = indexedDB.open(DB_NAME);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+      req.onblocked = () => resolve(null);
+    });
+    if (!db) return [];
+    if (!db.objectStoreNames.contains(STORE_NAME)) {
+      db.close();
+      return [];
+    }
+    const rows = await new Promise<Array<[string, string]>>((resolve) => {
+      const out: Array<[string, string]> = [];
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const cursorReq = tx.objectStore(STORE_NAME).openCursor();
+      cursorReq.onsuccess = () => {
+        const cursor = cursorReq.result;
+        if (!cursor) return;
+        if (typeof cursor.value === "string") out.push([String(cursor.key), cursor.value]);
+        cursor.continue();
+      };
+      tx.oncomplete = () => resolve(out);
+      tx.onerror = () => resolve(out);
+      tx.onabort = () => resolve(out);
+    });
+    db.close();
+    return rows;
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Walk every store this page can see and attribute what it finds. Runs entirely
  * on the device; nothing is transmitted and nothing is modified.
  */
@@ -133,33 +138,43 @@ export async function auditStorage(): Promise<StorageAudit> {
   const perApp = new Map<AppId, AppStorageRow>();
   const settings = { bytes: 0, keys: 0 };
   const foreign = { bytes: 0, keys: 0 };
-  let localBytes = 0;
-  let localKeys = 0;
+  let savedBytes = 0;
+  let savedKeys = 0;
+  // A key can sit in both stores mid-migration; count it once.
+  const counted = new Set<string>();
+
+  const attribute = (key: string, value: string) => {
+    if (counted.has(key)) return;
+    counted.add(key);
+    const bytes = pairBytes(key, value);
+    savedBytes += bytes;
+    savedKeys++;
+
+    const cls = classifyKey(key);
+    if (cls.kind === "settings") {
+      settings.bytes += bytes;
+      settings.keys++;
+      return;
+    }
+    if (cls.kind === "foreign") {
+      foreign.bytes += bytes;
+      foreign.keys++;
+      return;
+    }
+    const row = perApp.get(cls.app) ?? { app: cls.app, bytes: 0, keys: 0 };
+    row.bytes += bytes;
+    row.keys++;
+    perApp.set(cls.app, row);
+  };
+
+  for (const [key, value] of await readDbRows()) attribute(key, value);
 
   if (local) {
     try {
       for (let i = 0; i < local.length; i++) {
         const key = local.key(i);
         if (key === null) continue;
-        const bytes = pairBytes(key, local.getItem(key) ?? "");
-        localBytes += bytes;
-        localKeys++;
-
-        if (SETTINGS_KEYS.has(key)) {
-          settings.bytes += bytes;
-          settings.keys++;
-          continue;
-        }
-        const app = owner(key);
-        if (!app) {
-          foreign.bytes += bytes;
-          foreign.keys++;
-          continue;
-        }
-        const row = perApp.get(app) ?? { app, bytes: 0, keys: 0 };
-        row.bytes += bytes;
-        row.keys++;
-        perApp.set(app, row);
+        attribute(key, local.getItem(key) ?? "");
       }
     } catch {
       /* keep whatever was counted */
@@ -176,7 +191,8 @@ export async function auditStorage(): Promise<StorageAudit> {
 
   return {
     estimate,
-    local: { bytes: localBytes, keys: localKeys, available: local != null },
+    saved: { bytes: savedBytes, keys: savedKeys, available: storageBackend() !== "memory" },
+    backend: storageBackend(),
     session: measure(session),
     byApp: [...perApp.values()].sort((a, b) => b.bytes - a.bytes),
     settings,

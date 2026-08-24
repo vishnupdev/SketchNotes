@@ -912,3 +912,39 @@ export const DatabaseIcon = (p: IconProps) => (
     <path d="M4.5 12c0 1.6 3.4 2.9 7.5 2.9s7.5-1.3 7.5-2.9" />
   </Svg>
 );
+
+/** Three finder squares and a data cell — a QR code. */
+export const QrIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.5" y="3.5" width="6" height="6" rx="1.2" />
+    <rect x="14.5" y="3.5" width="6" height="6" rx="1.2" />
+    <rect x="3.5" y="14.5" width="6" height="6" rx="1.2" />
+    <path d="M14.5 14.5h2.5v2.5h-2.5zM20.5 14.5h-1M14.5 20.5h2.5M20 18.5v2M20.5 20.5h-1" />
+  </Svg>
+);
+
+/** A viewfinder's corner brackets — aim at a code. */
+export const ScanIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.5 8.5V5.6a2 2 0 0 1 2-2h2.9M15.6 3.6h2.9a2 2 0 0 1 2 2v2.9M20.5 15.6v2.9a2 2 0 0 1-2 2h-2.9M8.4 20.5H5.5a2 2 0 0 1-2-2v-2.9" />
+    <path d="M3.5 12h17" />
+  </Svg>
+);
+
+/** Two devices with an arrow between them — handing something across. */
+export const HandoffIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="2.6" y="5" width="7.4" height="10.5" rx="1.6" />
+    <rect x="14" y="8.5" width="7.4" height="10.5" rx="1.6" />
+    <path d="M10.6 10.6h4.2M13.2 8.9l1.9 1.7-1.9 1.7" />
+  </Svg>
+);
+
+/** A file with a downward arrow crossing it — dropping a file across. */
+export const DropIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M13.4 3.5H7.5A1.6 1.6 0 0 0 6 5.1v13.8a1.6 1.6 0 0 0 1.5 1.6h9a1.6 1.6 0 0 0 1.5-1.6V8.2z" />
+    <path d="M13.2 3.6v4.6h4.7" />
+    <path d="M12 11.4v5.2M9.9 14.4l2.1 2.2 2.1-2.2" />
+  </Svg>
+);

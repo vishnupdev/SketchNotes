@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useWorkspaceStore, type AppId } from "@/store/useWorkspaceStore";
 import { cx, trackSpot } from "@/lib/utils";
 import { playCue } from "@/lib/ui-sound";
-import { CloseIcon, SettingsIcon } from "@/components/SketchNotes/atoms/icons";
+import { CloseIcon, SearchIcon, SettingsIcon } from "@/components/SketchNotes/atoms/icons";
 import { APPS, APP_MAP, chipGradient, type AppEntry } from "@/components/AppCatalog";
 
 const ArrowIcon = (
@@ -52,6 +52,7 @@ export function AppLauncher() {
   const setActiveApp = useWorkspaceStore((s) => s.setActiveApp);
   const closeLauncher = useWorkspaceStore((s) => s.closeLauncher);
   const openSettings = useWorkspaceStore((s) => s.openSettings);
+  const openPalette = useWorkspaceStore((s) => s.openPalette);
   const appOrder = useWorkspaceStore((s) => s.appOrder);
   const setAppOrder = useWorkspaceStore((s) => s.setAppOrder);
   const hydrateAppOrder = useWorkspaceStore((s) => s.hydrateAppOrder);
@@ -229,13 +230,25 @@ export function AppLauncher() {
               Pick a workspace to open — drag <span aria-hidden>⠿</span> to reorder.
             </p>
           </div>
-          <button
-            aria-label="Close"
-            onClick={closeLauncher}
-            className="tint hover-pop -mr-1 -mt-1 grid size-9 place-items-center rounded-[10px] text-ink-soft hover:text-text min-[720px]:size-10 min-[720px]:rounded-xl min-[720px]:border min-[720px]:border-border"
-          >
-            <CloseIcon size={18} />
-          </button>
+          <div className="-mr-1 -mt-1 flex items-center gap-1.5">
+            {/* Search: the same palette Ctrl/⌘ + K opens, reachable by pointer
+                and touch — a screenful of tiles is more than a grid should ask you to
+                scan. It opens *over* the launcher, so Escape comes back here. */}
+            <button
+              aria-label="Search apps, tools and settings"
+              onClick={openPalette}
+              className="tint hover-pop grid size-9 place-items-center rounded-[10px] text-ink-soft hover:text-text min-[720px]:size-10 min-[720px]:rounded-xl min-[720px]:border min-[720px]:border-border"
+            >
+              <SearchIcon size={18} />
+            </button>
+            <button
+              aria-label="Close"
+              onClick={closeLauncher}
+              className="tint hover-pop grid size-9 place-items-center rounded-[10px] text-ink-soft hover:text-text min-[720px]:size-10 min-[720px]:rounded-xl min-[720px]:border min-[720px]:border-border"
+            >
+              <CloseIcon size={18} />
+            </button>
+          </div>
         </div>
 
         <div
@@ -368,6 +381,10 @@ export function AppLauncher() {
           </button>
           {/* Room only a wide dialog has: spell out the shortcuts. */}
           <p className="hidden items-center gap-1.5 text-[12px] text-ink-soft min-[720px]:flex">
+            <kbd className="rounded-md border border-border bg-paper px-1.5 py-0.5 font-sans text-[11px] font-semibold">
+              Ctrl K
+            </kbd>
+            to search ·
             <kbd className="rounded-md border border-border bg-paper px-1.5 py-0.5 font-sans text-[11px] font-semibold">
               Esc
             </kbd>

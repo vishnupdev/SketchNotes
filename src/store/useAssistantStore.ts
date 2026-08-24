@@ -21,10 +21,20 @@ interface AssistantState {
   messages: ChatMessage[];
   /** Which brain to answer with. */
   mode: EngineMode;
+  /**
+   * A question handed over from outside the app — the command palette passes
+   * whatever was typed here when it can't match a command itself. Deliberately
+   * *not* persisted: a reload must never re-ask a question on its own.
+   */
+  pending: string | null;
 
   addMessage: (message: ChatMessage) => void;
   setMode: (mode: EngineMode) => void;
   clear: () => void;
+  /** Queue a question for the chat to ask as soon as it is on screen. */
+  askLater: (question: string) => void;
+  /** Read and clear the queued question, so it can only ever be asked once. */
+  takePending: () => string | null;
   /** Adopt the persisted thread after mount (avoids an SSR mismatch). */
   hydrate: () => void;
 }
@@ -49,6 +59,15 @@ function isMessage(v: unknown): v is ChatMessage {
 export const useAssistantStore = create<AssistantState>((set, get) => ({
   messages: [],
   mode: "auto",
+  pending: null,
+
+  askLater: (question) => set({ pending: question.trim() || null }),
+
+  takePending: () => {
+    const { pending } = get();
+    if (pending !== null) set({ pending: null });
+    return pending;
+  },
 
   addMessage: (message) => {
     set((s) => ({ messages: [...s.messages, message].slice(-MAX_MESSAGES) }));

@@ -17,6 +17,7 @@ import {
 } from "@/lib/image/helpers";
 import { cx } from "@/lib/utils";
 import { CropStage } from "@/components/ImageStudio/CropStage";
+import { useIntakeStore } from "@/store/useIntakeStore";
 
 const ASPECTS: { key: string; label: string }[] = [
   { key: "free", label: "Free" },
@@ -109,6 +110,20 @@ export function ImageEditor() {
       setErr((e as Error).message);
     }
   }, []);
+
+  /*
+   * An image the operating system handed to OneApp — opened with it, or shared
+   * in from a gallery or browser. The shell leaves it in `useIntakeStore` and
+   * switches here; taking it (which removes it) means the picture is already
+   * loaded when the app appears, and a re-mount can't reopen it.
+   */
+  const takeIntake = useIntakeStore((s) => s.take);
+  const pendingImage = useIntakeStore((s) => s.pending.some((i) => i.kind === "image"));
+  useEffect(() => {
+    if (!pendingImage || img) return;
+    const item = takeIntake("image");
+    if (item?.file) void openImage(item.file);
+  }, [img, openImage, pendingImage, takeIntake]);
 
   // Live output preview (debounced), honouring the target-size mode.
   useEffect(() => {

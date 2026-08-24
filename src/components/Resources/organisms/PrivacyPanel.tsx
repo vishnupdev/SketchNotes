@@ -21,6 +21,13 @@ const TONE_TEXT = {
   neutral: "text-text",
 } as const;
 
+/** Plain-language name for the store answering reads and writes. */
+const STORE_LABEL = {
+  idb: "this browser's database (IndexedDB)",
+  local: "this browser's local storage",
+  memory: "memory only — nothing here will survive a reload",
+} as const;
+
 /**
  * The Privacy tab: the tracking side of "what is using this device".
  *
@@ -118,17 +125,19 @@ export function PrivacyPanel() {
       <Section
         id="privacy-stored"
         title="Kept on this device"
-        blurb="Everything this site is storing in your browser. Read-only — clear it from Settings → Offline, or your browser's site settings."
+        blurb="Everything this site is storing in your browser. Read-only — export or clear it from Settings → Data, drop the offline copies from Settings → Offline, or use your browser's site settings."
       >
         <div className="grid grid-cols-1 gap-3 min-[520px]:grid-cols-2">
           <StoreCard
             icon={<DriveIcon size={17} />}
             title="Saved data"
-            value={audit ? `${formatBytes(audit.local.bytes)} · ${audit.local.keys} keys` : "…"}
+            value={audit ? `${formatBytes(audit.saved.bytes)} · ${audit.saved.keys} keys` : "…"}
             note={
               audit?.estimate
-                ? `The browser puts this origin's total at ${formatBytes(audit.estimate.usage)} of a ${formatBytes(audit.estimate.quota)} allowance.`
-                : "Notes, tasks, reminders and preferences — all of it local."
+                ? `Held in ${STORE_LABEL[audit.backend]}. The browser puts this origin's total at ${formatBytes(audit.estimate.usage)} of a ${formatBytes(audit.estimate.quota)} allowance.`
+                : audit
+                  ? `Notes, tasks, reminders and preferences — all of it local, held in ${STORE_LABEL[audit.backend]}.`
+                  : "Notes, tasks, reminders and preferences — all of it local."
             }
           />
           <StoreCard

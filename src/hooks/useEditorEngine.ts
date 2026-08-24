@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, type RefObject } from "react";
 import { SketchEngine } from "@/engine/SketchEngine";
 import type { ExportFormat, NoteDocument, SketchBackup } from "@/engine/types";
 import { saveBlob } from "@/engine/export";
-import { storageAvailable } from "@/lib/storage";
+import { storageReady } from "@/lib/storage";
 import { fetchCustomThemes, fetchDensity, fetchTheme, fetchUiStyle } from "@/lib/notes-api";
 import { CUSTOM_THEME_VARS, resolveTheme } from "@/lib/themes";
 import { densityById, uiStyleById } from "@/lib/ui-style";
@@ -228,7 +228,7 @@ export function useEditorEngine(refs: CanvasRefs): EditorCommands {
       // Wait a tick so the engine-creation effect has run.
       await Promise.resolve();
       const st = store.getState();
-      const available = storageAvailable();
+      const available = await storageReady();
       st.setStorageOK(available);
 
       // Custom palettes first: a stored `custom:` theme id cannot resolve to a

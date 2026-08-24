@@ -1,0 +1,48 @@
+import type { AppId } from "@/store/useWorkspaceStore";
+
+/**
+ * Extra words that should find each app in the command palette.
+ *
+ * Not the same job as the Assistant's aliases (`lib/Assistant/knowledge.ts`),
+ * which match a whole spoken question — these are the words someone *types* to
+ * jump somewhere, so they are short, unambiguous nouns rather than phrases.
+ * Kept here rather than in the app catalog so the catalog stays about how an app
+ * is drawn, and out of the Assistant's knowledge base so the palette doesn't pull
+ * that whole file into the initial payload (rule #7).
+ *
+ * `Record<AppId, …>` deliberately: a new app is a type error until it can be
+ * searched for.
+ */
+export const APP_SEARCH_TERMS: Record<AppId, string[]> = {
+  sketchnotes: ["draw", "drawing", "canvas", "sketch", "whiteboard", "notes", "doodle", "pen"],
+  assistant: ["ai", "help", "guide", "chat", "ask"],
+  pdf: ["pdf", "document", "merge", "split", "sign", "annotate", "watermark"],
+  image: ["image", "photo", "picture", "crop", "resize", "compress", "filter"],
+  board: ["dashboard", "sections", "checklist", "counter", "habit", "links", "page"],
+  todos: ["tasks", "todo", "to-do", "checklist", "planner", "week"],
+  reminders: ["alarm", "alert", "notification", "remind", "schedule"],
+  timer: ["countdown", "stopwatch", "pomodoro", "clock", "minutes"],
+  system: ["device", "hardware", "specs", "cpu", "memory", "battery", "browser"],
+  resources: ["permissions", "privacy", "camera", "microphone", "tracking", "storage", "usage"],
+  nearby: ["bluetooth", "usb", "serial", "hid", "devices", "gamepad", "scan"],
+  speed: ["speed test", "bandwidth", "ping", "latency", "download", "upload", "internet"],
+  news: ["headlines", "newspaper", "articles", "tech news", "sports"],
+  world: ["time zone", "timezone", "utc", "gmt", "cities", "countries", "clock"],
+  malayalam: ["manglish", "transliteration", "keyboard", "handwriting", "മലയാളം"],
+  translate: ["translation", "translator", "language", "offline translate"],
+  morse: ["morse", "sos", "telegraph", "dots and dashes", "cw"],
+  sound: ["frequency", "hz", "decibel", "tuner", "pitch", "spectrum", "microphone"],
+  color: ["colour", "hex", "rgb", "palette", "eyedropper", "contrast", "swatch"],
+  qr: ["qr", "qr code", "barcode", "scan", "scanner", "wifi code", "vcard", "contact card"],
+  handoff: ["handoff", "transfer", "send to phone", "another device", "move data", "share data"],
+  drop: [
+    "file drop",
+    "send a file",
+    "send files",
+    "share a file",
+    "large file",
+    "airdrop",
+    "file transfer",
+    "peer to peer",
+  ],
+};

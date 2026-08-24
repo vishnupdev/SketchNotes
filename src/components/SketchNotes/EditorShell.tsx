@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef } from "react";
-import { EditorContext } from "@/context/editor-context";
+import { useEffect, useRef } from "react";
+import { EditorContext, useEditorCommands } from "@/context/editor-context";
 import { useEditorEngine } from "@/hooks/useEditorEngine";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { Header } from "@/components/SketchNotes/organisms/Header";
@@ -12,10 +12,33 @@ import { SelectionChip } from "@/components/SketchNotes/molecules/SelectionChip"
 import { Zoomer } from "@/components/SketchNotes/molecules/Zoomer";
 import { RefreshButton } from "@/components/SketchNotes/molecules/RefreshButton";
 import { Toast } from "@/components/SketchNotes/atoms/Toast";
+import { useIntakeStore } from "@/store/useIntakeStore";
 
 /** Registers global shortcuts; kept as a child so it sits inside the context. */
 function ShortcutBridge() {
   useKeyboardShortcuts();
+  return null;
+}
+
+/**
+ * Opens a note file the operating system handed to OneApp — a `.json` sketch
+ * export double-clicked on the desktop, or shared in.
+ *
+ * A child of the provider for the same reason as {@link ShortcutBridge}: the
+ * import command lives on the editor context. Taking the arrival removes it, so
+ * remounting the shell can never re-import the same file.
+ */
+function IntakeConsumer() {
+  const { importNote } = useEditorCommands();
+  const take = useIntakeStore((s) => s.take);
+  const pending = useIntakeStore((s) => s.pending.some((i) => i.kind === "note"));
+
+  useEffect(() => {
+    if (!pending) return;
+    const item = take("note");
+    if (item?.file) void importNote(item.file);
+  }, [importNote, pending, take]);
+
   return null;
 }
 
@@ -33,6 +56,7 @@ export function EditorShell() {
   return (
     <EditorContext.Provider value={commands}>
       <ShortcutBridge />
+      <IntakeConsumer />
       <Header />
       <CanvasStage stageRef={stageRef} bgRef={bgRef} cvRef={cvRef} />
       <SelectionChip />

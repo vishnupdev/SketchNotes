@@ -29,6 +29,9 @@ export type AppId =
   | "sound"
   | "color"
   | "resources"
+  | "qr"
+  | "handoff"
+  | "drop"
   | "assistant";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
@@ -53,6 +56,9 @@ const ALL_APPS: AppId[] = [
   "morse",
   "sound",
   "color",
+  "qr",
+  "handoff",
+  "drop",
 ];
 
 const ORDER_KEY = "sknotes:app-order";
@@ -88,6 +94,12 @@ interface WorkspaceState {
   launcherOpen: boolean;
   /** Whether the application settings overlay is open. */
   settingsOpen: boolean;
+  /**
+   * Whether the command palette is open — the type-anything way into the
+   * workspace (Ctrl/⌘ + K). Sits above the other two overlays, since it is how
+   * you leave one of them for somewhere else.
+   */
+  paletteOpen: boolean;
   /** User-defined order of launcher tiles; persisted to localStorage. */
   appOrder: AppId[];
   /**
@@ -119,6 +131,10 @@ interface WorkspaceState {
   closeLauncher: () => void;
   openSettings: () => void;
   closeSettings: () => void;
+  openPalette: () => void;
+  closePalette: () => void;
+  /** Ctrl/⌘ + K: open the palette, or close it if it is already open. */
+  togglePalette: () => void;
   /** Merge the persisted launcher order in after mount (avoids SSR mismatch). */
   hydrateAppOrder: () => void;
   setAppOrder: (order: AppId[]) => void;
@@ -137,6 +153,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   pdfTool: null,
   launcherOpen: false,
   settingsOpen: false,
+  paletteOpen: false,
   appOrder: ALL_APPS,
   appIntro: null,
   cursor: DEFAULT_CURSOR_SETTINGS,
@@ -155,8 +172,13 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   openLauncher: () => set({ launcherOpen: true }),
   closeLauncher: () => set({ launcherOpen: false }),
   // Opening settings closes the launcher so only one overlay shows at a time.
-  openSettings: () => set({ settingsOpen: true, launcherOpen: false }),
+  // The palette closes too: it is how someone got here, and leaving it open
+  // behind the dialog it just opened would swallow the next Escape.
+  openSettings: () => set({ settingsOpen: true, launcherOpen: false, paletteOpen: false }),
   closeSettings: () => set({ settingsOpen: false }),
+  openPalette: () => set({ paletteOpen: true }),
+  closePalette: () => set({ paletteOpen: false }),
+  togglePalette: () => set((s) => ({ paletteOpen: !s.paletteOpen })),
 
   hydrateAppOrder: async () => {
     const raw = await sGet(ORDER_KEY);

@@ -154,6 +154,18 @@
   --app-morse: #4d7c0f;
   --app-sound: #be123c;
   --app-color: #0d9488;
+  --app-qr: #475569;
+  --app-handoff: #0e7490;
+  --app-drop: #7c2d9e;
+
+  /* QR codes are read by a camera, not by a person, so these two are the one
+     pair in the workspace that does *not* follow the theme: a scanner expects
+     dark modules on a light quiet zone, and an inverted or tinted code is one
+     many phones refuse outright. They are tokens rather than literals so the
+     rule "no hardcoded colours in components" still holds, and so the reason
+     they never change is written down. */
+  --qr-dark: #000000;
+  --qr-light: #ffffff;
 
   /* Board section-type hues. Only ever used as a small glyph tile and a hairline
      rim (never as text or a fill behind text), so these are chosen for being
@@ -207,6 +219,9 @@
   --app-morse: #a3e635;
   --app-sound: #fb7185;
   --app-color: #2dd4bf;
+  --app-qr: #94a3b8;
+  --app-handoff: #22d3ee;
+  --app-drop: #c084fc;
   --board-note: #fbbf24;
   --board-checklist: #4d94ff;
   --board-counter: #1fb89f;
@@ -707,6 +722,8 @@
   --color-dock-ink: var(--dock-ink);
   --color-text: var(--text);
   --color-ed-bg: var(--ed-bg);
+  --color-qr-dark: var(--qr-dark);
+  --color-qr-light: var(--qr-light);
   --font-hand: var(--hand);
   --shadow-panel: var(--shadow);
 }

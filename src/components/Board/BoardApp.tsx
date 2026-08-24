@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useBoardActions } from "@/hooks/useBoard";
+import { splitLink } from "@/lib/Board/board-api";
+import { useIntakeStore } from "@/store/useIntakeStore";
 import { useBoardStore } from "@/store/useBoardStore";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { AppsIcon, BoardIcon } from "@/components/SketchNotes/atoms/icons";
@@ -13,6 +15,9 @@ import { BoardCanvas } from "@/components/Board/organisms/BoardCanvas";
 import { BoardEmpty } from "@/components/Board/organisms/BoardEmpty";
 import { HelpSheet } from "@/components/Board/organisms/HelpSheet";
 import { PromptComposer } from "@/components/Board/organisms/PromptComposer";
+
+/** Title of the links section a share lands in. */
+const SHARED_TITLE = "Shared";
 
 /**
  * Board — a page of sections the user composes by describing it.
@@ -32,6 +37,52 @@ export function BoardApp() {
   const setDraft = useBoardStore((s) => s.setDraft);
   const actions = useBoardActions();
   const { sections, runPrompt } = actions;
+  const [queuedShare, setQueuedShare] = useState<{ text: string; url: string } | null>(null);
+
+  /*
+   * Text or a link shared into OneApp from another app's share sheet.
+   *
+   * The board is where a saved link belongs, so the shell routes a share with no
+   * file here (see `lib/intake/types.ts`). It goes into a "Shared" section,
+   * created on first use, through the same `dispatch` the cards and the prompt
+   * use — so it lands in the transcript and can be undone like any other change.
+   */
+  const takeIntake = useIntakeStore((s) => s.take);
+  const pendingText = useIntakeStore((s) => s.pending.some((i) => i.kind === "text"));
+  const { dispatch } = actions;
+  useEffect(() => {
+    if (!pendingText) return;
+    const item = takeIntake("text");
+    if (!item) return;
+
+    const raw = [item.title, item.text, item.url].filter(Boolean).join(" ").trim();
+    if (!raw) return;
+    const { label, url } = splitLink(raw);
+
+    const existing = sections.find(
+      (s) => s.type === "links" && s.title.toLowerCase() === SHARED_TITLE.toLowerCase(),
+    );
+    if (existing) {
+      dispatch({ kind: "addItem", id: existing.id, text: label, url });
+      return;
+    }
+    // A fresh section has no id until the board has it, so the row is added on
+    // the next pass — `sections` changes, this effect is not re-entered (the
+    // arrival is already taken), so the add is queued explicitly.
+    dispatch({ kind: "add", type: "links", title: SHARED_TITLE });
+    setQueuedShare({ text: label, url });
+  }, [dispatch, pendingText, sections, takeIntake]);
+
+  // Second half of the above: drop the shared row into the section once it exists.
+  useEffect(() => {
+    if (!queuedShare) return;
+    const section = sections.find(
+      (s) => s.type === "links" && s.title.toLowerCase() === SHARED_TITLE.toLowerCase(),
+    );
+    if (!section) return;
+    dispatch({ kind: "addItem", id: section.id, text: queuedShare.text, url: queuedShare.url });
+    setQueuedShare(null);
+  }, [dispatch, queuedShare, sections]);
 
   /**
    * A tapped example: run it, unless it's a stem ("rename ") that needs

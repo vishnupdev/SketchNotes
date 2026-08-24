@@ -32,6 +32,9 @@ export const APP_LABELS: Record<AppId, string> = {
   morse: "Morse Code",
   sound: "Sound Meter",
   color: "Color Lens",
+  qr: "QR Codes",
+  handoff: "Handoff",
+  drop: "File Drop",
   assistant: "Assistant",
 };
 
@@ -149,6 +152,35 @@ export const APP_ALIASES: Record<AppId, string[]> = {
     "colour from image",
     "contrast checker",
   ],
+  qr: [
+    "qr codes",
+    "qr code",
+    "qr",
+    "barcode",
+    "scan a code",
+    "scanner",
+    "wifi code",
+    "vcard",
+  ],
+  handoff: [
+    "handoff",
+    "send to my phone",
+    "send to another device",
+    "transfer data",
+    "move my data",
+    "device transfer",
+  ],
+  drop: [
+    "file drop",
+    "send a file",
+    "send files",
+    "share a file",
+    "send a big file",
+    "large file transfer",
+    "file transfer",
+    "airdrop",
+    "send a video",
+  ],
   assistant: ["assistant", "guide", "ai agent", "helper", "chatbot"],
 };
 
@@ -190,6 +222,9 @@ export const APP_PATHS: Record<AppId, string> = {
   morse: "/morse",
   sound: "/soundmeter",
   color: "/color",
+  qr: "/qr",
+  handoff: "/handoff",
+  drop: "/drop",
   assistant: "/assistant",
 };
 
@@ -215,6 +250,9 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   morse: "learn, practise and send Morse code — chart, drills, translator and a key",
   sound: "measure sound frequency, musical pitch and loudness from the microphone",
   color: "read any colour out of a photo — every code, its name, contrast and palette",
+  qr: "scan a QR code with the camera or from a picture, and make codes for links, Wi-Fi, contacts and more",
+  handoff: "move this browser's data to another device by camera — no account, no upload, no cable",
+  drop: "send files of any size straight from one device to another, on the same network with no internet at all, or across the internet",
   assistant: "this guide — ask what the workspace can do",
 };
 
@@ -225,7 +263,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "What OneApp is",
     keywords: ["oneapp", "one app", "overview", "about", "what is this", "workspace", "summary", "purpose", "intro"],
     answer:
-      "OneApp is a single web workspace holding nineteen tools, so you never install nineteen apps.\n" +
+      "OneApp is a single web workspace holding twenty-one tools, so you never install twenty-one apps.\n" +
       "• Creative: Sketchnotes canvas, Image Studio, PDF Editor\n" +
       "• Planning: Board, Todos, Reminders, Timer\n" +
       "• Info: News, World Clock, System Info, Resource Monitor, Nearby Devices, Network Speed, Sound Meter, Color Lens\n" +
@@ -251,7 +289,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     keywords: ["offline", "offline mode", "work offline", "works offline", "use it offline", "use offline", "no internet", "no connection", "without internet", "airplane mode", "slow internet", "weak connection", "save data", "data saver", "install", "pwa", "home screen", "app icon", "service worker", "download app", "save for offline"],
     answer:
       "OneApp is a PWA: after your first visit it saves itself on your device, so every app opens with no connection — including a fresh reload of any app's link.\n" +
-      "• All nineteen apps are downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
+      "• Every app is downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
       "• Install it from your browser's Install / Add to Home Screen option to get an app icon and its own window\n" +
       "• Fully offline: Sketchnotes, PDF Editor, Image Studio, Board, Todos, Reminders, Timer, System Info, Nearby Devices, Sound Meter, Color Lens, World Clock (clocks and country details), Malayalam typing/keyboard, on-device Translate, and me\n" +
       "• Needs a connection: News and World Clock headlines (saved ones still open), online translation (past phrases still open), handwriting recognition and the speed test\n" +
@@ -338,7 +376,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "Mobile and touch support",
     keywords: ["mobile", "phone", "tablet", "ipad", "touch", "responsive", "stylus", "pen", "finger", "small screen"],
     answer:
-      "Every screen is designed mobile-first and reflows down to about 360px wide, so all nineteen tools work on a phone.\n" +
+      "Every screen is designed mobile-first and reflows down to about 360px wide, so every tool works on a phone.\n" +
       "• Drawing, handwriting and the PDF editor accept touch and stylus input\n" +
       "• Install it to your home screen to use it like a native app\n" +
       "• Layouts widen into side-by-side panes on tablets and desktops",
@@ -527,7 +565,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "Resource Monitor shows what is using this device, and which app in the workspace is doing it. Four views:\n" +
       "• Live — open the camera, microphone, screen capture or a location watch and see exactly what a site gets: the picture, the level, the source, how long it has been held, and one button to release it. Alongside it, live meters for memory, storage, processor, battery, network and data pulled\n" +
       "• Access — every resource a site can ask for, with this browser's current answer (allowed, blocked or asks first) and which apps here would ever use it\n" +
-      "• Apps — all nineteen apps broken out of the single browser origin they share, each with the resources it can reach and the storage it is actually holding\n" +
+      "• Apps — every app broken out of the single browser origin they share, each with the resources it can reach and the storage it is actually holding\n" +
       "• Privacy — the signals your browser sends, every host this page has contacted, what is stored on the device, and the long list of things any site can read with no prompt at all\n" +
       "It only reads: nothing is written, deleted or uploaded, and anything it opens is released the moment you switch apps. A web page can only see its own use of the camera, mic, screen and location, so it reports on OneApp — not on your other tabs or other applications.",
     followUps: ["Which apps use my camera?", "Is my data private?", "What does System Info show?"],

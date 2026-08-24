@@ -9,6 +9,7 @@ import { CursorSetting } from "@/components/Settings/CursorSetting";
 import { ThemeSetting } from "@/components/Settings/ThemeSetting";
 import { InterfaceSetting } from "@/components/Settings/InterfaceSetting";
 import { SoundSetting } from "@/components/Settings/SoundSetting";
+import { DataSetting } from "@/components/Settings/DataSetting";
 
 /**
  * One labelled block within the settings dialog. New settings go here.
@@ -166,6 +167,13 @@ export function SettingsPanel() {
             description="Keep every app on this device so the workspace opens with no internet."
           >
             <OfflineSetting />
+          </Section>
+
+          <Section
+            title="Data"
+            description="Your work lives in this browser and nowhere else. Save it to a file, bring a file back, or clear it out."
+          >
+            <DataSetting />
           </Section>
         </div>
       </div>

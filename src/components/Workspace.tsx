@@ -8,6 +8,8 @@ import { AppLauncher } from "@/components/AppLauncher";
 import { AppIntro } from "@/components/AppIntro";
 import { BootSplash } from "@/components/BootSplash";
 import { SettingsPanel } from "@/components/Settings/SettingsPanel";
+import { CommandPalette } from "@/components/Palette/organisms/CommandPalette";
+import { IntakeBridge } from "@/components/Intake/IntakeBridge";
 import { CursorEffect } from "@/components/Settings/CursorEffect";
 import { ReminderScheduler } from "@/components/Reminders/organisms/ReminderScheduler";
 import { ReminderAlert } from "@/components/Reminders/organisms/ReminderAlert";
@@ -15,6 +17,7 @@ import { OfflineBanner } from "@/components/Offline/OfflineBanner";
 import { AppLoadBoundary } from "@/components/Offline/AppLoadBoundary";
 import { TOOL_IDS } from "@/components/PdfEditor/catalog";
 import { APP_LOADERS } from "@/lib/offline/app-modules";
+import { useWorkspaceKeys } from "@/hooks/useWorkspaceKeys";
 import type { AppId } from "@/store/useWorkspaceStore";
 
 // Sketchnotes (EditorShell) is the default `/` route and stays statically
@@ -44,6 +47,9 @@ const MorseApp = dynamic(APP_LOADERS.morse, { ssr: false });
 const SoundMeterApp = dynamic(APP_LOADERS.sound, { ssr: false });
 const ColorLensApp = dynamic(APP_LOADERS.color, { ssr: false });
 const AssistantApp = dynamic(APP_LOADERS.assistant, { ssr: false });
+const QrToolApp = dynamic(APP_LOADERS.qr, { ssr: false });
+const HandoffApp = dynamic(APP_LOADERS.handoff, { ssr: false });
+const FileDropApp = dynamic(APP_LOADERS.drop, { ssr: false });
 
 /**
  * Every app's deep-link path — the one place a route is declared, read in both
@@ -74,6 +80,9 @@ const APP_PATHS: Record<AppId, string> = {
   morse: "/morse",
   sound: "/soundmeter",
   color: "/color",
+  qr: "/qr",
+  handoff: "/handoff",
+  drop: "/drop",
   assistant: "/assistant",
 };
 
@@ -151,6 +160,9 @@ function AppFrame({
  * app switch.
  */
 export function Workspace() {
+  // Shell-wide shortcuts (Ctrl/⌘ + K). Mounted here so they work in every app.
+  useWorkspaceKeys();
+
   const activeApp = useWorkspaceStore((s) => s.activeApp);
   const pdfTool = useWorkspaceStore((s) => s.pdfTool);
   const setActiveApp = useWorkspaceStore((s) => s.setActiveApp);
@@ -287,6 +299,24 @@ export function Workspace() {
         <ColorLensApp />
       </AppFrame>
 
+      {/* QR Codes. Unmounted on an app switch, which is what releases the
+          camera if the scanner was left running. */}
+      <AppFrame active={activeApp === "qr"} name="QR Codes">
+        <QrToolApp />
+      </AppFrame>
+
+      {/* Handoff. Unmounting is what ends both the camera and any open
+          device-to-device connection, so neither follows the user out. */}
+      <AppFrame active={activeApp === "handoff"} name="Handoff">
+        <HandoffApp />
+      </AppFrame>
+
+      {/* File Drop. Unmounting is what closes an open peer connection and
+          releases the camera, so neither survives leaving the app. */}
+      <AppFrame active={activeApp === "drop"} name="File Drop">
+        <FileDropApp />
+      </AppFrame>
+
       {/* Assistant — the in-app AI guide. */}
       <AppFrame active={activeApp === "assistant"} name="Assistant">
         <AssistantApp />
@@ -294,6 +324,14 @@ export function Workspace() {
 
       <AppLauncher />
       <SettingsPanel />
+
+      {/* Ctrl/⌘ + K from anywhere — the keyboard route into every app, PDF
+          section, theme and setting. Above the two overlays it can open. */}
+      <CommandPalette />
+
+      {/* Files the operating system hands us — a double-clicked PDF, a photo
+          from the share sheet — routed to the app that can open them. */}
+      <IntakeBridge />
 
       {/* The app's logo, played over the top whenever one opens. Sits above the
           launcher it was picked from and above the frame rising underneath. */}

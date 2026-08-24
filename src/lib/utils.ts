@@ -13,6 +13,20 @@ export function timeAgo(ts: number): string {
   return d < 7 ? `${d}d ago` : new Date(ts).toLocaleDateString();
 }
 
+/**
+ * Human-readable byte size (1024-based), e.g. "1.4 MB".
+ *
+ * Shell-level: used by the settings dialog, which belongs to no app. The
+ * Resource Monitor keeps its own copy on purpose — see `lib/Resources/format.ts`.
+ */
+export function formatBytes(bytes: number, digits = 1): string {
+  if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB", "TB"];
+  const i = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+  const v = bytes / 1024 ** i;
+  return `${v.toFixed(i === 0 ? 0 : digits)} ${units[i]}`;
+}
+
 /** Escape a literal so it can be embedded in a RegExp source. */
 export const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 

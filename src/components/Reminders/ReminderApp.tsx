@@ -6,6 +6,7 @@ import { useReminderStore } from "@/store/useReminderStore";
 import { useReminders, useReminderMutations } from "@/hooks/useReminders";
 import type { Reminder, ReminderFilter } from "@/lib/Reminders/types";
 import { notifyPermission, requestNotifyPermission, type NotifyPermission } from "@/lib/Reminders/notify";
+import { backgroundReminderState, type BackgroundReminderState } from "@/lib/Reminders/background";
 import { ensureAudioContext } from "@/lib/Reminders/sounds";
 import { ReminderItem } from "@/components/Reminders/molecules/ReminderItem";
 import { ReminderEditor } from "@/components/Reminders/organisms/ReminderEditor";
@@ -44,9 +45,17 @@ export function ReminderApp() {
 
   const [now, setNow] = useState(() => Date.now());
   const [perm, setPerm] = useState<NotifyPermission>("default");
+  /**
+   * Whether the browser will wake the app to check reminders with no tab open.
+   * Reported rather than assumed: it is Chromium-only and installation-gated, so
+   * the app has to be able to say "only while OneApp is open" when that is the
+   * truth (see `lib/Reminders/background.ts`).
+   */
+  const [background, setBackground] = useState<BackgroundReminderState>("unsupported");
   useEffect(() => {
     setNow(Date.now());
     setPerm(notifyPermission());
+    void backgroundReminderState().then(setBackground);
     const iv = window.setInterval(() => setNow(Date.now()), 30_000); // keep countdowns fresh
     return () => window.clearInterval(iv);
   }, []);
@@ -106,6 +115,19 @@ export function ReminderApp() {
                 </button>
               )}
             </div>
+          )}
+
+          {/* What happens when OneApp isn't open. Stated either way: a reminder
+              app that quietly only works while you're looking at it is worse
+              than one that tells you so. */}
+          {perm === "granted" && (
+            <p className="text-[12px] leading-relaxed text-ink-soft">
+              {background === "on"
+                ? "Alerts also arrive when OneApp is closed — the browser checks periodically, so a background alert can be a little late."
+                : background === "denied"
+                  ? "Alerts arrive while OneApp is open in any tab. Install OneApp to your device to also get them when it's closed."
+                  : "Alerts arrive while OneApp is open in any tab — this browser can't wake a closed app."}
+            </p>
           )}
 
           <div className="inline-flex gap-1 self-start rounded-xl border border-border bg-panel p-1">

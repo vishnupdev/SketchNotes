@@ -8,6 +8,7 @@ import {
 } from "react";
 import { cx } from "@/lib/utils";
 import { download } from "@/lib/PdfEditor/helpers";
+import { PDF_KIND, canPickFiles, saveFile } from "@/lib/download";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 
 /* ---------------- shared class tokens ---------------- */
@@ -50,15 +51,26 @@ export function useToolState() {
     setStatusState({ msg, kind });
   }, []);
   const clearResults = useCallback(() => setResults([]), []);
+
+  /**
+   * List a finished file without downloading it — for a tool that has already
+   * written the bytes somewhere the user chose (see the Edit tool's save path).
+   * The row still offers "download" and "Save as…", so a second copy is one tap
+   * away.
+   */
+  const listResult = useCallback((data: Uint8Array | Blob, name: string, mime?: string) => {
+    setResults((r) => [...r, { id: idRef.current++, name, data, mime }]);
+  }, []);
+
   const deliver = useCallback(
     (data: Uint8Array | Blob, name: string, mime?: string) => {
       download(data, name, mime);
-      setResults((r) => [...r, { id: idRef.current++, name, data, mime }]);
+      listResult(data, name, mime);
     },
-    [],
+    [listResult],
   );
 
-  return { status, setStatus, results, clearResults, deliver };
+  return { status, setStatus, results, clearResults, deliver, listResult };
 }
 
 export function StatusLine({ status }: { status: { msg: string; kind: StatusKind } }) {
@@ -78,24 +90,68 @@ export function StatusLine({ status }: { status: { msg: string; kind: StatusKind
   );
 }
 
+/** A result's bytes as a Blob, ready for a download or a file write. */
+export const resultBlob = (r: ToolResult): Blob =>
+  r.data instanceof Blob
+    ? r.data
+    : new Blob([r.data as BlobPart], { type: r.mime || "application/pdf" });
+
+/**
+ * Finished files. Every one can be downloaded again, and — where the browser
+ * has a file picker — saved to a chosen place on disk instead.
+ *
+ * "Save as…" is offered rather than made the default: a tool that produces one
+ * file (a merge) is better off asking where to put it, but one that produces
+ * several (a split, a burst) would otherwise open a dialog per file. Making it a
+ * second, explicit button keeps both honest.
+ */
 export function ResultList({ results }: { results: ToolResult[] }) {
   if (!results.length) return null;
+  const canSaveAs = canPickFiles();
   return (
     <div className="mt-2.5 flex flex-wrap gap-2">
       {results.map((r) => (
-        <button
+        <span
           key={r.id}
-          type="button"
-          onClick={() => download(r.data, r.name, r.mime)}
-          title="Download again"
-          className="inline-flex items-center gap-1.5 rounded-[9px] border border-border bg-paper px-3 py-2 font-mono text-[12px] hover:border-accent hover:text-accent"
+          className="inline-flex items-stretch overflow-hidden rounded-[9px] border border-border bg-paper font-mono text-[12px]"
         >
-          ⬇ {r.name}
-        </button>
+          <button
+            type="button"
+            onClick={() => download(r.data, r.name, r.mime)}
+            title="Download again"
+            className="inline-flex items-center gap-1.5 px-3 py-2 hover:text-accent"
+          >
+            ⬇ {r.name}
+          </button>
+          {canSaveAs && (
+            <button
+              type="button"
+              onClick={() => {
+                void saveFile(
+                  resultBlob(r),
+                  r.name,
+                  r.mime && !r.mime.includes("pdf")
+                    ? { description: "File", accept: { [r.mime]: [extOf(r.name)] } }
+                    : PDF_KIND,
+                );
+              }}
+              title="Choose where to save this file"
+              className="border-l border-border px-2.5 py-2 text-ink-soft hover:text-accent"
+            >
+              Save as…
+            </button>
+          )}
+        </span>
       ))}
     </div>
   );
 }
+
+/** ".pdf" from "report.pdf" — the picker wants an extension list. */
+const extOf = (name: string): string => {
+  const dot = name.lastIndexOf(".");
+  return dot > 0 ? name.slice(dot) : "";
+};
 
 /* ---------------- dropzone ---------------- */
 export function Dropzone({

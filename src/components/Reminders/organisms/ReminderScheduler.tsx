@@ -7,6 +7,7 @@ import { useReminderStore } from "@/store/useReminderStore";
 import { advanceRepeat, type Reminder } from "@/lib/Reminders/types";
 import { ensureAudioContext } from "@/lib/Reminders/sounds";
 import { registerNotifier, showNotification } from "@/lib/Reminders/notify";
+import { enableBackgroundReminders } from "@/lib/Reminders/background";
 import { queryKeys } from "@/lib/query-keys";
 
 const TICK_MS = 15_000;
@@ -25,9 +26,10 @@ export function ReminderScheduler() {
   const { replace } = useReminderMutations();
   const pushRinging = useReminderStore((s) => s.pushRinging);
 
-  // Register the notification service worker so alerts can show on mobile.
+  // Register the notification service worker so alerts can show on mobile, then
+  // ask it to keep checking while the workspace is closed. Both are idempotent.
   useEffect(() => {
-    void registerNotifier();
+    void registerNotifier().then(() => enableBackgroundReminders());
   }, []);
 
   // Unlock audio on the first user gesture (autoplay policy).
@@ -70,17 +72,31 @@ export function ReminderScheduler() {
       pushRinging(fired); // the alert rings + vibrates until dismissed (max 30s)
     };
 
+    /*
+     * Coming back to the tab, the collection in the cache may be out of date:
+     * the service worker fires reminders too while the workspace is closed (see
+     * `lib/Reminders/background.ts`) and writes `firedAt` straight to storage.
+     * Re-reading before checking is what stops this side announcing a reminder
+     * the worker has already dealt with — and, worse, writing the stale list
+     * back over the worker's update.
+     */
+    const resync = async () => {
+      await qc.invalidateQueries({ queryKey: queryKeys.reminders });
+      check();
+    };
+
     check();
     const iv = window.setInterval(check, TICK_MS);
     const onVisible = () => {
-      if (document.visibilityState === "visible") check();
+      if (document.visibilityState === "visible") void resync();
     };
+    const onFocus = () => void resync();
     document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("focus", check);
+    window.addEventListener("focus", onFocus);
     return () => {
       window.clearInterval(iv);
       document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("focus", check);
+      window.removeEventListener("focus", onFocus);
     };
   }, [qc, replace, pushRinging]);
 

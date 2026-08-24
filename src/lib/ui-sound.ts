@@ -59,7 +59,7 @@ export type UiCue =
  */
 const SCALE = [
   196.0, 220.0, 261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25, 783.99, 880.0,
-  1046.5, 1174.66, 1318.51, 1567.98, 1760.0, 2093.0, 2349.32,
+  1046.5, 1174.66, 1318.51, 1567.98, 1760.0, 2093.0, 2349.32, 2637.02, 3135.96, 3520.0,
 ];
 
 /** A step past the end of the scale is folded back into it. */
@@ -141,7 +141,7 @@ const CUES: Record<UiCue, CueSpec> = {
     notes: [[0, 0]],
     root: 9,
     // The whole scale, so every app in the catalog gets a note to itself. Tied to
-    // the scale's length rather than the catalog's: a nineteenth app would wrap
+    // the scale's length rather than the catalog's: an app past the end would wrap
     // back onto the first app's note, and the fix then is another scale step.
     band: [0, SCALE.length],
     // A soft tone, not a held one: the app is open by the time the veil clears,

@@ -4,7 +4,7 @@ import { ACCESS_ITEMS, type AccessId } from "./catalog";
 /**
  * What each app in the workspace does with the device — the answer a browser's
  * site-settings screen can never give, because it sees one origin where there
- * are nineteen apps.
+ * are twenty-one apps.
  *
  * The permission-gated half is *derived* from `usedBy` in the catalog rather
  * than written twice, so the Access tab and the Apps tab can never disagree.
@@ -20,6 +20,7 @@ export const APP_NETWORK: Partial<Record<AppId, string>> = {
   malayalam: "Handwriting recognition posts the strokes you draw. Typing and the keyboard stay local.",
   speed: "Downloads and uploads test payloads — that is the measurement.",
   system: "Looks up your public IP address.",
+  drop: "Files go straight to the other device. In “anywhere” mode a public STUN server is asked for this device's public address — it never sees the files; in “this network only” mode nothing outside the network is contacted at all.",
 };
 
 /** One line on what the app keeps in this browser. */
@@ -42,6 +43,9 @@ export const APP_STORAGE_NOTE: Record<AppId, string> = {
   morse: "Speed, pitch and per-character progress.",
   sound: "Reference pitch, view and dB offset.",
   color: "Recently picked colours.",
+  qr: "Codes you have scanned or made on this device.",
+  drop: "Nothing — files stream through and are written where you choose.",
+  handoff: "Nothing — a transfer is held in memory only until you accept it.",
   resources: "Nothing — this app only reads.",
 };
 
