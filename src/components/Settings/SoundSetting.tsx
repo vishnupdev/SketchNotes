@@ -9,6 +9,9 @@ import { cx } from "@/lib/utils";
  * Settings → Sound. One switch for the whole workspace, plus a way to hear what
  * it controls.
  *
+ * Sound is opt-in: the workspace ships silent and this switch is the only thing
+ * that turns the cues on.
+ *
  * The preview button earns its place: the start-up chime is the one cue most
  * users will never hear by accident, because a browser won't play audio until
  * the page has been interacted with and a cold load hasn't been. Pressing this
@@ -34,7 +37,7 @@ export function SoundSetting() {
           <span className="block text-[13px] font-semibold">Interface sounds</span>
           <span className="mt-0.5 block text-[12px] leading-relaxed text-ink-soft">
             A chime when the workspace opens, then a soft tone that rings as you arrive somewhere.
-            Every app and every page inside one has its own note.
+            Every app and every page inside one has its own note. Off until you switch them on.
           </span>
         </span>
         <button

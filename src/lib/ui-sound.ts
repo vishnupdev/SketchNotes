@@ -13,10 +13,11 @@
  *
  * Two things decide whether a cue is heard:
  *
- *  - the user's setting, mirrored here from the workspace store. It is *also*
- *    read straight from storage on first use, because a cue can be asked for
- *    before the store's async hydration lands and a muted workspace has to stay
- *    muted through that window.
+ *  - the user's setting, mirrored here from the workspace store — off until it
+ *    is switched on in Settings → Sound. It is *also* read straight from storage
+ *    on first use, because a cue can be asked for before the store's async
+ *    hydration lands and a muted workspace has to stay muted through that
+ *    window.
  *  - the browser's autoplay policy. Audio is not allowed until the document has
  *    been interacted with, and creating an AudioContext before then gets it
  *    suspended *and* logs a console warning — so this checks the same signal the
@@ -233,13 +234,20 @@ let lastAt = 0;
 /** Output buses of the cues that may still be ringing. See {@link release}. */
 const voices: GainNode[] = [];
 
-/** The preference, read from storage the first time it is needed. */
+/**
+ * The preference, read from storage the first time it is needed.
+ *
+ * Off unless it has been switched on. A workspace that makes noise on its very
+ * first load is a surprise, so only a stored "on" counts — an absent key, an
+ * older value, or storage being unreadable all mean silence. Sound is something
+ * the user opts into, in Settings → Sound.
+ */
 function isEnabled(): boolean {
   if (enabled === null) {
     try {
-      enabled = window.localStorage.getItem(UI_SOUND_KEY) !== "off";
+      enabled = window.localStorage.getItem(UI_SOUND_KEY) === "on";
     } catch {
-      enabled = true;
+      enabled = false;
     }
   }
   return enabled;

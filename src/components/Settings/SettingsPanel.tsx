@@ -156,7 +156,7 @@ export function SettingsPanel() {
 
           <Section
             title="Sound"
-            description="Quiet tones for opening the workspace and for arriving somewhere in it — each app and each page has its own note. Nothing else in the workspace makes a sound unless you ask it to."
+            description="Off until you turn them on: quiet tones for opening the workspace and for arriving somewhere in it — each app and each page has its own note. Nothing else in the workspace makes a sound unless you ask it to."
           >
             <SoundSetting />
           </Section>

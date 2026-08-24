@@ -100,8 +100,9 @@ interface WorkspaceState {
   cursor: CursorSettings;
   /**
    * Whether the interface sounds play — the boot chime and the movement tones.
-   * On by default. Mirrored into `@/lib/ui-sound`, which is where the cues are
-   * actually gated, so a non-React caller (`playNav`) needn't reach the store.
+   * Off until the user switches them on in Settings → Sound. Mirrored into
+   * `@/lib/ui-sound`, which is where the cues are actually gated, so a non-React
+   * caller (`playNav`) needn't reach the store.
    */
   soundOn: boolean;
 
@@ -139,7 +140,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   appOrder: ALL_APPS,
   appIntro: null,
   cursor: DEFAULT_CURSOR_SETTINGS,
-  soundOn: true,
+  soundOn: false,
 
   // Re-picking the app that's already on screen closes the launcher without
   // replaying the animation — nothing opened.
@@ -196,8 +197,9 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   // bare flag is the one shape both readers can agree on without parsing.
   hydrateSound: async () => {
     const raw = await sGet(UI_SOUND_KEY);
-    if (raw === null) return;
-    const on = raw !== "off";
+    // Only an explicit "on" unmutes, matching how `@/lib/ui-sound` reads the same
+    // key: nothing stored means the user has not asked for sound yet.
+    const on = raw === "on";
     set({ soundOn: on });
     setUiSoundEnabled(on);
   },

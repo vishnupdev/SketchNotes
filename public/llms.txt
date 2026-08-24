@@ -82,10 +82,10 @@ stored on the device.
   from any image file or emoji, rendered on the device (nothing is uploaded), with its
   hotspot at the top-left or the centre. Touch input and the drawing/text cursors are
   unaffected.
-- Sound: interface sounds, on by default and switchable off. Deliberately plain — three
-  notes when the workspace opens, one soft tone whenever you arrive somewhere, and nothing
-  that is not a note. Every app has its own note (its place in the app catalog) and so does
-  every page inside an app (its
+- Sound: interface sounds, off by default — switch them on in Settings → Sound, which also
+  previews the start-up chime. Deliberately plain — three notes when the workspace opens,
+  one soft tone whenever you arrive somewhere, and nothing that is not a note. Every app has
+  its own note (its place in the app catalog) and so does every page inside an app (its
   place in that app's tab bar), so moving forward through a tab bar rises in pitch and
   moving back falls. Opening the app switcher sounds an open fifth — the one chord, for the
   one place that isn't somewhere you have arrived. Every tone is drawn from a single C major
