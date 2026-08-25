@@ -21,7 +21,7 @@ import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
  * or location open so "in use" is something you can see rather than infer, and
  * meters the resources that need no permission at all. **Access** lists every
  * resource the browser gates, with its current answer. **Apps** breaks the one
- * browser origin back into the twenty-one apps behind it — the view a browser's
+ * browser origin back into every app behind it — the view a browser's
  * site settings cannot produce. **Privacy** covers the rest: the signals this
  * browser sends, the hosts the page has actually contacted, what is stored, and
  * the long list of things any site can read without ever asking.

@@ -40,6 +40,7 @@ const ResourceMonitorApp = dynamic(APP_LOADERS.resources, { ssr: false });
 const NearbyApp = dynamic(APP_LOADERS.nearby, { ssr: false });
 const NetworkSpeedApp = dynamic(APP_LOADERS.speed, { ssr: false });
 const NewsApp = dynamic(APP_LOADERS.news, { ssr: false });
+const StreamsApp = dynamic(APP_LOADERS.streams, { ssr: false });
 const WorldClockApp = dynamic(APP_LOADERS.world, { ssr: false });
 const MalayalamWriterApp = dynamic(APP_LOADERS.malayalam, { ssr: false });
 const TranslateApp = dynamic(APP_LOADERS.translate, { ssr: false });
@@ -49,7 +50,9 @@ const ColorLensApp = dynamic(APP_LOADERS.color, { ssr: false });
 const AssistantApp = dynamic(APP_LOADERS.assistant, { ssr: false });
 const QrToolApp = dynamic(APP_LOADERS.qr, { ssr: false });
 const HandoffApp = dynamic(APP_LOADERS.handoff, { ssr: false });
+const CloneApp = dynamic(APP_LOADERS.clone, { ssr: false });
 const FileDropApp = dynamic(APP_LOADERS.drop, { ssr: false });
+const TextKitApp = dynamic(APP_LOADERS.text, { ssr: false });
 
 /**
  * Every app's deep-link path — the one place a route is declared, read in both
@@ -74,6 +77,7 @@ const APP_PATHS: Record<AppId, string> = {
   nearby: "/nearby",
   speed: "/speedtest",
   news: "/news",
+  streams: "/streams",
   world: "/worldclock",
   malayalam: "/malayalam",
   translate: "/translate",
@@ -82,7 +86,9 @@ const APP_PATHS: Record<AppId, string> = {
   color: "/color",
   qr: "/qr",
   handoff: "/handoff",
+  clone: "/clone",
   drop: "/drop",
+  text: "/text",
   assistant: "/assistant",
 };
 
@@ -268,6 +274,13 @@ export function Workspace() {
         <NewsApp />
       </AppFrame>
 
+      {/* Streams. Unmounted on an app switch (AppFrame mounts only while
+          active), which is what stops the player: music never follows the user
+          into another app. */}
+      <AppFrame active={activeApp === "streams"} name="Streams">
+        <StreamsApp />
+      </AppFrame>
+
       {/* World Clock. Unmounted on an app switch (AppFrame mounts only while
           active), which is what stops its per-second tick running behind
           another app. */}
@@ -311,10 +324,22 @@ export function Workspace() {
         <HandoffApp />
       </AppFrame>
 
+      {/* Clone. Unmounting closes any open link and stops the camera — and
+          since a clone is written only from the panel that received it, leaving
+          the app is also what discards one that was never applied. */}
+      <AppFrame active={activeApp === "clone"} name="Clone">
+        <CloneApp />
+      </AppFrame>
+
       {/* File Drop. Unmounting is what closes an open peer connection and
           releases the camera, so neither survives leaving the app. */}
       <AppFrame active={activeApp === "drop"} name="File Drop">
         <FileDropApp />
+      </AppFrame>
+
+      {/* Text Kit — pure local text operations, nothing to release on exit. */}
+      <AppFrame active={activeApp === "text"} name="Text Kit">
+        <TextKitApp />
       </AppFrame>
 
       {/* Assistant — the in-app AI guide. */}

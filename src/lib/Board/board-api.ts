@@ -4,7 +4,9 @@ import { KIND_BY_TYPE, SECTION_DEFAULTS, SECTION_KINDS } from "./catalog";
 import type { BoardSection, SectionItem, SectionType } from "./types";
 
 /** Single storage slot holding the whole board, like `sknotes:todos`. */
-const KEY = "sknotes:board";
+/** The one slot holding the whole board. Exported so a delete can be trashed. */
+export const BOARD_KEY = "sknotes:board";
+const KEY = BOARD_KEY;
 
 const TYPES: SectionType[] = SECTION_KINDS.map((k) => k.type);
 const isType = (v: unknown): v is SectionType => TYPES.includes(v as SectionType);

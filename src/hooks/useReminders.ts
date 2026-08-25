@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchReminders, saveReminders } from "@/lib/Reminders/reminders-api";
 import { DEFAULT_SOUND, type NewReminder, type Reminder } from "@/lib/Reminders/types";
 import { queryKeys } from "@/lib/query-keys";
+import { REMINDERS_KEY } from "@/lib/Reminders/reminders-api";
+import { itemPart, moveToTrash } from "@/lib/trash";
 import { uid } from "@/lib/utils";
 
 /** Reactive reminder collection (single source of truth). */
@@ -67,7 +69,18 @@ export function useReminderMutations() {
   });
 
   const remove = useMutation({
-    mutationFn: async (id: string) => commit(read().filter((r) => r.id !== id)),
+    mutationFn: async (id: string) => {
+      const reminder = read().find((r) => r.id === id);
+      if (reminder) {
+        await moveToTrash({
+          app: "reminders",
+          label: reminder.title,
+          detail: new Date(reminder.fireAt).toLocaleString(),
+          parts: [itemPart(REMINDERS_KEY, reminder)],
+        });
+      }
+      return commit(read().filter((r) => r.id !== id));
+    },
   });
 
   /** Replace the whole collection (used by the scheduler after firing). */

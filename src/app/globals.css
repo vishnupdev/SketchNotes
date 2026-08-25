@@ -147,15 +147,18 @@
   --app-nearby: #0369a1;
   --app-speed: #6d8bff;
   --app-news: #c2410c;
+  --app-streams: #d61f4e;
   --app-world: #1d63b8;
   --app-malayalam: #0891b2;
   --app-translate: #4f46e5;
   --app-assistant: #b026c9;
+  --app-text: #8a5a2b;
   --app-morse: #4d7c0f;
   --app-sound: #be123c;
   --app-color: #0d9488;
   --app-qr: #475569;
   --app-handoff: #0e7490;
+  --app-clone: #1d4ed8;
   --app-drop: #7c2d9e;
 
   /* QR codes are read by a camera, not by a person, so these two are the one
@@ -212,15 +215,18 @@
   --app-nearby: #38bdf8;
   --app-speed: #8ba4ff;
   --app-news: #fb7141;
+  --app-streams: #ff5470;
   --app-world: #5a9dfb;
   --app-malayalam: #22c3dd;
   --app-translate: #818cf8;
   --app-assistant: #e07ff0;
+  --app-text: #d8a15f;
   --app-morse: #a3e635;
   --app-sound: #fb7185;
   --app-color: #2dd4bf;
   --app-qr: #94a3b8;
   --app-handoff: #22d3ee;
+  --app-clone: #7aa5ff;
   --app-drop: #c084fc;
   --board-note: #fbbf24;
   --board-checklist: #4d94ff;

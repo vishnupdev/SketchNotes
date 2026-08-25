@@ -4,7 +4,7 @@ import { ACCESS_ITEMS, type AccessId } from "./catalog";
 /**
  * What each app in the workspace does with the device — the answer a browser's
  * site-settings screen can never give, because it sees one origin where there
- * are twenty-one apps.
+ * are two dozen apps.
  *
  * The permission-gated half is *derived* from `usedBy` in the catalog rather
  * than written twice, so the Access tab and the Apps tab can never disagree.
@@ -15,11 +15,14 @@ import { ACCESS_ITEMS, type AccessId } from "./catalog";
 /** What an app sends over the network, or null when it never does. */
 export const APP_NETWORK: Partial<Record<AppId, string>> = {
   news: "Fetches headlines through this site's own server route.",
+  streams:
+    "Searches YouTube through this site's own server route, then hands playback to YouTube's embed — the video itself is streamed from YouTube to your browser.",
   world: "Fetches a country's headlines; clocks and facts are bundled offline.",
   translate: "Online mode posts your text to this site's translate route. On-device mode sends nothing.",
   malayalam: "Handwriting recognition posts the strokes you draw. Typing and the keyboard stay local.",
   speed: "Downloads and uploads test payloads — that is the measurement.",
   system: "Looks up your public IP address.",
+  clone: "The copy runs device to device. Over a cable or on “this network only” nothing outside the two devices is contacted at all; “anywhere” asks a public STUN server for this device's address, and it never sees your data.",
   drop: "Files go straight to the other device. In “anywhere” mode a public STUN server is asked for this device's public address — it never sees the files; in “this network only” mode nothing outside the network is contacted at all.",
 };
 
@@ -37,6 +40,7 @@ export const APP_STORAGE_NOTE: Record<AppId, string> = {
   nearby: "Nothing — device grants are held by the browser, not by the page.",
   speed: "Your past speed-test results.",
   news: "Nothing beyond the cached responses the offline worker keeps.",
+  streams: "The videos you saved, and a short trail of what you played.",
   world: "Pinned cities and clock preferences.",
   malayalam: "The document you are writing and its formatting.",
   translate: "Your language choices.",
@@ -44,8 +48,10 @@ export const APP_STORAGE_NOTE: Record<AppId, string> = {
   sound: "Reference pitch, view and dB offset.",
   color: "Recently picked colours.",
   qr: "Codes you have scanned or made on this device.",
+  text: "The text you are working on, kept so a refresh doesn't lose it.",
   drop: "Nothing — files stream through and are written where you choose.",
   handoff: "Nothing — a transfer is held in memory only until you accept it.",
+  clone: "Nothing of its own — it reads this device's saved data to copy it, and writes the incoming copy into the apps it belongs to.",
   resources: "Nothing — this app only reads.",
 };
 

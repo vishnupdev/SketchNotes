@@ -98,6 +98,10 @@ the browser stops treating the workspace as evictable, or erase the lot. See
 | Share target | [`public/sw.js`](./public/sw.js) | The share sheet's POST is answered by the worker, so a shared file never reaches a server. |
 | Save in place | [`lib/download.ts`](./src/lib/download.ts) | Where the File System Access API exists, the PDF editor saves edits back to the file that was opened instead of downloading a copy. |
 | Handoff | [`components/Handoff/`](./src/components/Handoff) | Move data to another device over a chain of QR codes, or a QR-signalled WebRTC link on the local network. |
+| Clone | [`components/Clone/`](./src/components/Clone) | Copy a whole device — every app's data and every setting — onto another one: by cable (USB tethering, or a clone file carried on a drive), over a network, or with no network at all via a loop of QR codes. Verified whole before anything is written, and the receiving device is first shown a per-app plan of what would arrive, be replaced, be left alone or be deleted. |
+| Text Kit | [`components/TextKit/`](./src/components/TextKit) | Case, lines and counts; base64/URL/HTML/JSON-string codecs; JSON format, minify and a *located* parse error; line diff; regex workbench; SHA/CRC of text or a file. One shared, persisted draft, no network. |
+| Trash | [`lib/trash.ts`](./src/lib/trash.ts) | Deleted notes, tasks, reminders and board sections recoverable for 30 days from Settings → Recently deleted. Restores as storage operations, so it needs no code from the app the item came from. |
+| Content search | [`lib/palette/content.ts`](./src/lib/palette/content.ts) | Ctrl/⌘ + K also searches what is *in* the apps — note bodies, tasks, board rows — and opens the item itself. Readers load on first search, so nothing joins the initial bundle. |
 | File Drop | [`components/FileDrop/`](./src/components/FileDrop) | Send files of any size device-to-device over WebRTC — same network with no internet, or across networks via STUN. Streamed in chunks with backpressure both ways, verified per file, written into a chosen folder or streamed to disk through the service worker; an interrupted transfer resumes. |
 
 ### Files larger than memory
@@ -130,8 +134,9 @@ The whole workspace is usable with a weak connection or none at all. Four pieces
 
 Apps that are fully local — Sketchnotes, PDF Editor, Image Studio, Todos,
 Reminders, Timer, System Info, QR Codes, Handoff, Malayalam typing, on-device
-Translate, Assistant — behave identically offline, and File Drop's
-same-network mode contacts nothing outside it. The rest degrade explicitly rather
+Translate, Assistant — behave identically offline, and both File Drop's
+same-network mode and Clone's cable and no-network routes contact nothing
+outside the two devices. The rest degrade explicitly rather
 than failing silently. The worker is registered in production only (in dev it
 would fight HMR).
 
@@ -149,6 +154,8 @@ renderer, under a second:
   [File Drop's framing, checksums and name sanitiser](./src/lib/FileDrop/filedrop.test.ts) —
   including that a half-copied code says so, and that a file name from another device can't
   escape the folder it was told to write into;
+- the [clone reader and its plan](./src/lib/Clone/clone.test.ts), which decides what an
+  arriving clone would overwrite or delete on the device it lands on;
 - the [backup reader](./src/lib/backup/backup.test.ts) and
   [key attribution](./src/lib/storage-keys.test.ts), which decide what is written into
   storage;

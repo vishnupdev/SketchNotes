@@ -2,7 +2,9 @@ import { sGet, sSet } from "@/lib/storage";
 import type { Reminder, Repeat, SoundId } from "./types";
 
 /** Single storage slot holding the whole reminder collection. */
-const KEY = "sknotes:reminders";
+/** The one slot holding every reminder. Exported so a delete can be trashed. */
+export const REMINDERS_KEY = "sknotes:reminders";
+const KEY = REMINDERS_KEY;
 
 const SOUNDS: SoundId[] = ["chime", "bell", "beep", "digital", "marimba", "alert"];
 const REPEATS: Repeat[] = ["none", "daily", "weekly", "monthly"];

@@ -2,7 +2,9 @@ import { sGet, sSet } from "@/lib/storage";
 import type { Priority, Task } from "./types";
 
 /** Single storage slot holding the whole task collection. */
-const KEY = "sknotes:todos";
+/** The one slot holding every task. Exported so a delete can be trashed. */
+export const TODOS_KEY = "sknotes:todos";
+const KEY = TODOS_KEY;
 
 const PRIORITIES: Priority[] = ["low", "medium", "high"];
 const isPriority = (v: unknown): v is Priority => PRIORITIES.includes(v as Priority);

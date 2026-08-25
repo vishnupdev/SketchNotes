@@ -199,6 +199,24 @@ const NewsGlyph = (
   </svg>
 );
 
+const StreamsGlyph = (
+  // A screen with a play triangle and a pair of antennae: something being
+  // broadcast, and the press that starts it.
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="size-6"
+  >
+    <rect x="3.5" y="6" width="17" height="14" rx="2.5" />
+    <path d="M8.6 2.8 11.2 6M15.4 2.8 12.8 6" />
+    <path d="M10.4 10 15.4 13 10.4 16z" fill="currentColor" />
+  </svg>
+);
+
 const WorldClockGlyph = (
   // A globe with a clock set into it: the two halves of the app in one mark.
   <svg
@@ -364,6 +382,41 @@ const HandoffGlyph = (
   </svg>
 );
 
+const CloneGlyph = (
+  // Two identical devices, the second drawn out of the first by a curved arrow:
+  // a whole machine being copied, not a file being sent.
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="2.6" y="3.2" width="9" height="12.4" rx="1.7" />
+    <rect x="12.4" y="8.4" width="9" height="12.4" rx="1.7" />
+    <path d="M6 18.2a5.4 5.4 0 0 0 5.2 2.4" />
+    <path d="M5.2 15.9 6.1 18.4l2.5-.6" />
+  </svg>
+);
+
+const TextKitGlyph = (
+  // A letter and the lines it sits among: the app is letters (case, encoding)
+  // and lines (sort, dedupe, diff) in one place.
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M3.5 18.5 8 5.5l4.5 13" />
+    <path d="M5.6 14.2h4.8" />
+    <path d="M16 8.5h4.5M16 12.5h4.5M16 16.5h2.8" />
+  </svg>
+);
+
 const DropGlyph = (
   <svg
     viewBox="0 0 24 24"
@@ -472,6 +525,13 @@ export const APPS: AppEntry[] = [
     hue: "--app-news",
   },
   {
+    id: "streams",
+    name: "Streams",
+    tagline: "Music & live from YouTube",
+    icon: StreamsGlyph,
+    hue: "--app-streams",
+  },
+  {
     id: "world",
     name: "World Clock",
     tagline: "Live times worldwide",
@@ -491,6 +551,13 @@ export const APPS: AppEntry[] = [
     tagline: "Translate any text",
     icon: TranslateGlyph,
     hue: "--app-translate",
+  },
+  {
+    id: "text",
+    name: "Text Kit",
+    tagline: "Convert, compare & check text",
+    icon: TextKitGlyph,
+    hue: "--app-text",
   },
   {
     id: "morse",
@@ -526,6 +593,13 @@ export const APPS: AppEntry[] = [
     tagline: "Send data to another device",
     icon: HandoffGlyph,
     hue: "--app-handoff",
+  },
+  {
+    id: "clone",
+    name: "Clone",
+    tagline: "Copy this device onto another",
+    icon: CloneGlyph,
+    hue: "--app-clone",
   },
   {
     id: "drop",

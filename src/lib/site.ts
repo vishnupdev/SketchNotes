@@ -69,6 +69,12 @@ export const APPS: AppEntry[] = [
     blurb: "latest headlines by category — tech, software engineering, sports and more",
   },
   {
+    path: "/streams",
+    name: "Streams",
+    blurb:
+      "play music and live channels from YouTube — genre and language stations, live radio and news, search and a saved library",
+  },
+  {
     path: "/worldclock",
     name: "World Clock",
     blurb:
@@ -114,10 +120,22 @@ export const APPS: AppEntry[] = [
       "move your notes, tasks and boards to another device by camera — no account, no upload, no cable",
   },
   {
+    path: "/clone",
+    name: "Clone",
+    blurb:
+      "copy an entire device's workspace onto another one — over a USB cable, across a network, or with no network at all",
+  },
+  {
     path: "/drop",
     name: "File Drop",
     blurb:
       "send files of any size from any device to any device — peer-to-peer, with no upload and no account",
+  },
+  {
+    path: "/text",
+    name: "Text Kit",
+    blurb:
+      "text tools that run in your browser — case converter, line sorter, word count, base64 and URL encoder, JSON formatter, text diff, regex tester and SHA/CRC checksums",
   },
   {
     path: "/assistant",
@@ -177,6 +195,13 @@ export const SITE_KEYWORDS = [
   "cmyk color code",
   "color contrast checker",
   "what color is this",
+  "youtube music online",
+  "listen to music online free",
+  "youtube live streaming",
+  "live tv online",
+  "lofi radio online",
+  "online music player",
+  "watch youtube in one app",
   "world clock",
   "world time",
   "time zone converter",
@@ -228,6 +253,26 @@ export const SITE_KEYWORDS = [
   "send a file to another device",
   "webrtc file transfer",
   "no upload file sharing",
+  "json formatter online",
+  "text diff tool",
+  "compare two texts",
+  "base64 encode decode",
+  "regex tester online",
+  "sha256 hash online",
+  "file checksum in browser",
+  "word and character count",
+  "case converter online",
+  "sort lines remove duplicates",
+  "clone device data",
+  "copy everything to a new phone",
+  "move data to a new laptop",
+  "transfer data over a usb cable",
+  "usb tethering data transfer",
+  "migrate to a new device",
+  "switch phones keep my data",
+  "copy browser data to another computer",
+  "device migration without cloud",
+  "transfer data with no internet",
   "free ai assistant",
   "in-app ai guide",
   "on-device ai chat",

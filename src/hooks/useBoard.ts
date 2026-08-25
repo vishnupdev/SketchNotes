@@ -3,7 +3,15 @@
 import { useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { applyCommand } from "@/lib/Board/apply";
-import { clampText, clampTitle, fetchBoard, safeUrl, saveBoard } from "@/lib/Board/board-api";
+import {
+  BOARD_KEY,
+  clampText,
+  clampTitle,
+  fetchBoard,
+  safeUrl,
+  saveBoard,
+} from "@/lib/Board/board-api";
+import { itemPart, moveToTrash } from "@/lib/trash";
 import { parsePrompt } from "@/lib/Board/commands";
 import type { BoardCommand, BoardSection, SectionItem } from "@/lib/Board/types";
 import { queryKeys } from "@/lib/query-keys";
@@ -87,6 +95,26 @@ export function useBoardActions(): BoardActions {
       const result = applyCommand(before, command);
       if (result.sections) {
         if (result.undoable && opts?.undoable !== false) pushPast(before);
+        /*
+         * Undo already covers the last 25 changes of *this session*; the trash is
+         * what survives a reload. Only the two commands that destroy a whole
+         * section go in it — an unticked checkbox is not worth keeping for a
+         * month, and a removed card can be an afternoon's thinking.
+         */
+        if (command.kind === "remove" || command.kind === "clear") {
+          const gone =
+            command.kind === "remove"
+              ? before.filter((s) => s.id === command.id)
+              : before;
+          for (const section of gone) {
+            void moveToTrash({
+              app: "board",
+              label: section.title,
+              detail: `${section.type} · ${section.items.length} row${section.items.length === 1 ? "" : "s"}`,
+              parts: [itemPart(BOARD_KEY, section)],
+            });
+          }
+        }
         commit(result.sections);
       }
       // Deliberately no `setFocus` here: flashing and scrolling to a card is how

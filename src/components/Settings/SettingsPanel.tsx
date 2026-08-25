@@ -10,6 +10,7 @@ import { ThemeSetting } from "@/components/Settings/ThemeSetting";
 import { InterfaceSetting } from "@/components/Settings/InterfaceSetting";
 import { SoundSetting } from "@/components/Settings/SoundSetting";
 import { DataSetting } from "@/components/Settings/DataSetting";
+import { TrashSetting } from "@/components/Settings/TrashSetting";
 
 /**
  * One labelled block within the settings dialog. New settings go here.
@@ -174,6 +175,13 @@ export function SettingsPanel() {
             description="Your work lives in this browser and nowhere else. Save it to a file, bring a file back, or clear it out."
           >
             <DataSetting />
+          </Section>
+
+          <Section
+            title="Recently deleted"
+            description="Notes, tasks, reminders and board sections you delete are kept here for a month, so a slip can be undone."
+          >
+            <TrashSetting />
           </Section>
         </div>
       </div>

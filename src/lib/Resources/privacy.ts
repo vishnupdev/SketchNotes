@@ -58,7 +58,13 @@ export function readPrivacySignals(): PrivacySignal[] {
     },
     {
       label: "Secure context",
-      value: window.isSecureContext ? "Yes (HTTPS)" : "No",
+      // localhost is a secure context without being HTTPS, and calling it
+      // "HTTPS" on a dev machine would be a small lie in an app about honesty.
+      value: !window.isSecureContext
+        ? "No"
+        : window.location.protocol === "https:"
+          ? "Yes (HTTPS)"
+          : "Yes (local)",
       tone: window.isSecureContext ? "good" : "warn",
       note: "Camera, microphone and location are refused outright without it.",
     },

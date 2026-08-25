@@ -11,7 +11,7 @@ import { isDensityId, isUiStyleId } from "@/lib/ui-style";
 import { sDel, sGet, sSet } from "./storage";
 
 /** Storage-key helpers keep the key scheme in one place. */
-const KEY = {
+export const KEY = {
   index: "sknotes:index",
   note: (id: string) => `sknotes:${id}`,
   theme: "sknotes:theme",

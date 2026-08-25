@@ -5,6 +5,8 @@ import { fetchTodos, saveTodos } from "@/lib/Todos/todos-api";
 import type { NewTask, Task } from "@/lib/Todos/types";
 import { startOfDay } from "@/lib/Todos/dates";
 import { queryKeys } from "@/lib/query-keys";
+import { TODOS_KEY } from "@/lib/Todos/todos-api";
+import { itemPart, moveToTrash } from "@/lib/trash";
 import { uid } from "@/lib/utils";
 
 /** Reactive task collection. The list is the single source of truth; views
@@ -78,11 +80,35 @@ export function useTodoMutations() {
   });
 
   const remove = useMutation({
-    mutationFn: async (id: string) => commit(read().filter((t) => t.id !== id)),
+    mutationFn: async (id: string) => {
+      const task = read().find((t) => t.id === id);
+      if (task) {
+        await moveToTrash({
+          app: "todos",
+          label: task.title,
+          detail: task.notes || undefined,
+          parts: [itemPart(TODOS_KEY, task)],
+        });
+      }
+      return commit(read().filter((t) => t.id !== id));
+    },
   });
 
   const clearCompleted = useMutation({
-    mutationFn: async () => commit(read().filter((t) => !t.completed)),
+    mutationFn: async () => {
+      // One trash entry for the sweep rather than one per task: it was a single
+      // action, so it should be a single thing to put back.
+      const done = read().filter((t) => t.completed);
+      for (const task of done) {
+        await moveToTrash({
+          app: "todos",
+          label: task.title,
+          detail: "cleared with completed tasks",
+          parts: [itemPart(TODOS_KEY, task)],
+        });
+      }
+      return commit(read().filter((t) => !t.completed));
+    },
   });
 
   return { create, update, toggle, remove, clearCompleted };

@@ -22,6 +22,7 @@ export type AppId =
   | "nearby"
   | "speed"
   | "news"
+  | "streams"
   | "world"
   | "malayalam"
   | "translate"
@@ -31,7 +32,9 @@ export type AppId =
   | "resources"
   | "qr"
   | "handoff"
+  | "clone"
   | "drop"
+  | "text"
   | "assistant";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
@@ -50,6 +53,7 @@ const ALL_APPS: AppId[] = [
   "nearby",
   "speed",
   "news",
+  "streams",
   "world",
   "malayalam",
   "translate",
@@ -58,7 +62,9 @@ const ALL_APPS: AppId[] = [
   "color",
   "qr",
   "handoff",
+  "clone",
   "drop",
+  "text",
 ];
 
 const ORDER_KEY = "sknotes:app-order";

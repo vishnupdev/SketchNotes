@@ -22,8 +22,8 @@ const FILTERS: { id: Filter; label: string }[] = [
 /**
  * The Apps tab — the one view no browser can produce.
  *
- * A browser's site settings see a single origin; this workspace is twenty-one
- * apps behind that origin, so "oneappready.vercel.app may use your camera" is
+ * A browser's site settings see a single origin; this workspace is a whole
+ * shelf of apps behind that origin, so "oneappready.vercel.app may use your camera" is
  * true and useless. Here the same question is answered per app, and the storage
  * figures are attributed by walking this browser's own keys rather than being
  * asserted.

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useBoardActions } from "@/hooks/useBoard";
 import { splitLink } from "@/lib/Board/board-api";
 import { useIntakeStore } from "@/store/useIntakeStore";
+import { useFocusStore } from "@/store/useFocusStore";
 import { useBoardStore } from "@/store/useBoardStore";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { AppsIcon, BoardIcon } from "@/components/SketchNotes/atoms/icons";
@@ -72,6 +73,20 @@ export function BoardApp() {
     dispatch({ kind: "add", type: "links", title: SHARED_TITLE });
     setQueuedShare({ text: label, url });
   }, [dispatch, pendingText, sections, takeIntake]);
+
+  /*
+   * A section a palette search hit named. The board already knows how to scroll
+   * to and flash a card (that is how a typed command shows where it landed), so
+   * this only has to hand the id over.
+   */
+  const takeFocus = useFocusStore((s) => s.take);
+  const focusPending = useFocusStore((s) => s.app === "board");
+  const setFocusSection = useBoardStore((s) => s.setFocus);
+  useEffect(() => {
+    if (!focusPending) return;
+    const id = takeFocus("board");
+    if (id) setFocusSection(id);
+  }, [focusPending, setFocusSection, takeFocus]);
 
   // Second half of the above: drop the shared row into the section once it exists.
   useEffect(() => {

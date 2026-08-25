@@ -5,7 +5,7 @@ import { drawQr } from "@/lib/qr/encode";
 import { buildFrames } from "@/lib/qr/frames";
 import { cx } from "@/lib/utils";
 import { CheckIcon, CopyIcon, QrIcon } from "@/components/SketchNotes/atoms/icons";
-import { FramePlayer } from "@/components/Handoff/molecules/FramePlayer";
+import { FramePlayer } from "@/components/SketchNotes/molecules/FramePlayer";
 
 const BTN =
   "inline-flex items-center gap-2 rounded-full border border-border bg-panel px-3.5 py-2 text-[12.5px] font-semibold text-text transition-colors hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40";

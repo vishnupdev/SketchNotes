@@ -6,7 +6,7 @@ import type { BackupSummary, RestoreMode } from "@/lib/backup/types";
 import { acceptFrame, buildFrames, newCollector } from "@/lib/qr/frames";
 import { createReceiver, type HandoffLink } from "@/lib/Handoff/webrtc";
 import { startScanner, type Scanner } from "@/lib/qr/scanner";
-import { FramePlayer } from "@/components/Handoff/molecules/FramePlayer";
+import { FramePlayer } from "@/components/SketchNotes/molecules/FramePlayer";
 import { APP_MAP } from "@/components/AppCatalog";
 import { CameraIcon, StopIcon } from "@/components/SketchNotes/atoms/icons";
 import { cx, formatBytes } from "@/lib/utils";

@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { NoteDocument, NoteMeta } from "@/engine/types";
 import {
+  KEY,
   deleteNote,
   fetchNote,
   fetchNotesIndex,
@@ -10,6 +11,7 @@ import {
   saveNotesIndex,
 } from "@/lib/notes-api";
 import { queryKeys } from "@/lib/query-keys";
+import { itemPart, keyPart, moveToTrash } from "@/lib/trash";
 
 /** Reactive notes index (the drawer list), newest-first. */
 export function useNotesIndex() {
@@ -72,6 +74,24 @@ export function useNoteMutations() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
+      /*
+       * Captured before the delete, so a mis-tapped note is recoverable for a
+       * month (Settings → Data → Recently deleted). A drawing is the one thing
+       * in this workspace with no other copy anywhere, which is why it is the
+       * delete that most needed a net under it.
+       */
+      const meta = readIndex().find((n) => n.id === id);
+      const doc = await fetchNote(id);
+      await moveToTrash({
+        app: "sketchnotes",
+        label: doc.title || meta?.title || "Untitled note",
+        detail: `${doc.els.length} element${doc.els.length === 1 ? "" : "s"}`,
+        parts: [
+          keyPart(KEY.note(id), JSON.stringify(doc)),
+          ...(meta ? [itemPart(KEY.index, meta)] : []),
+        ],
+      });
+
       await deleteNote(id);
       const next = readIndex().filter((n) => n.id !== id);
       await persistIndex(next);

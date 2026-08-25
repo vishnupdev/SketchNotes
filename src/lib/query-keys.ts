@@ -9,6 +9,7 @@ export const queryKeys = {
   systemInfo: ["system-info"] as const,
   storageAudit: ["resources", "storage-audit"] as const,
   news: (tab: string) => ["news", tab] as const,
+  streams: (kind: string, query: string) => ["streams", kind, query] as const,
   countryNews: (code: string) => ["worldclock", "news", code] as const,
   translation: (mode: string, source: string, target: string, text: string) =>
     ["translation", mode, source, target, text] as const,

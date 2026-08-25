@@ -948,3 +948,32 @@ export const DropIcon = (p: IconProps) => (
     <path d="M12 11.4v5.2M9.9 14.4l2.1 2.2 2.1-2.2" />
   </Svg>
 );
+
+/**
+ * Two identical device outlines, the second drawn from the first by a curved
+ * arrow — a copy of a whole machine, not a file being sent.
+ */
+export const CloneIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="2.6" y="3.2" width="9" height="12.4" rx="1.7" />
+    <rect x="12.4" y="8.4" width="9" height="12.4" rx="1.7" />
+    <path d="M6 18.2a5.4 5.4 0 0 0 5.2 2.4" />
+    <path d="M5.2 15.9 6.1 18.4l2.5-.6" />
+  </Svg>
+);
+
+/** A hash sign — checksums and digests. */
+export const HashIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M9.4 3.6 7.9 20.4M16.1 3.6l-1.5 16.8M4.2 8.9h15.2M3.6 15.1h15.2" />
+  </Svg>
+);
+
+/** A capital A with a caret — text tools. */
+export const TextKitIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4.5 17.5 9.5 5.5h1.2l5 12" />
+    <path d="M6.6 13.4h7.4" />
+    <path d="M17.5 8.5v11M15.4 17.2l2.1 2.3 2.1-2.3" />
+  </Svg>
+);

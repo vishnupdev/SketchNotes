@@ -26,6 +26,7 @@ export const APP_LABELS: Record<AppId, string> = {
   nearby: "Nearby Devices",
   speed: "Network Speed",
   news: "News",
+  streams: "Streams",
   world: "World Clock",
   malayalam: "Malayalam Writer",
   translate: "Translate",
@@ -34,7 +35,9 @@ export const APP_LABELS: Record<AppId, string> = {
   color: "Color Lens",
   qr: "QR Codes",
   handoff: "Handoff",
+  clone: "Clone",
   drop: "File Drop",
+  text: "Text Kit",
   assistant: "Assistant",
 };
 
@@ -93,6 +96,20 @@ export const APP_ALIASES: Record<AppId, string[]> = {
   ],
   speed: ["network speed", "speed test", "speedtest", "internet speed", "bandwidth"],
   news: ["news", "headlines", "newspaper"],
+  streams: [
+    "streams",
+    "youtube",
+    "youtube music",
+    "music",
+    "songs",
+    "play music",
+    "listen to music",
+    "radio",
+    "live tv",
+    "live stream",
+    "live streaming",
+    "lofi",
+  ],
   world: [
     "world clock",
     "world time",
@@ -170,6 +187,43 @@ export const APP_ALIASES: Record<AppId, string[]> = {
     "move my data",
     "device transfer",
   ],
+  // "clone" and the phrases people use when they've bought a new machine. The
+  // bare word "copy" is left out: it belongs to copying text, not devices.
+  clone: [
+    "clone",
+    "clone my device",
+    "system clone",
+    "copy everything",
+    "new phone",
+    "new laptop",
+    "switching devices",
+    "switching phones",
+    "migrate",
+    "migration",
+    "move everything",
+    "set up my new device",
+    "transfer over a cable",
+    "usb transfer",
+    "copy without internet",
+  ],
+  text: [
+    "text kit",
+    "text tools",
+    "diff",
+    "compare two texts",
+    "base64",
+    "encode",
+    "decode",
+    "format json",
+    "json formatter",
+    "regex tester",
+    "word count",
+    "character count",
+    "checksum",
+    "sha256",
+    "hash a file",
+    "change case",
+  ],
   drop: [
     "file drop",
     "send a file",
@@ -216,6 +270,7 @@ export const APP_PATHS: Record<AppId, string> = {
   nearby: "/nearby",
   speed: "/speedtest",
   news: "/news",
+  streams: "/streams",
   world: "/worldclock",
   malayalam: "/malayalam",
   translate: "/translate",
@@ -224,7 +279,9 @@ export const APP_PATHS: Record<AppId, string> = {
   color: "/color",
   qr: "/qr",
   handoff: "/handoff",
+  clone: "/clone",
   drop: "/drop",
+  text: "/text",
   assistant: "/assistant",
 };
 
@@ -244,6 +301,8 @@ export const APP_SUMMARIES: Record<AppId, string> = {
     "find the devices around this machine, read what each one is and can do, and connect to them",
   speed: "download, upload, ping and jitter measurement",
   news: "headlines by category — tech, software engineering, sports, national, state, local, world",
+  streams:
+    "music stations and live channels from YouTube, played in a workspace tab",
   world: "live time in cities worldwide, with each country's facts, specialities and news",
   malayalam: "type Malayalam by Manglish, on-screen keyboard or handwriting",
   translate: "translate text online, or fully offline on-device",
@@ -252,7 +311,9 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   color: "read any colour out of a photo — every code, its name, contrast and palette",
   qr: "scan a QR code with the camera or from a picture, and make codes for links, Wi-Fi, contacts and more",
   handoff: "move this browser's data to another device by camera — no account, no upload, no cable",
+  clone: "copy this whole device onto another one — by cable, over a network, or with no network at all",
   drop: "send files of any size straight from one device to another, on the same network with no internet at all, or across the internet",
+  text: "the small jobs on text — case, lines, counts, base64, JSON, diff, regex and checksums, all done on this device",
   assistant: "this guide — ask what the workspace can do",
 };
 
@@ -610,6 +671,20 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     followUps: ["Which apps need internet?", "List all the apps"],
   },
   {
+    id: "app-streams",
+    title: "Streams — music and live channels from YouTube",
+    app: "streams",
+    keywords: ["streams", "youtube", "youtube music", "music", "song", "songs", "play music", "listen", "radio", "live", "live stream", "live streaming", "live tv", "lofi", "playlist", "watch a video", "bollywood", "malayalam songs"],
+    answer:
+      "Streams plays music and live channels from YouTube inside the workspace, in four sections:\n" +
+      "• Music — stations by genre and language scene (Lo-fi, Top hits, Bollywood, Malayalam, Tamil, Chill, Classical, Jazz, Rock, EDM and more)\n" +
+      "• Live — channels broadcasting right now: music radio, world and Indian news, sports, nature, space and study rooms\n" +
+      "• Search — anything on YouTube, filtered to everything, music, or live only\n" +
+      "• Library — what you saved and a short trail of what you played, both kept on this device\n" +
+      "Each station is a saved search rather than a pinned video, so it keeps working as streams start and end. The player shrinks to a bar while you browse and keeps playing, and stops when you leave the app. Playback is YouTube's own embed on its own domain, so views count for the creator; nothing is downloaded or re-hosted. It needs a connection.",
+    followUps: ["Which apps need internet?", "How do I check the news?", "List all the apps"],
+  },
+  {
     id: "app-world",
     title: "World Clock — live times, countries and their news",
     app: "world",
@@ -693,6 +768,22 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     followUps: ["Is my data private?", "What can Image Studio do?", "List all the apps"],
   },
   {
+    id: "app-clone",
+    title: "Clone — copy a whole device onto another one",
+    app: "clone",
+    keywords: ["clone", "clone my device", "system clone", "copy my device", "copy everything", "new phone", "new laptop", "new computer", "switching devices", "switching phones", "migrate", "migration", "move everything to my new device", "set up my new device", "transfer over a cable", "usb cable transfer", "usb tethering", "copy data without internet", "transfer without wifi", "move my whole workspace", "same data on both devices", "replace my old device"],
+    answer:
+      "Clone copies this entire workspace — every app's data and every setting — onto another device, down whichever route you have.\n" +
+      "• By cable — plug the two together and turn on USB tethering; the wire becomes a private network and the whole clone crosses in seconds, with no router, no internet and nothing else involved. If the cable can't carry a network, write a clone file to a USB drive or memory card and read it back on the other side\n" +
+      "• Over a network — the same direct link on one Wi-Fi. If the devices are on different networks, tick that box and a public STUN server is asked one question (what address this device looks like from outside); it never sees the clone\n" +
+      "• Without a network — the clone becomes a loop of QR codes and the other device reads them off this screen with its camera. No wire, no Wi-Fi, no internet at all\n" +
+      "• Before anything is written, the receiving device shows where the clone came from, what it holds app by app, and exactly what would change here — what arrives, what gets replaced, and what would be deleted\n" +
+      "• Two ways to land it: add it alongside what's already on the device, or make the device identical, which deletes anything the clone doesn't carry\n" +
+      "• Every clone carries a checksum and is verified whole before a single item is written, and the sending device gets a receipt saying what actually landed\n" +
+      "There's no server and no account anywhere in this: the clone goes straight from one device to the other. Handoff is the smaller version — a chosen app or two, by camera — where Clone moves the lot.",
+    followUps: ["How do I back up my work?", "Is my data private?", "What is Handoff?"],
+  },
+  {
     id: "app-assistant",
     title: "The Assistant — how this guide works",
     app: "assistant",
@@ -712,7 +803,8 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "Which apps need an internet connection",
     keywords: ["internet", "connection", "network", "need wifi", "which apps need internet", "works offline", "online only"],
     answer:
-      "Only four things need a connection:\n" +
+      "Only these need a connection:\n" +
+      "• Streams — the music and live channels come from YouTube\n" +
       "• News — headlines are fetched live\n" +
       "• Network Speed — it measures a real connection\n" +
       "• Online translation — offline mode avoids this entirely\n" +

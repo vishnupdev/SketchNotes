@@ -7,7 +7,7 @@ import { pickEntries, readSendGroups, groupId, type SendGroup } from "@/lib/Hand
 import { createSender, webrtcSupported, type HandoffLink } from "@/lib/Handoff/webrtc";
 import { startScanner, type Scanner } from "@/lib/qr/scanner";
 import { DataPicker } from "@/components/Handoff/molecules/DataPicker";
-import { FramePlayer } from "@/components/Handoff/molecules/FramePlayer";
+import { FramePlayer } from "@/components/SketchNotes/molecules/FramePlayer";
 import { cx, formatBytes } from "@/lib/utils";
 
 const BTN =

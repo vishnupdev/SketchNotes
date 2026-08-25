@@ -45,8 +45,8 @@
 // chunk, not just the ones visited) and query-tolerant static lookups; v8 adds
 // the /nearby route; v10 adds the share target, background reminder checks and
 // the /qr and /handoff routes; v11 adds the /drop route and File Drop's
-// streaming downloads.
-const VERSION = "oneapp-v11";
+// streaming downloads; v12 adds the /clone route.
+const VERSION = "oneapp-v12";
 const SHELL_CACHE = `oneapp-shell-${VERSION}`;
 const STATIC_CACHE = `oneapp-static-${VERSION}`;
 const DATA_CACHE = `oneapp-data-${VERSION}`;
@@ -109,6 +109,7 @@ const SHELL_URLS = [
   "/nearby",
   "/speedtest",
   "/news",
+  "/streams",
   "/worldclock",
   "/malayalam",
   "/translate",
@@ -117,7 +118,9 @@ const SHELL_URLS = [
   "/color",
   "/qr",
   "/handoff",
+  "/clone",
   "/drop",
+  "/text",
   "/assistant",
 ];
 
@@ -135,8 +138,8 @@ const CORE_ASSET_URLS = ["/manifest.webmanifest", "/icon.svg", "/pdf.worker.min.
  */
 const BUILD_MANIFEST_URL = "/precache-manifest.json";
 
-/** Remote hosts whose images may be cached (news publisher logos, country flags). */
-const MEDIA_HOSTS = ["www.google.com", "news.google.com", "flagcdn.com"];
+/** Remote hosts whose images may be cached (news publisher logos, country flags, video art). */
+const MEDIA_HOSTS = ["www.google.com", "news.google.com", "flagcdn.com", "i.ytimg.com"];
 
 /*
  * Share target. The manifest points the platform's share sheet at this path; the
@@ -356,13 +359,16 @@ function isRevalidatingAsset(url) {
 }
 
 /**
- * Same-origin API responses safe to replay from cache: news headlines (stale
- * beats blank) and translations (deterministic for a given query, so a cached
- * hit is the same answer the network would give).
+ * Same-origin API responses safe to replay from cache: news headlines and
+ * stream listings (stale beats blank — a station still shows what it found last
+ * time, even though playing it needs the network) and translations
+ * (deterministic for a given query, so a cached hit is the same answer the
+ * network would give).
  */
 function isCacheableApi(url) {
   return (
     url.pathname === "/api/news" ||
+    url.pathname === "/api/streams" ||
     url.pathname === "/api/worldclock/news" ||
     url.pathname === "/api/translate"
   );

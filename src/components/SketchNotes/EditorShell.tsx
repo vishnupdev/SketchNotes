@@ -13,6 +13,7 @@ import { Zoomer } from "@/components/SketchNotes/molecules/Zoomer";
 import { RefreshButton } from "@/components/SketchNotes/molecules/RefreshButton";
 import { Toast } from "@/components/SketchNotes/atoms/Toast";
 import { useIntakeStore } from "@/store/useIntakeStore";
+import { useFocusStore } from "@/store/useFocusStore";
 
 /** Registers global shortcuts; kept as a child so it sits inside the context. */
 function ShortcutBridge() {
@@ -43,6 +44,27 @@ function IntakeConsumer() {
 }
 
 /**
+ * Opens the note a palette search hit named.
+ *
+ * A child of the provider, like the others here, because opening a note is an
+ * editor command. The target is *taken* (which clears it), so remounting the
+ * shell cannot jump the user somewhere a second time.
+ */
+function FocusConsumer() {
+  const { openNote } = useEditorCommands();
+  const takeFocus = useFocusStore((s) => s.take);
+  const pending = useFocusStore((s) => s.app === "sketchnotes");
+
+  useEffect(() => {
+    if (!pending) return;
+    const id = takeFocus("sketchnotes");
+    if (id) void openNote(id);
+  }, [openNote, pending, takeFocus]);
+
+  return null;
+}
+
+/**
  * Editor page composition. Owns the canvas element refs, spins up the engine
  * orchestrator, and lays out the full chrome around the drawing surface.
  */
@@ -57,6 +79,7 @@ export function EditorShell() {
     <EditorContext.Provider value={commands}>
       <ShortcutBridge />
       <IntakeConsumer />
+      <FocusConsumer />
       <Header />
       <CanvasStage stageRef={stageRef} bgRef={bgRef} cvRef={cvRef} />
       <SelectionChip />

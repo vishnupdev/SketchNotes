@@ -5,18 +5,23 @@ import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { useAssistantStore } from "@/store/useAssistantStore";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useTheme } from "@/hooks/useTheme";
-import { APP_MAP } from "@/components/AppCatalog";
+import { APP_MAP, chipGradient } from "@/components/AppCatalog";
 import { TOOLS } from "@/components/PdfEditor/catalog";
 import { THEMES } from "@/lib/themes";
 import { buildPaletteCommands, type PaletteContext } from "@/lib/palette/commands";
 import { APP_SEARCH_TERMS } from "@/lib/palette/terms";
 import { scoreCommand } from "@/lib/palette/match";
+import { MIN_CONTENT_QUERY, searchContent, type ContentHit } from "@/lib/palette/content";
+import { useFocusStore } from "@/store/useFocusStore";
 import { PaletteRow } from "@/components/Palette/molecules/PaletteRow";
 import { AssistantIcon, SearchIcon } from "@/components/SketchNotes/atoms/icons";
 import { cx } from "@/lib/utils";
 
 /** How many rows to show at once. Enough to scan, short enough to stay a list. */
 const MAX_ROWS = 8;
+
+/** How long to wait after a keystroke before reading the user's data. */
+const CONTENT_DEBOUNCE_MS = 180;
 
 const GROUP_LABEL = {
   app: "Apps",
@@ -52,6 +57,8 @@ export function CommandPalette() {
 
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
+  const [hits, setHits] = useState<ContentHit[]>([]);
+  const requestFocus = useFocusStore((s) => s.request);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -105,13 +112,15 @@ export function CommandPalette() {
   const trimmed = query.trim();
   /** Offered when nothing matches, or when the query reads like a sentence. */
   const showAsk = trimmed.length > 2 && (matches.length === 0 || trimmed.includes(" "));
-  const rowCount = matches.length + (showAsk ? 1 : 0);
+  /** Commands first, then things found in the user's data, then the Assistant. */
+  const rowCount = matches.length + hits.length + (showAsk ? 1 : 0);
 
   // Reset on every open, so the palette never reopens mid-search.
   useEffect(() => {
     if (!open) return;
     setQuery("");
     setCursor(0);
+    setHits([]);
     // The input is inside a dialog that fades in; focus on the next frame so
     // the caret lands after the transition rather than fighting it.
     const id = requestAnimationFrame(() => inputRef.current?.focus());
@@ -122,6 +131,31 @@ export function CommandPalette() {
     setCursor(0);
   }, [query]);
 
+  /*
+   * Content search: the note, task or card the query names, rather than the app
+   * that holds it. Debounced and gated on a few characters, because this reads
+   * every app's data — and skipped entirely while the palette is shut, so it
+   * costs nothing until someone types.
+   */
+  useEffect(() => {
+    if (!open) return;
+    const text = query.trim();
+    if (text.length < MIN_CONTENT_QUERY) {
+      setHits([]);
+      return;
+    }
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void searchContent(text).then((found) => {
+        if (!cancelled) setHits(found);
+      });
+    }, CONTENT_DEBOUNCE_MS);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [open, query]);
+
   // Keep the selected row in view when it moves off the visible list.
   useEffect(() => {
     listRef.current
@@ -131,17 +165,31 @@ export function CommandPalette() {
 
   const run = useCallback(
     (index: number) => {
-      if (showAsk && index === matches.length) {
-        ctx.ask(trimmed);
+      // A command…
+      const command = matches[index];
+      if (command) {
+        command.run(ctx);
         closePalette();
         return;
       }
-      const command = matches[index];
-      if (!command) return;
-      command.run(ctx);
-      closePalette();
+      // …then something found in the data…
+      const hit = hits[index - matches.length];
+      if (hit) {
+        // The target is left for the app to pick up; apps that can't focus
+        // anything simply open, which is still where the user wanted to be.
+        if (hit.target) requestFocus(hit.app, hit.target);
+        if (hit.app === "pdf") ctx.setPdfTool(null);
+        ctx.setActiveApp(hit.app);
+        closePalette();
+        return;
+      }
+      // …and finally the offer to ask the Assistant.
+      if (showAsk && index === matches.length + hits.length) {
+        ctx.ask(trimmed);
+        closePalette();
+      }
     },
-    [closePalette, ctx, matches, showAsk, trimmed],
+    [closePalette, ctx, hits, matches, requestFocus, showAsk, trimmed],
   );
 
   const onKeyDown = (e: React.KeyboardEvent) => {
@@ -255,16 +303,64 @@ export function CommandPalette() {
             );
           })}
 
+          {hits.length > 0 && (
+            <li
+              role="presentation"
+              className="px-2.5 pb-1 pt-2 text-[11px] font-bold uppercase tracking-[.6px] text-ink-soft"
+            >
+              Found in your data
+            </li>
+          )}
+          {hits.map((hit, i) => {
+            const index = matches.length + i;
+            const app = APP_MAP[hit.app];
+            return (
+              <li role="presentation" key={hit.id}>
+                <button
+                  type="button"
+                  id={`palette-row-${index}`}
+                  role="option"
+                  aria-selected={index === cursor}
+                  tabIndex={-1}
+                  onClick={() => run(index)}
+                  onPointerMove={() => setCursor(index)}
+                  className={cx(
+                    "flex w-full items-center gap-3 rounded-xl border px-2.5 py-2 text-left transition-colors",
+                    index === cursor
+                      ? "border-accent bg-accent-soft"
+                      : "border-transparent hover:bg-paper",
+                  )}
+                >
+                  <span
+                    style={{ "--chip-grad": chipGradient(app?.hue ?? "--accent") } as React.CSSProperties}
+                    className="grid size-8 shrink-0 place-items-center rounded-[9px] bg-(image:--chip-grad) text-white [&>svg]:size-4"
+                  >
+                    {app?.icon}
+                  </span>
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-[13.5px] font-semibold tracking-[.1px]">
+                      {hit.title}
+                    </span>
+                    <span className="truncate text-[11.5px] text-ink-soft">
+                      {app?.name ?? hit.app}
+                      {hit.snippet ? ` · ${hit.snippet}` : ""}
+                    </span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+
           {showAsk && (
             <li role="presentation">
               <button
                 type="button"
-                id={`palette-row-${matches.length}`}
+                id={`palette-row-${matches.length + hits.length}`}
                 role="option"
-                aria-selected={cursor === matches.length}
+                aria-selected={cursor === matches.length + hits.length}
                 tabIndex={-1}
-                onClick={() => run(matches.length)}
-                onPointerMove={() => setCursor(matches.length)}
+                onClick={() => run(matches.length + hits.length)}
+                onPointerMove={() => setCursor(matches.length + hits.length)}
                 className={cx(
                   "mt-1 flex w-full items-center gap-3 rounded-xl border px-2.5 py-2 text-left transition-colors",
                   cursor === matches.length
@@ -302,7 +398,7 @@ export function CommandPalette() {
           <kbd className="ml-1.5 rounded-md border border-border bg-paper px-1.5 py-0.5 font-sans text-[10.5px] font-semibold">
             Enter
           </kbd>
-          to open · anything else goes to the Assistant
+          to open · apps, tools and your own notes and tasks
         </p>
       </div>
     </div>

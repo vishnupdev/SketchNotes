@@ -34,6 +34,7 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   nearby: () => import("@/components/Nearby/NearbyApp").then((m) => m.NearbyApp),
   speed: () => import("@/components/NetworkSpeed/NetworkSpeedApp").then((m) => m.NetworkSpeedApp),
   news: () => import("@/components/News/NewsApp").then((m) => m.NewsApp),
+  streams: () => import("@/components/Streams/StreamsApp").then((m) => m.StreamsApp),
   world: () => import("@/components/WorldClock/WorldClockApp").then((m) => m.WorldClockApp),
   malayalam: () =>
     import("@/components/MalayalamWriter/MalayalamWriterApp").then((m) => m.MalayalamWriterApp),
@@ -44,7 +45,9 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   assistant: () => import("@/components/Assistant/AssistantApp").then((m) => m.AssistantApp),
   qr: () => import("@/components/QrTool/QrToolApp").then((m) => m.QrToolApp),
   handoff: () => import("@/components/Handoff/HandoffApp").then((m) => m.HandoffApp),
+  clone: () => import("@/components/Clone/CloneApp").then((m) => m.CloneApp),
   drop: () => import("@/components/FileDrop/FileDropApp").then((m) => m.FileDropApp),
+  text: () => import("@/components/TextKit/TextKitApp").then((m) => m.TextKitApp),
 };
 
 /**
@@ -63,7 +66,9 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "color",
   "qr",
   "handoff",
+  "clone",
   "drop",
+  "text",
   "translate",
   "malayalam",
   "image",
@@ -72,6 +77,7 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "nearby",
   "speed",
   "news",
+  "streams",
   "world",
   "pdf",
 ];
@@ -89,6 +95,7 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   nearby: "Nearby Devices",
   speed: "Speed Test",
   news: "News",
+  streams: "Streams",
   world: "World Clock",
   malayalam: "Malayalam Writer",
   translate: "Translate",
@@ -97,6 +104,8 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   color: "Color Lens",
   qr: "QR Codes",
   handoff: "Handoff",
+  clone: "Clone",
   drop: "File Drop",
+  text: "Text Kit",
   assistant: "Assistant",
 };
