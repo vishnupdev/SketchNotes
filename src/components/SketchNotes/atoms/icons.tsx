@@ -970,10 +970,101 @@ export const HashIcon = (p: IconProps) => (
 );
 
 /** A capital A with a caret — text tools. */
+/** A signpost: two arms pointing opposite ways — directions, which is the job. */
+export const WalkaroundIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3.2v17.6" />
+    <path d="M12 6.2h6.4l2 2.4-2 2.4H12" />
+    <path d="M12 13h-6.4l-2 2.4 2 2.4H12" />
+  </Svg>
+);
+
 export const TextKitIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d="M4.5 17.5 9.5 5.5h1.2l5 12" />
     <path d="M6.6 13.4h7.4" />
     <path d="M17.5 8.5v11M15.4 17.2l2.1 2.3 2.1-2.3" />
+  </Svg>
+);
+
+/** A page inside camera corner-marks — a document being framed to scan. */
+export const ScanDocIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.4 8.2V5.6a2.2 2.2 0 0 1 2.2-2.2h2.6M15.8 3.4h2.6a2.2 2.2 0 0 1 2.2 2.2v2.6M20.6 15.8v2.6a2.2 2.2 0 0 1-2.2 2.2h-2.6M8.2 20.6H5.6a2.2 2.2 0 0 1-2.2-2.2v-2.6" />
+    <path d="M8.6 9.4h6.8M8.6 12h6.8M8.6 14.6h4.2" />
+  </Svg>
+);
+
+/** A billfold with a card sliding out — money kept, not banked. */
+export const WalletIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.4 8.4A2 2 0 0 1 5.4 6.4h13.2a2 2 0 0 1 2 2v8.4a2 2 0 0 1-2 2H5.4a2 2 0 0 1-2-2z" />
+    <path d="M3.4 10.6h11.2a1.4 1.4 0 0 1 1.4 1.4v1.4a1.4 1.4 0 0 1-1.4 1.4H3.4" />
+    <path d="M16.6 6.4 15 3.8a1.2 1.2 0 0 0-1.5-.5L6.6 6.4" />
+  </Svg>
+);
+
+/** A microphone over a waveform — a recording with something in it. */
+export const VoiceMemoIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="9.4" y="2.8" width="5.2" height="9.6" rx="2.6" />
+    <path d="M6.2 10.6a5.8 5.8 0 0 0 11.6 0" />
+    <path d="M12 16.4v2.2" />
+    <path d="M5.4 20.8v-1.6M8.7 20.8v-2.8M12 20.8v-1.2M15.3 20.8v-2.8M18.6 20.8v-1.6" />
+  </Svg>
+);
+
+/** Two opposed arrows between unlike marks — one quantity read as another. */
+export const ConvertIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.6 8.6h11.6M12.4 5.4l3 3.2-3 3.2" />
+    <path d="M20.4 15.4H8.8M11.6 12.2l-3 3.2 3 3.2" />
+  </Svg>
+);
+
+/** Braces around a bolt — a request fired at an endpoint. */
+export const ApiIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M7.6 4.2C5.4 4.2 5.9 10 3.6 10c2.3 0 1.8 5.8 4 5.8" />
+    <path d="M16.4 19.8c2.2 0 1.7-5.8 4-5.8-2.3 0-1.8-5.8-4-5.8" />
+    <path d="M13.2 8.2 10 13.4h3.4l-1 4 3.2-5.2h-3.4z" />
+  </Svg>
+);
+
+/** Angle brackets over a stacked card — a saved fragment of code. */
+export const SnippetIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M6.6 3.4h9.2a2 2 0 0 1 2 2v9.2a2 2 0 0 1-2 2H6.6a2 2 0 0 1-2-2V5.4a2 2 0 0 1 2-2Z" />
+    <path d="M9.4 7.8 7.2 10l2.2 2.2M13 7.8 15.2 10 13 12.2" />
+    <path d="M8.4 19.4a2 2 0 0 0 2 1.2h6.8a2.6 2.6 0 0 0 2.6-2.6V9.6" />
+  </Svg>
+);
+
+/** The Markdown mark — an M beside a down-caret, inside its frame. */
+export const MarkdownIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="2.6" y="5.6" width="18.8" height="12.8" rx="2.2" />
+    <path d="M5.8 15.4V9l2.6 3.2L11 9v6.4" />
+    <path d="M15.2 9v4.6M13.2 12.4l2 2.4 2-2.4" />
+  </Svg>
+);
+
+/** A clock whose hands are set against a repeat notch — when a job next fires. */
+export const ChronoIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M20.4 12a8.4 8.4 0 1 1-2.8-6.3" />
+    <path d="M20.6 3.6v3.9h-3.9" />
+    <path d="M12 7.6V12l3 1.9" />
+  </Svg>
+);
+
+/** Overlapping swatches, one half-filled — a palette measured, not just shown. */
+export const SwatchIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.2" y="3.2" width="9" height="9" rx="1.8" />
+    <path d="M7.7 3.2v9" />
+    <rect x="11.8" y="11.8" width="9" height="9" rx="1.8" />
+    <path d="M11.8 16.3h9" />
+    <path d="M14.6 7.7h6.2M6 14.6v6.2" />
   </Svg>
 );

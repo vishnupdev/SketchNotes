@@ -39,6 +39,16 @@ export const APP_LABELS: Record<AppId, string> = {
   drop: "File Drop",
   text: "Text Kit",
   assistant: "Assistant",
+  walk: "Walkaround",
+  scan: "Scan",
+  wallet: "Wallet",
+  voice: "Voice Memos",
+  convert: "Convert",
+  api: "API Client",
+  snippets: "Snippets",
+  markdown: "Markdown",
+  chrono: "Chrono",
+  contrast: "Contrast",
 };
 
 /**
@@ -236,6 +246,125 @@ export const APP_ALIASES: Record<AppId, string[]> = {
     "send a video",
   ],
   assistant: ["assistant", "guide", "ai agent", "helper", "chatbot"],
+  walk: [
+    "walkaround",
+    "walk around",
+    "guided tour",
+    "tour",
+    "show me around",
+    "show me how",
+    "take me round",
+    "walkthrough",
+    "walk through",
+    "tutorial",
+    "onboarding",
+    "how do i use this",
+    "tooltips",
+  ],
+  scan: [
+    "scan",
+    "scanner",
+    "document scanner",
+    "scan a document",
+    "scan to pdf",
+    "scan a receipt",
+    "photograph a page",
+    "straighten a page",
+    "deskew",
+  ],
+  wallet: [
+    "wallet",
+    "expenses",
+    "expense tracker",
+    "spending",
+    "spend tracker",
+    "budget",
+    "my money",
+    "track my spending",
+    "split the bill",
+    "split a bill",
+    "who owes what",
+  ],
+  voice: [
+    "voice memos",
+    "voice memo",
+    "voice recorder",
+    "record my voice",
+    "record audio",
+    "dictate",
+    "dictation",
+    "transcribe",
+    "transcription",
+    "speech to text",
+  ],
+  convert: [
+    "convert",
+    "converter",
+    "unit converter",
+    "convert units",
+    "currency converter",
+    "exchange rate",
+    "kg to pounds",
+    "celsius to fahrenheit",
+    "how many",
+  ],
+  api: [
+    "api client",
+    "api tester",
+    "rest client",
+    "http request",
+    "send a request",
+    "postman",
+    "curl",
+    "test an endpoint",
+    "call an api",
+  ],
+  snippets: [
+    "snippets",
+    "snippet",
+    "code snippets",
+    "save some code",
+    "my snippets",
+    "boilerplate",
+    "code library",
+  ],
+  markdown: [
+    "markdown",
+    "markdown editor",
+    "write markdown",
+    "readme",
+    "mermaid",
+    "mermaid diagram",
+    "preview markdown",
+  ],
+  chrono: [
+    "chrono",
+    "cron",
+    "crontab",
+    "cron expression",
+    "explain a cron",
+    "when does this run",
+    "timestamp",
+    "unix timestamp",
+    "epoch",
+    "epoch time",
+    "duration",
+    "how long is",
+  ],
+  contrast: [
+    "contrast",
+    "contrast checker",
+    "wcag",
+    "accessibility check",
+    "a11y",
+    "colour ramp",
+    "color ramp",
+    "design tokens",
+    "colour blind",
+    "color blind",
+    "colour blindness",
+    "is this readable",
+  ],
 };
 
 /**
@@ -283,6 +412,16 @@ export const APP_PATHS: Record<AppId, string> = {
   drop: "/drop",
   text: "/text",
   assistant: "/assistant",
+  walk: "/walkaround",
+  scan: "/scan",
+  wallet: "/wallet",
+  voice: "/voice",
+  convert: "/convert",
+  api: "/apiclient",
+  snippets: "/snippets",
+  markdown: "/markdown",
+  chrono: "/chrono",
+  contrast: "/contrast",
 };
 
 /** One-line summary per app, used when listing the whole workspace. */
@@ -315,6 +454,24 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   drop: "send files of any size straight from one device to another, on the same network with no internet at all, or across the internet",
   text: "the small jobs on text — case, lines, counts, base64, JSON, diff, regex and checksums, all done on this device",
   assistant: "this guide — ask what the workspace can do",
+  walk:
+    "a guided tour of any app here — a drawing of its screen, with a tooltip on each control saying what it does and what to try",
+  scan:
+    "photograph a page and get a PDF — you mark the four corners and it is flattened, not just cropped",
+  wallet:
+    "log what you spent in a few seconds, see where the month went, and split a bill fairly down to the last paisa",
+  voice:
+    "record a memo and, optionally, transcribe it as you speak — so you can search what you said months later",
+  convert:
+    "units of every kind — length, weight, temperature, data, fuel — plus currency at the latest published rate",
+  api: "build an HTTP request, send it, and read the reply, with the equivalent curl command beside it",
+  snippets: "the code you keep looking up, tagged and searchable, with copy on every card",
+  markdown:
+    "write markdown with a live preview, Mermaid diagrams and a table of contents, then export it as .md or a standalone HTML file",
+  chrono:
+    "explain a cron expression and show when it next fires, read any timestamp in every form, and do arithmetic on durations",
+  contrast:
+    "grade a colour pair against every WCAG level, build a 50–950 token ramp, and preview a palette under colour-vision deficiency",
 };
 
 export const KNOWLEDGE: KnowledgeEntry[] = [
@@ -324,11 +481,13 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "What OneApp is",
     keywords: ["oneapp", "one app", "overview", "about", "what is this", "workspace", "summary", "purpose", "intro"],
     answer:
-      "OneApp is a single web workspace holding twenty-one tools, so you never install twenty-one apps.\n" +
-      "• Creative: Sketchnotes canvas, Image Studio, PDF Editor\n" +
-      "• Planning: Board, Todos, Reminders, Timer\n" +
-      "• Info: News, World Clock, System Info, Resource Monitor, Nearby Devices, Network Speed, Sound Meter, Color Lens\n" +
-      "• Language: Translate, Malayalam Writer, Morse Code, and me — the Assistant\n" +
+      "OneApp is a single web workspace holding thirty-five tools, so you never install thirty-five apps.\n" +
+      "• Creative: Sketchnotes canvas, Image Studio, PDF Editor, Scan, Markdown\n" +
+      "• Planning: Board, Todos, Reminders, Timer, Wallet, Voice Memos\n" +
+      "• Info: News, World Clock, System Info, Resource Monitor, Nearby Devices, Network Speed, Sound Meter, Color Lens, Convert\n" +
+      "• Making things: Snippets, Chrono, Contrast, API Client, Text Kit, QR Codes\n" +
+      "• Moving things: Handoff, Clone, File Drop, Streams\n" +
+      "• Language: Translate, Malayalam Writer, Morse Code, and me — the Assistant, alongside Walkaround\n" +
       "Everything is free, needs no account, and keeps your data in your own browser.",
     followUps: ["List all the apps", "Is my data private?", "Does it work offline?"],
   },
@@ -352,8 +511,8 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "OneApp is a PWA: after your first visit it saves itself on your device, so every app opens with no connection — including a fresh reload of any app's link.\n" +
       "• Every app is downloaded in the background on a healthy connection; to force it (before a flight, say) open Settings → Offline → Save all apps for offline\n" +
       "• Install it from your browser's Install / Add to Home Screen option to get an app icon and its own window\n" +
-      "• Fully offline: Sketchnotes, PDF Editor, Image Studio, Board, Todos, Reminders, Timer, System Info, Nearby Devices, Sound Meter, Color Lens, World Clock (clocks and country details), Malayalam typing/keyboard, on-device Translate, and me\n" +
-      "• Needs a connection: News and World Clock headlines (saved ones still open), online translation (past phrases still open), handwriting recognition and the speed test\n" +
+      "• Fully offline: Sketchnotes, PDF Editor, Image Studio, Board, Todos, Reminders, Timer, System Info, Nearby Devices, Sound Meter, Color Lens, Scan, Wallet, Snippets, Markdown, Chrono, Contrast, Convert's units, Voice Memos' recording, World Clock (clocks and country details), Malayalam typing/keyboard, on-device Translate, Walkaround, and me\n" +
+      "• Needs a connection: News and World Clock headlines (saved ones still open), online translation (past phrases still open), handwriting recognition, the speed test, Convert's currency rates (the last ones are kept and dated), Voice Memos' transcription, and the API Client — every request it sends is relayed by the server, so it needs the network\n" +
       "• On a weak or metered connection it serves saved content instead of stalling, and skips optional downloads like news logos",
     followUps: ["Is my data private?", "Which apps need internet?", "List all the apps"],
   },
@@ -795,6 +954,21 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "• If your browser has a built-in on-device AI model, I use it to phrase answers naturally; otherwise the bundled engine answers. Either way the work happens on your device\n" +
       "• Your questions never leave the browser, and the conversation is saved locally so it's still here when you return",
     followUps: ["List all the apps", "What is OneApp?", "Is my data private?"],
+  },
+
+  {
+    id: "app-walk",
+    title: "Walkaround — a guided tour of any app",
+    app: "walk",
+    keywords: ["walkaround", "walk around", "tour", "guided tour", "walkthrough", "tutorial", "onboarding", "show me around", "show me how", "take me through", "how do i use this", "where is", "tips", "tooltips", "getting started", "new here", "learn the app", "what can this app do"],
+    answer:
+      "Walkaround shows you round an app instead of telling you about it. Pick any app and it plays a short guided tour of that one.\n" +
+      "• Each stop is a tooltip on a drawing of that app's screen — its header, its working area, its tabs — pointing at one control and saying where it is and what it does\n" +
+      "• Every stop also carries a suggestion: the shortcut, the combination or the caveat you would otherwise find out on your third visit\n" +
+      "• Step with the arrow keys, or tap a numbered pin to jump straight to a stop; the whole tour is written out underneath the drawing as well\n" +
+      "• Open takes you into the real app when you have read it, and finishing a tour ticks that app off, so you can see which ones you have been shown\n" +
+      "It only ever reads: nothing you do here changes the app it is describing, and it works offline like the rest of the workspace.",
+    followUps: ["List all the apps", "What is OneApp?", "How do I switch apps?"],
   },
 
   // ── Cross-cutting how-tos ────────────────────────────────────────────────

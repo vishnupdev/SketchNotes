@@ -152,6 +152,7 @@
   --app-malayalam: #0891b2;
   --app-translate: #4f46e5;
   --app-assistant: #b026c9;
+  --app-walk: #8a6d0f;
   --app-text: #8a5a2b;
   --app-morse: #4d7c0f;
   --app-sound: #be123c;
@@ -160,6 +161,15 @@
   --app-handoff: #0e7490;
   --app-clone: #1d4ed8;
   --app-drop: #7c2d9e;
+  --app-scan: #3f6212;
+  --app-wallet: #047857;
+  --app-voice: #9d174d;
+  --app-convert: #6d28d9;
+  --app-markdown: #0f5c8c;
+  --app-snippets: #7e22ce;
+  --app-chrono: #a16207;
+  --app-contrast: #7c1d6f;
+  --app-api: #b91c1c;
 
   /* QR codes are read by a camera, not by a person, so these two are the one
      pair in the workspace that does *not* follow the theme: a scanner expects
@@ -220,6 +230,7 @@
   --app-malayalam: #22c3dd;
   --app-translate: #818cf8;
   --app-assistant: #e07ff0;
+  --app-walk: #e3c04a;
   --app-text: #d8a15f;
   --app-morse: #a3e635;
   --app-sound: #fb7185;
@@ -228,6 +239,15 @@
   --app-handoff: #22d3ee;
   --app-clone: #7aa5ff;
   --app-drop: #c084fc;
+  --app-scan: #86c34a;
+  --app-wallet: #34d399;
+  --app-voice: #f472a0;
+  --app-convert: #b49bff;
+  --app-markdown: #5fa8dc;
+  --app-snippets: #c77dff;
+  --app-chrono: #e0b341;
+  --app-contrast: #e879c7;
+  --app-api: #f87171;
   --board-note: #fbbf24;
   --board-checklist: #4d94ff;
   --board-counter: #1fb89f;

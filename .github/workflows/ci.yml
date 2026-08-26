@@ -1,0 +1,118 @@
+# The checks CLAUDE.md already requires before finishing, run for every push and
+# pull request instead of from memory.
+#
+# The order is deliberate: the fast, framework-free checks fail in seconds, the
+# registry checks catch the half-registered app the compiler cannot see, and only
+# then does the build run — because a build is the slow step and there is no point
+# paying for it to learn that a type is wrong.
+#
+# Lighthouse is a separate, manual job. Performance is measured under simulated
+# throttling and a shared runner scores several points below a laptop for the same
+# commit, so gating a pull request on it would produce red runs that mean nothing.
+# See the header of scripts/audit-lighthouse.mjs.
+
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+# One run per branch: a new push makes the one already in flight irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Full history so the service-worker check can read public/sw.js as it
+          # stands on the branch being merged into.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Types
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests
+        run: npm test
+
+      - name: App registry
+        run: npm run check:registry
+
+      - name: Theme contrast
+        run: npm run check:themes
+
+      # A worker edited without a VERSION bump reaches new visitors only —
+      # every existing install keeps serving the precache it already has.
+      - name: Service-worker version
+        run: |
+          if [ -n "${{ github.base_ref }}" ]; then
+            base="origin/${{ github.base_ref }}"
+          else
+            base="${{ github.event.before }}"
+            # A new branch (or a first push) reports an all-zero "before"; the
+            # previous commit is the only meaningful comparison left.
+            case "$base" in
+              ""|0000000000000000000000000000000000000000) base="HEAD^" ;;
+            esac
+          fi
+          echo "comparing against $base"
+          node scripts/check-sw-version.mjs --base="$base"
+
+      - name: Build
+        run: npm run build
+
+      # Re-run now that public/precache-manifest.json exists: without it the
+      # worker has no chunk list, and every app is offline-broken on a cold load.
+      - name: Build precache manifest
+        run: npm run check:registry
+
+  audit:
+    name: Lighthouse
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # Chrome is preinstalled on the GitHub-hosted runner, which is what
+      # chrome-launcher finds. Accessibility, Best Practices and SEO are gated
+      # against the rule #7 baseline; Performance is reported for comparison.
+      - name: Audit
+        run: node scripts/audit-lighthouse.mjs --routes=/,/pdfeditor,/todos --runs=3 --json=lighthouse.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-scores
+          path: lighthouse.json
+          if-no-files-found: warn

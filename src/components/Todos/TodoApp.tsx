@@ -14,6 +14,7 @@ import { DayView } from "@/components/Todos/organisms/DayView";
 import { WeekView } from "@/components/Todos/organisms/WeekView";
 import { MonthView } from "@/components/Todos/organisms/MonthView";
 import { YearView } from "@/components/Todos/organisms/YearView";
+import { AgendaView } from "@/components/Todos/organisms/AgendaView";
 import { TaskEditor } from "@/components/Todos/organisms/TaskEditor";
 import { AppsIcon, PlusIcon } from "@/components/SketchNotes/atoms/icons";
 import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
@@ -138,6 +139,10 @@ export function TodoApp() {
           <NavView viewKey={`${view}:${anchor}`} motion={periodMotion}>
             {isLoading ? (
               <p className="py-10 text-center text-[13px] text-ink-soft">Loading tasks…</p>
+            ) : view === "agenda" ? (
+              // The agenda spans every date, so it takes the whole filtered pool
+              // rather than a period slice — the grouping is its own.
+              <AgendaView tasks={pool} now={now} />
             ) : view === "day" ? (
               <DayView pool={pool} anchor={anchor} todayStart={todayStart} />
             ) : view === "week" ? (

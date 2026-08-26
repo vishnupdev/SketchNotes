@@ -22,6 +22,13 @@ export const APP_NETWORK: Partial<Record<AppId, string>> = {
   malayalam: "Handwriting recognition posts the strokes you draw. Typing and the keyboard stay local.",
   speed: "Downloads and uploads test payloads — that is the measurement.",
   system: "Looks up your public IP address.",
+  convert:
+    "Fetches published exchange rates through this site's own server route. The unit side never touches the network.",
+  api: "Every request you send goes out through this site's own server route — a browser cannot call an API that has not allowed it. Private addresses are refused, and nothing sent is written to disk.",
+  voice:
+    "Recording is local. Transcription, when switched on, uses the browser's own speech service — in Chrome that means the audio is sent to Google. It is off by default.",
+  markdown:
+    "Nothing. Mermaid diagrams are drawn on the device; the diagram engine is downloaded once, the first time a document contains one.",
   clone: "The copy runs device to device. Over a cable or on “this network only” nothing outside the two devices is contacted at all; “anywhere” asks a public STUN server for this device's address, and it never sees your data.",
   drop: "Files go straight to the other device. In “anywhere” mode a public STUN server is asked for this device's public address — it never sees the files; in “this network only” mode nothing outside the network is contacted at all.",
 };
@@ -30,6 +37,16 @@ export const APP_NETWORK: Partial<Record<AppId, string>> = {
 export const APP_STORAGE_NOTE: Record<AppId, string> = {
   sketchnotes: "Every note and the note index.",
   assistant: "Your chat history with the guide.",
+  walk: "Which app you last toured, and which tours you have finished.",
+  scan: "Nothing — pages are held in memory until you save the PDF, then dropped.",
+  wallet: "Your spending log, currency and monthly target. Bill splits are not kept.",
+  voice: "Your memos: the recordings and their transcripts.",
+  convert: "Your unit and currency choices, plus the last exchange-rate table for offline use.",
+  api: "Saved requests and the one request you are editing. Never the history — see below.",
+  snippets: "Your snippet library.",
+  markdown: "The document you are writing.",
+  chrono: "The expression, timestamp and duration you last worked on.",
+  contrast: "The colours you last checked, your ramp, and your palette.",
   pdf: "Nothing — files are opened, edited and saved back without being stored.",
   image: "Nothing — pictures are processed in memory only.",
   board: "The board and all its sections.",

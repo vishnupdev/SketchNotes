@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { useTextKitStore } from "@/store/useTextKitStore";
-import { CODECS, decode, encode, type Codec } from "@/lib/TextKit/encode";
+import { CODECS, DECODE_ONLY, decode, encode, type Codec } from "@/lib/TextKit/encode";
 import { TextField } from "@/components/TextKit/molecules/TextField";
+import { JwtView } from "@/components/TextKit/molecules/JwtView";
 import { cx } from "@/lib/utils";
 import { SwapIcon } from "@/components/SketchNotes/atoms/icons";
 
@@ -23,9 +24,15 @@ export function EncodePanel() {
   const [codec, setCodec] = useState<Codec>("base64");
   const [direction, setDirection] = useState<"encode" | "decode">("encode");
 
+  // A decode-only codec has no direction to be in, so the toggle is hidden and
+  // the effective direction is forced — otherwise switching to JWT while
+  // "encode" was selected would show a refusal rather than the token.
+  const oneWay = DECODE_ONLY.has(codec);
+  const effective = oneWay ? "decode" : direction;
+
   const result = useMemo(
-    () => (direction === "encode" ? encode(text, codec) : decode(text, codec)),
-    [codec, direction, text],
+    () => (effective === "encode" ? encode(text, codec) : decode(text, codec)),
+    [codec, effective, text],
   );
 
   return (
@@ -51,55 +58,71 @@ export function EncodePanel() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="inline-flex gap-1 rounded-xl border border-border bg-panel p-1">
-          {(["encode", "decode"] as const).map((d) => (
-            <button
-              key={d}
-              type="button"
-              onClick={() => setDirection(d)}
-              aria-current={direction === d}
-              className={cx(
-                "rounded-lg px-3.5 py-1.5 text-[12.5px] font-semibold capitalize transition-colors",
-                direction === d ? "bg-accent-soft text-accent" : "text-ink-soft hover:text-text",
-              )}
-            >
-              {d}
-            </button>
-          ))}
-        </div>
+        {!oneWay && (
+          <div className="inline-flex gap-1 rounded-xl border border-border bg-panel p-1">
+            {(["encode", "decode"] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => setDirection(d)}
+                aria-current={direction === d}
+                className={cx(
+                  "rounded-lg px-3.5 py-1.5 text-[12.5px] font-semibold capitalize transition-colors",
+                  direction === d ? "bg-accent-soft text-accent" : "text-ink-soft hover:text-text",
+                )}
+              >
+                {d}
+              </button>
+            ))}
+          </div>
+        )}
         <span className="text-[12px] text-ink-soft">
           {CODECS.find((c) => c.id === codec)?.hint}
         </span>
       </div>
 
       <TextField
-        label={direction === "encode" ? "Plain text" : "Encoded text"}
+        label={codec === "jwt" ? "Token" : effective === "encode" ? "Plain text" : "Encoded text"}
         value={text}
         onChange={setText}
         rows={7}
-        placeholder={direction === "encode" ? "Text to encode" : "Encoded text to decode"}
+        placeholder={
+          codec === "jwt"
+            ? "Paste a JWT — eyJhbGciOi…"
+            : effective === "encode"
+              ? "Text to encode"
+              : "Encoded text to decode"
+        }
       />
 
-      {/* Feeding the result back is the operation people actually want next —
-          decode, edit, re-encode — so it is one button rather than a copy-paste. */}
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => result.ok && setText(result.text)}
-          disabled={!result.ok || !text}
-          className={cx(BTN, "disabled:opacity-40")}
-        >
-          <SwapIcon size={15} />
-          Use the result as the input
-        </button>
-      </div>
-
-      {result.ok ? (
-        <TextField label="Result" value={result.text} rows={7} />
+      {/* A JWT is three structured parts and a verdict, not one output string, so
+          it gets its own view rather than the generic result field. */}
+      {codec === "jwt" ? (
+        <JwtView token={text} />
       ) : (
-        <p role="alert" className="text-[12.5px] leading-relaxed text-danger">
-          {result.error}
-        </p>
+        <>
+          {/* Feeding the result back is the operation people actually want next —
+              decode, edit, re-encode — so it is one button rather than a copy-paste. */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => result.ok && setText(result.text)}
+              disabled={!result.ok || !text}
+              className={cx(BTN, "disabled:opacity-40")}
+            >
+              <SwapIcon size={15} />
+              Use the result as the input
+            </button>
+          </div>
+
+          {result.ok ? (
+            <TextField label="Result" value={result.text} rows={7} />
+          ) : (
+            <p role="alert" className="text-[12.5px] leading-relaxed text-danger">
+              {result.error}
+            </p>
+          )}
+        </>
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import { periodLabel } from "@/lib/Todos/dates";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/SketchNotes/atoms/icons";
 
 const VIEWS: { id: ViewMode; label: string }[] = [
+  { id: "agenda", label: "Agenda" },
   { id: "day", label: "Day" },
   { id: "week", label: "Week" },
   { id: "month", label: "Month" },
@@ -53,31 +54,36 @@ export function PeriodNav({ view, anchor, now, onView, onStep, onToday }: Period
         <h2 className="min-w-0 truncate text-[17px] font-extrabold tracking-tight">
           {periodLabel(view, anchor, now)}
         </h2>
-        <div className="flex flex-none items-center gap-1">
-          <button
-            type="button"
-            onClick={onToday}
-            className="tint rounded-lg border border-border px-3 py-1.5 text-[12.5px] font-semibold hover:border-accent hover:text-accent"
-          >
-            Today
-          </button>
-          <button
-            type="button"
-            aria-label="Previous period"
-            onClick={() => onStep(-1)}
-            className="tint grid size-9 place-items-center rounded-lg border border-border hover:border-accent hover:text-accent"
-          >
-            <ChevronLeftIcon size={18} />
-          </button>
-          <button
-            type="button"
-            aria-label="Next period"
-            onClick={() => onStep(1)}
-            className="tint grid size-9 place-items-center rounded-lg border border-border hover:border-accent hover:text-accent"
-          >
-            <ChevronRightIcon size={18} />
-          </button>
-        </div>
+        {/* The agenda spans every date, so there is no period to step through and
+            nothing for "Today" to jump to. The controls are hidden rather than
+            disabled: a stepper that visibly does nothing is worse than none. */}
+        {view !== "agenda" && (
+          <div className="flex flex-none items-center gap-1">
+            <button
+              type="button"
+              onClick={onToday}
+              className="tint rounded-lg border border-border px-3 py-1.5 text-[12.5px] font-semibold hover:border-accent hover:text-accent"
+            >
+              Today
+            </button>
+            <button
+              type="button"
+              aria-label="Previous period"
+              onClick={() => onStep(-1)}
+              className="tint grid size-9 place-items-center rounded-lg border border-border hover:border-accent hover:text-accent"
+            >
+              <ChevronLeftIcon size={18} />
+            </button>
+            <button
+              type="button"
+              aria-label="Next period"
+              onClick={() => onStep(1)}
+              className="tint grid size-9 place-items-center rounded-lg border border-border hover:border-accent hover:text-accent"
+            >
+              <ChevronRightIcon size={18} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -142,6 +142,66 @@ export const APPS: AppEntry[] = [
     name: "Assistant",
     blurb: "a free AI guide that answers what every app in the workspace can do",
   },
+  {
+    path: "/walkaround",
+    name: "Walkaround",
+    blurb:
+      "a guided tour of any app in the workspace — a schematic of its screen with a tooltip on each control in turn, saying where it is, what it does and what is worth trying",
+  },
+  {
+    path: "/scan",
+    name: "Scan",
+    blurb:
+      "turn a photo of a page into a PDF — mark the four corners and the page is flattened with a perspective correction, not merely cropped, then enhanced and saved as a multi-page PDF entirely in your browser",
+  },
+  {
+    path: "/wallet",
+    name: "Wallet",
+    blurb:
+      "an expense tracker that takes seconds to use — log what you spent, see where the month went by category, set a monthly target, export a CSV, and split a bill fairly to the last minor unit",
+  },
+  {
+    path: "/voice",
+    name: "Voice Memos",
+    blurb:
+      "record voice memos and transcribe them as you speak, so you can search months of recordings by what was said — the audio never leaves your device",
+  },
+  {
+    path: "/convert",
+    name: "Convert",
+    blurb:
+      "convert units of length, weight, temperature, volume, area, speed, data, time, pressure, energy, fuel and angle, plus currency at the latest European Central Bank rates",
+  },
+  {
+    path: "/apiclient",
+    name: "API Client",
+    blurb:
+      "build and send HTTP requests in the browser — methods, headers, JSON bodies, a saved collection, a pretty-printed response viewer and the equivalent curl command",
+  },
+  {
+    path: "/snippets",
+    name: "Snippets",
+    blurb:
+      "a searchable library for the code you keep looking up — tagged, syntax-highlighted, copy on every card, and stored only on your own device",
+  },
+  {
+    path: "/markdown",
+    name: "Markdown",
+    blurb:
+      "a markdown editor with a live preview, Mermaid diagrams, tables, task lists, a table of contents and word count, exporting to .md or a standalone HTML file",
+  },
+  {
+    path: "/chrono",
+    name: "Chrono",
+    blurb:
+      "explain any cron expression in plain English and list its next runs, convert Unix timestamps and dates into every form, and do arithmetic on durations",
+  },
+  {
+    path: "/contrast",
+    name: "Contrast",
+    blurb:
+      "check colour contrast against every WCAG level and get the nearest passing shade, build a 50–950 tonal ramp as CSS, Tailwind, SCSS or JSON tokens, and preview a palette under colour-vision deficiency",
+  },
 ];
 
 /** Keywords targeting the brand plus each tool's search intent. */
@@ -277,4 +337,46 @@ export const SITE_KEYWORDS = [
   "in-app ai guide",
   "on-device ai chat",
   "ai agent no api key",
+  "document scanner online",
+  "scan to pdf in browser",
+  "scan a receipt to pdf",
+  "photo to pdf",
+  "deskew a scanned page",
+  "expense tracker no account",
+  "spending tracker offline",
+  "split a bill calculator",
+  "who owes what",
+  "monthly budget tracker",
+  "voice recorder online",
+  "voice memo with transcript",
+  "transcribe speech in browser",
+  "searchable voice notes",
+  "unit converter online",
+  "currency converter",
+  "kg to pounds",
+  "celsius to fahrenheit",
+  "litres per 100km to mpg",
+  "api client in browser",
+  "rest client online",
+  "postman alternative online",
+  "send an http request online",
+  "convert request to curl",
+  "code snippet manager",
+  "save code snippets online",
+  "markdown editor online",
+  "markdown preview",
+  "mermaid diagram editor",
+  "markdown to html",
+  "cron expression explained",
+  "cron next run time",
+  "crontab generator",
+  "unix timestamp converter",
+  "epoch to date",
+  "duration calculator",
+  "contrast checker wcag",
+  "colour contrast ratio",
+  "colour ramp generator",
+  "tailwind colour tokens",
+  "colour blindness simulator",
+  "accessible colour palette",
 ];

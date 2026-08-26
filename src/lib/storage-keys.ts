@@ -61,6 +61,17 @@ const OWNERS: OwnerRule[] = [
   { app: "world", match: prefix("sknotes:worldclock:") },
   { app: "speed", match: prefix("sknotes:netspeed:") },
   { app: "malayalam", match: prefix("sknotes:malayalam-") },
+  { app: "walk", match: prefix("sknotes:walk:") },
+  { app: "wallet", match: prefix("sknotes:wallet:") },
+  { app: "voice", match: prefix("sknotes:voice:") },
+  { app: "convert", match: prefix("sknotes:convert:") },
+  { app: "api", match: prefix("sknotes:api:") },
+  { app: "snippets", match: prefix("sknotes:snippets:") },
+  { app: "markdown", match: prefix("sknotes:markdown:") },
+  { app: "chrono", match: prefix("sknotes:chrono:") },
+  { app: "contrast", match: prefix("sknotes:contrast:") },
+  // Scan deliberately stores nothing — its pages live in memory until exported —
+  // so it has no rule here. Adding one would claim a prefix that never exists.
   // Sketchnotes keys a note by its bare id (`sknotes:<id>`) plus one index, so
   // it can only be identified last — as "every remaining workspace key".
   { app: "sketchnotes", match: prefix("sknotes:") },

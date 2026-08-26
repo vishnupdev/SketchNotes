@@ -19,6 +19,7 @@ npm run build    # production build
 npm run typecheck
 npm run lint     # eslint (flat config in eslint.config.mjs)
 npm test         # vitest — the pure logic (parsers, protocol, backup, geometry)
+npm run verify   # everything above plus the registry, theme and worker checks
 ```
 
 ## Architecture
@@ -99,10 +100,20 @@ the browser stops treating the workspace as evictable, or erase the lot. See
 | Save in place | [`lib/download.ts`](./src/lib/download.ts) | Where the File System Access API exists, the PDF editor saves edits back to the file that was opened instead of downloading a copy. |
 | Handoff | [`components/Handoff/`](./src/components/Handoff) | Move data to another device over a chain of QR codes, or a QR-signalled WebRTC link on the local network. |
 | Clone | [`components/Clone/`](./src/components/Clone) | Copy a whole device — every app's data and every setting — onto another one: by cable (USB tethering, or a clone file carried on a drive), over a network, or with no network at all via a loop of QR codes. Verified whole before anything is written, and the receiving device is first shown a per-app plan of what would arrive, be replaced, be left alone or be deleted. |
+| Walkaround | [`components/Walkaround/`](./src/components/Walkaround) | A guided tour of any app: each stop is a tooltip on a *schematic* of that app's screen — header, Apps button, working-area blocks, bottom tabs — with a direction and a suggestion. Tours a drawing rather than the live app deliberately, so it holds no selectors into anyone else's DOM and cannot break what it describes; anchors are resolved by [`lib/Walkaround/stage.ts`](./src/lib/Walkaround/stage.ts) and every authored one is checked by [`walkaround.test.ts`](./src/lib/Walkaround/walkaround.test.ts). |
 | Text Kit | [`components/TextKit/`](./src/components/TextKit) | Case, lines and counts; base64/URL/HTML/JSON-string codecs; JSON format, minify and a *located* parse error; line diff; regex workbench; SHA/CRC of text or a file. One shared, persisted draft, no network. |
 | Trash | [`lib/trash.ts`](./src/lib/trash.ts) | Deleted notes, tasks, reminders and board sections recoverable for 30 days from Settings → Recently deleted. Restores as storage operations, so it needs no code from the app the item came from. |
 | Content search | [`lib/palette/content.ts`](./src/lib/palette/content.ts) | Ctrl/⌘ + K also searches what is *in* the apps — note bodies, tasks, board rows — and opens the item itself. Readers load on first search, so nothing joins the initial bundle. |
 | File Drop | [`components/FileDrop/`](./src/components/FileDrop) | Send files of any size device-to-device over WebRTC — same network with no internet, or across networks via STUN. Streamed in chunks with backpressure both ways, verified per file, written into a chosen folder or streamed to disk through the service worker; an interrupted transfer resumes. |
+| Scan | [`components/Scan/`](./src/components/Scan) | Photo of a page → PDF. The corners you mark are flattened by a real homography ([`lib/Scan/warp.ts`](./src/lib/Scan/warp.ts), solved 8×8 with partial pivoting — an axis-aligned quad hits a zero pivot otherwise) and inverse-mapped with bilinear sampling. The "Document" finish divides out a blurred local-background estimate, so a page lit from one side doesn't come out half black. Assembled with pdf-lib; nothing is persisted, so an unexported scan leaves with the app. |
+| Wallet | [`components/Wallet/`](./src/components/Wallet) | Expense log, monthly roll-up and a bill splitter. Amounts are **integer minor units** end to end — no float can shave a paisa off a total. The splitter assigns every leftover unit largest-fraction-first and names who absorbed it, then settles the group in the fewest transfers. Per-day-*elapsed* averages, not per-day-in-month. |
+| Voice Memos | [`components/Voice/`](./src/components/Voice) | MediaRecorder + the browser's speech recognition, restarted automatically because it stops mid-recording on its own. The transcript is the feature: it's what makes audio searchable, and when the storage cap is hit it's the *audio* that's dropped and the transcript kept. Transcription is off by default and says why. |
+| Convert | [`components/Convert/`](./src/components/Convert) | Twelve unit categories plus currency. Temperature carries an offset and L/100km is a reciprocal, so both are functions rather than bent factors ([`lib/Convert/units.ts`](./src/lib/Convert/units.ts)). Rates come from `/api/rates` (ECB) and are cached with their **publish date shown**, so a stale rate can't pass for a live one. |
+| API Client | [`components/Api/`](./src/components/Api) | Request builder, response viewer and a curl line. The relay ([`app/api/relay/route.ts`](./src/app/api/relay/route.ts)) is the security-critical piece: SSRF-guarded by [`lib/Api/guard.ts`](./src/lib/Api/guard.ts) — scheme, port allowlist, no URL credentials, and every **resolved** address checked against private/loopback/link-local/metadata ranges (IPv4-mapped IPv6 included), with redirects reported rather than followed. History is never written to disk, because requests carry tokens. |
+| Snippets | [`components/Snippets/`](./src/components/Snippets) | One flat list, one query spanning titles/tags/languages/bodies (`#tag`, `lang:go`), copy on every card. Highlighted by a small token-array tokeniser ([`lib/code-highlight.ts`](./src/lib/code-highlight.ts)) rendered as spans — no highlighting dependency and no `innerHTML`. |
+| Markdown | [`components/Markdown/`](./src/components/Markdown) | Hand-written parser ([`lib/Markdown/parse.ts`](./src/lib/Markdown/parse.ts)) producing a **typed node tree, never an HTML string** — so there's no sanitiser to get wrong and `javascript:` targets render as text. Mermaid is imported inside the effect, so a document without a diagram never downloads the engine. Exports .md or a standalone, style-inlined HTML file. |
+| Chrono | [`components/Chrono/`](./src/components/Chrono) | Cron explained in English *and* its next runs as real dates (the only check that catches a misunderstanding rather than a typo), including cron's either-or day rule; timestamps in every form with the unit it guessed stated out loud; duration parsing and arithmetic. All covered by [`chrono.test.ts`](./src/lib/Chrono/chrono.test.ts). |
+| Contrast | [`components/Contrast/`](./src/components/Contrast) | WCAG grading with the **nearest passing shade** (linear-light lightness walk, so hue survives), a 50–950 ramp exporting to CSS / Tailwind v4 `@theme` / SCSS / JSON, and colour-vision simulation that *measures* which pairs collapse instead of asking you to look. Built on the shared [`lib/color.ts`](./src/lib/color.ts) the theme picker uses, so verdicts can't disagree. |
 
 ### Files larger than memory
 
@@ -139,6 +150,39 @@ same-network mode and Clone's cable and no-network routes contact nothing
 outside the two devices. The rest degrade explicitly rather
 than failing silently. The worker is registered in production only (in dev it
 would fight HMR).
+
+## Checks
+
+`npm run verify` is the gate: typecheck, lint, tests, then three checks that exist because
+the mistakes they catch are silent — nothing throws, nothing fails to compile, and the app
+looks fine on the machine that made the change.
+
+| Command | What it catches |
+| --- | --- |
+| `npm run check:registry` | A half-registered app. Adding one touches ~12 files; five are `Record<AppId, …>` maps the compiler guards, and the rest fail quietly. This checks that every app id is in **both** the `AppId` union and `ALL_APPS`, that its route is in the worker's `SHELL_URLS` and in `public/llms.txt`, that it has an `--app-<id>` hue in **both** the light and dark token block, that `site.ts` covers it (sitemap, metadata, `SeoContent`, `StructuredData`), that no storage-key owner rule is shadowed by an earlier one — and, once built, that `precache-manifest.json` lists real chunks. |
+| `npm run check:sw` | `public/sw.js` edited without bumping `VERSION`. The caches are named after it, so without the bump every existing install keeps its old precache: a route added to `SHELL_URLS` 404s offline for returning visitors and reproduces on nobody's machine. Compares against a git ref (`-- --base=origin/master`). |
+| `npm run check:themes` | A preset palette below WCAG AA on any pair that carries text. |
+
+`npm run audit` runs Lighthouse against a production build and holds the rule #7 baseline —
+Accessibility 94, Best Practices 100, SEO 91. It starts its own server on :3100, so a dev
+server on :3000 is left alone:
+
+```bash
+npm run build
+npm run audit                                       # / on mobile emulation
+npm run audit -- --routes=/,/pdfeditor --runs=3     # median of three, per route
+npm run audit -- --perf=85                          # gate Performance too
+```
+
+Performance is measured and printed but not gated by default: rule #7's 99 is the deployed
+site's score, and the same commit served by `next start` locally or on a CI runner lands in
+the 70s–80s for reasons that have nothing to do with the code. Pass `--perf=N` to hold a
+floor when comparing two commits on one machine. The other three categories are
+deterministic — a drop there is a real regression anywhere.
+
+[`.github/workflows/ci.yml`](./.github/workflows/ci.yml) runs `verify` plus the build on
+every push and pull request. Lighthouse is a manual (`workflow_dispatch`) job in the same
+file, for the reason above.
 
 ## Tests
 

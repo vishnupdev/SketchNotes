@@ -48,6 +48,16 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   clone: () => import("@/components/Clone/CloneApp").then((m) => m.CloneApp),
   drop: () => import("@/components/FileDrop/FileDropApp").then((m) => m.FileDropApp),
   text: () => import("@/components/TextKit/TextKitApp").then((m) => m.TextKitApp),
+  walk: () => import("@/components/Walkaround/WalkaroundApp").then((m) => m.WalkaroundApp),
+  scan: () => import("@/components/Scan/ScanApp").then((m) => m.ScanApp),
+  wallet: () => import("@/components/Wallet/WalletApp").then((m) => m.WalletApp),
+  voice: () => import("@/components/Voice/VoiceApp").then((m) => m.VoiceApp),
+  convert: () => import("@/components/Convert/ConvertApp").then((m) => m.ConvertApp),
+  api: () => import("@/components/Api/ApiApp").then((m) => m.ApiApp),
+  snippets: () => import("@/components/Snippets/SnippetsApp").then((m) => m.SnippetsApp),
+  markdown: () => import("@/components/Markdown/MarkdownApp").then((m) => m.MarkdownApp),
+  chrono: () => import("@/components/Chrono/ChronoApp").then((m) => m.ChronoApp),
+  contrast: () => import("@/components/Contrast/ContrastApp").then((m) => m.ContrastApp),
 };
 
 /**
@@ -61,6 +71,7 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "timer",
   "reminders",
   "assistant",
+  "walk",
   "morse",
   "sound",
   "color",
@@ -69,6 +80,15 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "clone",
   "drop",
   "text",
+  // Light, entirely-local tools — cheap to warm and among the most used.
+  "convert",
+  "chrono",
+  "contrast",
+  "snippets",
+  "wallet",
+  "markdown",
+  "voice",
+  "api",
   "translate",
   "malayalam",
   "image",
@@ -79,6 +99,8 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "news",
   "streams",
   "world",
+  // Late, with the PDF editor: Scan shares its pdf-lib bundle.
+  "scan",
   "pdf",
 ];
 
@@ -108,4 +130,14 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   drop: "File Drop",
   text: "Text Kit",
   assistant: "Assistant",
+  walk: "Walkaround",
+  scan: "Scan",
+  wallet: "Wallet",
+  voice: "Voice Memos",
+  convert: "Convert",
+  api: "API Client",
+  snippets: "Snippets",
+  markdown: "Markdown",
+  chrono: "Chrono",
+  contrast: "Contrast",
 };

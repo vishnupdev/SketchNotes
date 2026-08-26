@@ -53,6 +53,16 @@ const HandoffApp = dynamic(APP_LOADERS.handoff, { ssr: false });
 const CloneApp = dynamic(APP_LOADERS.clone, { ssr: false });
 const FileDropApp = dynamic(APP_LOADERS.drop, { ssr: false });
 const TextKitApp = dynamic(APP_LOADERS.text, { ssr: false });
+const WalkaroundApp = dynamic(APP_LOADERS.walk, { ssr: false });
+const ScanApp = dynamic(APP_LOADERS.scan, { ssr: false });
+const WalletApp = dynamic(APP_LOADERS.wallet, { ssr: false });
+const VoiceApp = dynamic(APP_LOADERS.voice, { ssr: false });
+const ConvertApp = dynamic(APP_LOADERS.convert, { ssr: false });
+const ApiApp = dynamic(APP_LOADERS.api, { ssr: false });
+const SnippetsApp = dynamic(APP_LOADERS.snippets, { ssr: false });
+const MarkdownApp = dynamic(APP_LOADERS.markdown, { ssr: false });
+const ChronoApp = dynamic(APP_LOADERS.chrono, { ssr: false });
+const ContrastApp = dynamic(APP_LOADERS.contrast, { ssr: false });
 
 /**
  * Every app's deep-link path — the one place a route is declared, read in both
@@ -90,6 +100,17 @@ const APP_PATHS: Record<AppId, string> = {
   drop: "/drop",
   text: "/text",
   assistant: "/assistant",
+  walk: "/walkaround",
+  scan: "/scan",
+  wallet: "/wallet",
+  voice: "/voice",
+  convert: "/convert",
+  // Not "/api" — that prefix belongs to this app's own route handlers.
+  api: "/apiclient",
+  snippets: "/snippets",
+  markdown: "/markdown",
+  chrono: "/chrono",
+  contrast: "/contrast",
 };
 
 const PDF_BASE = APP_PATHS.pdf;
@@ -340,6 +361,53 @@ export function Workspace() {
       {/* Text Kit — pure local text operations, nothing to release on exit. */}
       <AppFrame active={activeApp === "text"} name="Text Kit">
         <TextKitApp />
+      </AppFrame>
+
+      {/* Walkaround — the guided tour of whichever app you pick. Pure reading:
+          it draws a schematic of another app rather than reaching into it. */}
+      <AppFrame active={activeApp === "walk"} name="Walkaround">
+        <WalkaroundApp />
+      </AppFrame>
+
+      {/* Scan. Unmounted on an app switch, which is what releases the camera if
+          the viewfinder was left open — and discards an unexported scan, which is
+          deliberate: its pages are held in memory only (see useScanStore). */}
+      <AppFrame active={activeApp === "scan"} name="Scan">
+        <ScanApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "wallet"} name="Wallet">
+        <WalletApp />
+      </AppFrame>
+
+      {/* Voice Memos. Unmounting is what releases the microphone and stops any
+          transcription, so neither follows the user into another app. */}
+      <AppFrame active={activeApp === "voice"} name="Voice Memos">
+        <VoiceApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "convert"} name="Convert">
+        <ConvertApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "api"} name="API Client">
+        <ApiApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "snippets"} name="Snippets">
+        <SnippetsApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "markdown"} name="Markdown">
+        <MarkdownApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "chrono"} name="Chrono">
+        <ChronoApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "contrast"} name="Contrast">
+        <ContrastApp />
       </AppFrame>
 
       {/* Assistant — the in-app AI guide. */}

@@ -33,6 +33,7 @@ Image Studio) share one Next.js shell. The rules below are mandatory for all wor
   - Routing/deep links use the app's path segment, e.g. **`/pdfeditor`** and `/pdfeditor/<section>`
     (URL is derived inside `src/components/Workspace.tsx`).
 - New apps are registered in `src/store/useWorkspaceStore.ts` (`AppId`) and `AppLauncher.tsx`.
+- A new app also needs its walkaround tour — see rule #8.
 - Naming: use the app's namespace consistently across components, lib, store, and routes.
 
 ## 5. App isolation — changing one app must not break another
@@ -73,7 +74,50 @@ Best Practices 100, SEO 91, Agentic Browsing 2/3** (goal: 3/3).
   (`src/components/SeoContent.tsx`, JSON-LD in `StructuredData.tsx`, `public/manifest.webmanifest`) current
   so agents can parse the app. When adding a route/app/feature, update these so they describe it.
 
+## 8. Every app carries a walkaround — and it has to stay true
+Walkaround (`/walkaround`) is the guided tour of each app: one `Tour` per `AppId` in
+`src/lib/Walkaround/tours.ts`, played as tooltips over a **schematic** of that app's screen.
+
+- **New app → author its tour.** `TOURS` is `Record<AppId, Tour>`, so a new id is a type error until
+  you do. Give it 3–6 stops covering what someone arriving cold would not find on their own.
+- **Changed app → update its tour.** This is the half nothing can catch, and the reason this rule
+  exists. Renaming a tab, adding a panel, moving or removing a control leaves a tour that still
+  typechecks, still passes its tests, and now confidently describes a screen that is no longer there
+  — the worst failure a help feature has, because it is *believed*. If your change alters what a user
+  sees, re-read that app's `layout.blocks` / `layout.tabs` and every step that points at them.
+- **Anchors, never selectors.** A step points at `brand`, `apps`, `body`, `body:<n>` or `tab:<n>` on
+  the schematic. Walkaround holds no selectors into any other app's DOM and reads none of their state
+  (rule #5) — which is exactly why it can never break the app it describes, and why the schematic has
+  to be maintained by hand.
+- **A stop needs both halves.** `direction` says where the thing is and what it does; `suggestion` is
+  the shortcut, the combination or the caveat a reader would otherwise discover on their third visit.
+  A stop that only restates a label already on screen is not worth a stop.
+- Keep the facts consistent with `src/lib/Assistant/knowledge.ts` — two guides that disagree about the
+  same app are worse than one.
+- `npm test` covers the mechanical half only: that every authored anchor resolves against that app's
+  layout and every tooltip lands on the stage. No check can tell you the words are still accurate.
+
 ## Verify before finishing
-Run and pass: `npm run typecheck`, `npm run lint`, and (for non-trivial changes) `npm run build`.
-For UI/route/content changes, also confirm the rule #7 scores are not regressed (Performance,
-Accessibility, Best Practices, SEO, Agentic Browsing).
+Run and pass **`npm run verify`** — typecheck, lint, tests, then the three checks for the
+failures that are otherwise silent: `check:registry` (a half-registered app — launcher, offline
+shell, brand hue, SEO entry, storage owner), `check:sw` (worker edited without a `VERSION` bump)
+and `check:themes` (a palette below WCAG AA). For non-trivial changes also run `npm run build`.
+
+For UI/route/content changes, confirm the rule #7 scores are not regressed: `npm run audit`
+(Lighthouse against a production build; holds Accessibility 94 / Best Practices 100 / SEO 91 and
+reports Performance) plus a check that `public/llms.txt` still describes what changed for the
+Agentic Browsing score. CI runs the same commands — see `.github/workflows/ci.yml`.
+
+If you changed what an app *looks like*, also re-read that app’s entry in
+`src/lib/Walkaround/tours.ts` (rule #8). The suite checks that every tour still points somewhere
+real; it cannot check that the tour still describes the screen.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

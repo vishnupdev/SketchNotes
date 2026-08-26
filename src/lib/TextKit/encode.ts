@@ -10,7 +10,14 @@
  * input is whatever was pasted and "that isn't valid base64" is a useful answer.
  */
 
-export type Codec = "base64" | "base64url" | "url" | "urlComponent" | "html" | "jsonString";
+export type Codec =
+  | "base64"
+  | "base64url"
+  | "url"
+  | "urlComponent"
+  | "html"
+  | "jsonString"
+  | "jwt";
 
 export const CODECS: Array<{ id: Codec; label: string; hint: string }> = [
   { id: "base64", label: "Base64", hint: "Standard, with padding" },
@@ -19,7 +26,17 @@ export const CODECS: Array<{ id: Codec; label: string; hint: string }> = [
   { id: "urlComponent", label: "URL component", hint: "One parameter — escapes everything" },
   { id: "html", label: "HTML entities", hint: "& < > \" '" },
   { id: "jsonString", label: "JSON string", hint: "Quoted, with escapes" },
+  { id: "jwt", label: "JWT", hint: "Read a token's header, claims and expiry — decode only" },
 ];
+
+/**
+ * Codecs that only go one way.
+ *
+ * A JWT is read, never written: minting one requires signing it, which requires a
+ * key. The panel hides the direction toggle for these rather than offering an
+ * "encode" that could not work.
+ */
+export const DECODE_ONLY = new Set<Codec>(["jwt"]);
 
 export type CodecResult = { ok: true; text: string } | { ok: false; error: string };
 
@@ -73,6 +90,10 @@ export function encode(text: string, codec: Codec): CodecResult {
         return ok(HTML_ENTITIES.reduce((out, [re, to]) => out.replace(re, to), text));
       case "jsonString":
         return ok(JSON.stringify(text));
+      case "jwt":
+        // Minting a JWT means signing it, which means a key. Reading one is the
+        // useful half and the only half this app can honestly offer.
+        return fail("A JWT can only be read here — writing one requires the signing key.");
     }
   } catch {
     return fail("That couldn't be encoded.");
@@ -105,6 +126,10 @@ export function decode(text: string, codec: Codec): CodecResult {
         if (typeof parsed !== "string") return fail("That JSON isn't a string.");
         return ok(parsed);
       }
+      case "jwt":
+        // A token's three parts are structured, not one string, so the panel
+        // renders `JwtView` instead of a result field. See `lib/TextKit/jwt.ts`.
+        return fail("A JWT is shown as its parts rather than as one string.");
     }
   } catch {
     return fail(

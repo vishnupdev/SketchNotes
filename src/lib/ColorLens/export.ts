@@ -63,33 +63,10 @@ export function formatPalette(palette: PaletteEntry[], format: ExportFormat): st
   }
 }
 
-/**
- * Save text to the user's device. Local-only, like every other export in the
- * workspace — nothing is uploaded to produce it.
+/*
+ * `downloadText` and `copyText` used to be defined here. They now live in
+ * `lib/export-text.ts`, shared, because four other apps export text too and
+ * rule #5 forbids them reaching into this app for it. Re-exported rather than
+ * moved outright, so every existing Color Lens import is unchanged.
  */
-export function downloadText(text: string, filename: string, mime: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: `${mime};charset=utf-8` }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  // Revoked well after the click: revoking too eagerly cancels the download in
-  // some browsers, and the blob is a few kilobytes at most.
-  setTimeout(() => URL.revokeObjectURL(url), 60_000);
-}
-
-/**
- * Copy to the clipboard, reporting whether it worked so the UI can show a
- * "copied" state only when it truly was. Fails silently on browsers that block
- * clipboard writes outside a user gesture.
- */
-export async function copyText(text: string): Promise<boolean> {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    return false;
-  }
-}
+export { copyText, downloadText } from "@/lib/export-text";

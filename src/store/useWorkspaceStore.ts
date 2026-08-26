@@ -35,19 +35,35 @@ export type AppId =
   | "clone"
   | "drop"
   | "text"
-  | "assistant";
+  | "assistant"
+  | "walk"
+  | "scan"
+  | "wallet"
+  | "voice"
+  | "convert"
+  | "api"
+  | "snippets"
+  | "markdown"
+  | "chrono"
+  | "contrast";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
 const ALL_APPS: AppId[] = [
   "sketchnotes",
-  // The guide sits near the front so a first-time visitor finds it early.
+  // The two guides sit near the front so a first-time visitor finds them early.
   "assistant",
+  "walk",
   "pdf",
   "image",
   "board",
   "todos",
   "reminders",
   "timer",
+  "wallet",
+  "scan",
+  "voice",
+  "convert",
+  "markdown",
   "system",
   "resources",
   "nearby",
@@ -65,6 +81,10 @@ const ALL_APPS: AppId[] = [
   "clone",
   "drop",
   "text",
+  "snippets",
+  "chrono",
+  "contrast",
+  "api",
 ];
 
 const ORDER_KEY = "sknotes:app-order";

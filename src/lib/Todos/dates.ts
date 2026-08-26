@@ -48,6 +48,11 @@ export function startOfYear(ts: number): number {
 /** Half-open range covering the whole period that `anchor` falls in. */
 export function periodRange(view: ViewMode, anchor: number): { start: number; end: number } {
   switch (view) {
+    // The agenda is not a period — it spans everything, so its range is every
+    // date a task could carry. Callers filtering by it get the whole collection,
+    // which is exactly what the agenda shows.
+    case "agenda":
+      return { start: -8.64e15, end: 8.64e15 };
     case "day": {
       const start = startOfDay(anchor);
       return { start, end: start + DAY_MS };
@@ -73,6 +78,10 @@ export function periodRange(view: ViewMode, anchor: number): { start: number; en
 export function shiftPeriod(view: ViewMode, anchor: number, dir: 1 | -1): number {
   const d = new Date(anchor);
   switch (view) {
+    // Nothing to step through: the agenda already covers every date, so its
+    // stepper is hidden rather than being a control that does nothing.
+    case "agenda":
+      return anchor;
     case "day":
       return startOfDay(anchor + dir * DAY_MS);
     case "week":
@@ -151,6 +160,8 @@ export function dueLabel(ts: number, now: number): string {
 /** Heading for the currently-framed period, e.g. "July 2026" or "Jul 21 – 27, 2026". */
 export function periodLabel(view: ViewMode, anchor: number, now: number): string {
   switch (view) {
+    case "agenda":
+      return "Everything ahead";
     case "day": {
       const d = new Date(startOfDay(anchor));
       const rel = dueLabel(anchor, now);

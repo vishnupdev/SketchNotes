@@ -10,7 +10,7 @@
 export type Priority = "low" | "medium" | "high";
 
 /** The calendar granularity the workspace is currently framed by. */
-export type ViewMode = "day" | "week" | "month" | "year";
+export type ViewMode = "agenda" | "day" | "week" | "month" | "year";
 
 /** Which slice of the task list to show. */
 export type TodoFilter = "all" | "active" | "completed";

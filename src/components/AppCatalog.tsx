@@ -1,5 +1,22 @@
 import type { ReactNode } from "react";
 import type { AppId } from "@/store/useWorkspaceStore";
+/*
+ * The glyphs below are drawn inline in this file, one per app. The nine imported
+ * here are the exception: they already exist in the shared icon set because each
+ * app's own masthead uses the same mark, and drawing a second copy here would mean
+ * two glyphs to keep in step (rule #2). Sized to 24 to match the inline ones.
+ */
+import {
+  ApiIcon,
+  ChronoIcon,
+  ConvertIcon,
+  MarkdownIcon,
+  ScanDocIcon,
+  SnippetIcon,
+  SwatchIcon,
+  VoiceMemoIcon,
+  WalletIcon,
+} from "@/components/SketchNotes/atoms/icons";
 
 /**
  * The workspace's app directory: one entry per app, holding its mark, its copy
@@ -432,6 +449,22 @@ const DropGlyph = (
   </svg>
 );
 
+const WalkaroundGlyph = (
+  // A signpost with two arms: the app hands out directions.
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.75}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 3.2v17.6" />
+    <path d="M12 6.2h6.4l2 2.4-2 2.4H12" />
+    <path d="M12 13h-6.4l-2 2.4 2 2.4H12" />
+  </svg>
+);
+
 export const APPS: AppEntry[] = [
   {
     id: "sketchnotes",
@@ -446,6 +479,13 @@ export const APPS: AppEntry[] = [
     tagline: "A private guide to every app",
     icon: AssistantGlyph,
     hue: "--app-assistant",
+  },
+  {
+    id: "walk",
+    name: "Walkaround",
+    tagline: "A guided tour of any app",
+    icon: WalkaroundGlyph,
+    hue: "--app-walk",
   },
   {
     id: "pdf",
@@ -607,6 +647,69 @@ export const APPS: AppEntry[] = [
     tagline: "Send any file, device to device",
     icon: DropGlyph,
     hue: "--app-drop",
+  },
+  {
+    id: "scan",
+    name: "Scan",
+    tagline: "Photograph a page, get a PDF",
+    icon: <ScanDocIcon size={24} />,
+    hue: "--app-scan",
+  },
+  {
+    id: "wallet",
+    name: "Wallet",
+    tagline: "Track spending & split bills",
+    icon: <WalletIcon size={24} />,
+    hue: "--app-wallet",
+  },
+  {
+    id: "voice",
+    name: "Voice Memos",
+    tagline: "Record & search what you said",
+    icon: <VoiceMemoIcon size={24} />,
+    hue: "--app-voice",
+  },
+  {
+    id: "convert",
+    name: "Convert",
+    tagline: "Units, sizes & currency",
+    icon: <ConvertIcon size={24} />,
+    hue: "--app-convert",
+  },
+  {
+    id: "markdown",
+    name: "Markdown",
+    tagline: "Write, preview & export",
+    icon: <MarkdownIcon size={24} />,
+    hue: "--app-markdown",
+  },
+  {
+    id: "snippets",
+    name: "Snippets",
+    tagline: "The code you keep looking up",
+    icon: <SnippetIcon size={24} />,
+    hue: "--app-snippets",
+  },
+  {
+    id: "chrono",
+    name: "Chrono",
+    tagline: "Cron, timestamps & durations",
+    icon: <ChronoIcon size={24} />,
+    hue: "--app-chrono",
+  },
+  {
+    id: "contrast",
+    name: "Contrast",
+    tagline: "Check colour & build a ramp",
+    icon: <SwatchIcon size={24} />,
+    hue: "--app-contrast",
+  },
+  {
+    id: "api",
+    name: "API Client",
+    tagline: "Send a request, read the reply",
+    icon: <ApiIcon size={24} />,
+    hue: "--app-api",
   },
 ];
 
