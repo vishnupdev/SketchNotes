@@ -430,7 +430,8 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   pdf: "ten PDF tools — edit, merge, split, organise, convert, watermark and more",
   image: "crop, resize, compress and convert images to any upload limit",
   board: "a page you build by typing — add, edit and remove sections in plain English",
-  todos: "tasks framed by day, week, month and year",
+  todos:
+    "tasks framed by day, week, month and year — plus an agenda that gathers tasks and reminders together into overdue, today and coming up",
   reminders: "timed alerts that ring with a sound you pick",
   timer: "countdown timers, a lap stopwatch and pomodoro cycles",
   system: "a live report on this device, browser and hardware",

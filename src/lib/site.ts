@@ -42,7 +42,12 @@ export const APPS: AppEntry[] = [
     blurb:
       "build your own page in plain English — add, rename, reorder and remove note, checklist, counter, links and habit sections by typing what you want",
   },
-  { path: "/todos", name: "Todos", blurb: "task list and weekly planner" },
+  {
+    path: "/todos",
+    name: "Todos",
+    blurb:
+      "task list and planner framed by agenda, day, week, month and year — the agenda gathers tasks and reminders together into what is overdue, due today and coming up",
+  },
   { path: "/reminders", name: "Reminders", blurb: "scheduled reminders with notifications" },
   { path: "/timer", name: "Timer", blurb: "pomodoro and countdown timer" },
   {

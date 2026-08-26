@@ -51,9 +51,21 @@ export function MermaidFigure({ source, dark }: { source: string; dark: boolean 
         setPending(false);
       } catch (e) {
         if (cancelled) return;
-        // A diagram with a syntax error is the normal case while typing one, so
-        // it reports the message rather than looking broken.
-        setError(e instanceof Error ? e.message.split("\n")[0] : "That diagram could not be drawn.");
+        const message = e instanceof Error ? e.message : "";
+        // Two very different failures reach here and they need different answers.
+        //
+        // The engine is deliberately *not* precached for offline — it is ~2.5 MB
+        // and most documents have no diagram in them (see
+        // `scripts/generate-precache.mjs`) — so the first diagram ever rendered
+        // needs a connection. A failed dynamic import says "Failed to fetch
+        // dynamically imported module", which would otherwise be shown to the
+        // user as if their diagram were malformed.
+        const offline = /dynamically imported module|Importing a module script failed|Failed to fetch/i.test(message);
+        setError(
+          offline
+            ? "The diagram engine has not been downloaded yet, and it needs a connection the first time. Everything else here works offline; once a diagram has rendered once, it will too."
+            : message.split("\n")[0] || "That diagram could not be drawn.",
+        );
         setPending(false);
       }
     })();

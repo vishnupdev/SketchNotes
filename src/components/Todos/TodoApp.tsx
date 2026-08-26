@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { useTodoStore } from "@/store/useTodoStore";
 import { useTodos, useTodoMutations } from "@/hooks/useTodos";
+import { useReminders } from "@/hooks/useReminders";
 import { inRange, matchesQuery, statsFor, visible } from "@/lib/Todos/selectors";
 import { periodRange, startOfDay } from "@/lib/Todos/dates";
 import { PeriodNav, VIEW_ORDER } from "@/components/Todos/molecules/PeriodNav";
@@ -58,6 +59,9 @@ export function TodoApp() {
 
   const { data: tasks = [], isLoading } = useTodos();
   const { clearCompleted } = useTodoMutations();
+  // Reminders join the agenda view. Merged at the shell (`lib/schedule.ts`), so
+  // neither app reaches into the other (rule #5).
+  const { data: reminders = [] } = useReminders();
 
   // A client-only "today", refreshed on mount so date maths stays out of SSR.
   const [now, setNow] = useState(() => Date.now());
@@ -142,7 +146,7 @@ export function TodoApp() {
             ) : view === "agenda" ? (
               // The agenda spans every date, so it takes the whole filtered pool
               // rather than a period slice — the grouping is its own.
-              <AgendaView tasks={pool} now={now} />
+              <AgendaView tasks={pool} reminders={reminders} now={now} />
             ) : view === "day" ? (
               <DayView pool={pool} anchor={anchor} todayStart={todayStart} />
             ) : view === "week" ? (

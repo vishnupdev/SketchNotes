@@ -55,10 +55,54 @@ if (files.length === 0) {
   process.exit(0);
 }
 
+/*
+ * Chunks deliberately left *out* of the eager precache.
+ *
+ * Mermaid is the case this exists for. It is ~2.8 MB across three dozen chunks —
+ * about 40% of the whole build — and it is only ever loaded when a Markdown
+ * document actually contains a ```mermaid fence. Precaching it would make every
+ * visitor download a diagram engine, on the offline install, to support a feature
+ * most of them will never open.
+ *
+ * Leaving it out costs very little, because the service worker caches hashed
+ * build output cache-first anyway: the first document with a diagram in it pulls
+ * these chunks over the network once, and from then on they are stored and the
+ * diagram renders offline like everything else. The only thing given up is a
+ * diagram working offline *before* it has ever been rendered online.
+ *
+ * Matched on content rather than filename because Next content-hashes chunk
+ * names, so there is no stable pattern to match on. Reading the build output
+ * costs a few megabytes of I/O once per build.
+ */
+const LAZY_ONLY = /mermaid|flowchart-v2|sequenceDiagram|cytoscape|dagre/;
+
+const eager = [];
+let deferred = 0;
+let deferredBytes = 0;
+
+for (const file of files) {
+  if (file.endsWith(".js")) {
+    const source = await readFile(file, "latin1");
+    if (LAZY_ONLY.test(source)) {
+      deferred++;
+      deferredBytes += source.length;
+      continue;
+    }
+  }
+  eager.push(file);
+}
+
 // `.next/static/chunks/x.js` is served as `/_next/static/chunks/x.js`.
-const assets = files
+const assets = eager
   .map((file) => posix.join("/_next/static", relative(STATIC_DIR, file).split(/[\\/]/).join("/")))
   .sort();
+
+if (deferred > 0) {
+  const mb = (deferredBytes / 1048576).toFixed(2);
+  console.log(
+    `[precache] deferring ${deferred} on-demand chunk(s), ${mb} MB — cached by the worker on first use`,
+  );
+}
 
 /*
  * A digest of the asset list, so the worker can tell one build's manifest from

@@ -17,6 +17,21 @@ import tseslint from "typescript-eslint";
  * eslint-plugin-react (7.37.5 still declares `eslint <= 9`) and Next's Babel
  * parser, both of which crash on ESLint 10's APIs. Swap back to the shared
  * preset once those support ESLint 10.
+ *
+ * **eslint-plugin-jsx-a11y is missing for the same reason**, and it is the gap
+ * worth knowing about, because rule #7 holds this project to an Accessibility
+ * score. 6.10.2 still declares `eslint: ^3 … ^9`, so `npm i -D` fails ERESOLVE
+ * against ESLint 10 outright — this was tried, not assumed. Installing it with
+ * `--legacy-peer-deps` would mean shipping a plugin that says it does not
+ * support this ESLint, so it is left out until upstream catches up.
+ *
+ * The practical consequence: `jsx-a11y/*` rules are not enforced, and an
+ * `eslint-disable-next-line jsx-a11y/…` comment is a **hard error** ("Definition
+ * for rule was not found") rather than a no-op — `reportUnusedDisableDirectives:
+ * "off"` silences *unused* directives, not ones naming an unknown rule. So write
+ * a plain comment explaining the exemption instead of a disable directive; see
+ * the `<video>` in `Scan/organisms/Capture.tsx` and the `<audio>` in
+ * `Voice/molecules/MemoCard.tsx`, neither of which has a caption track to give.
  */
 export default tseslint.config(
   {

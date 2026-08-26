@@ -1,3 +1,10 @@
+import {
+  cameraSupported,
+  classifyCameraError,
+  closeCamera,
+  openCamera,
+  type CameraError,
+} from "@/lib/camera";
 import { decodeFrom } from "./decode";
 
 /**
@@ -38,20 +45,25 @@ export interface Scanner {
 
 const SAMPLE_EDGE = 640;
 
-/** Human-readable reason a camera could not be opened. */
-function cameraError(error: unknown): string {
-  const name = error instanceof DOMException ? error.name : "";
-  if (name === "NotAllowedError" || name === "SecurityError") {
-    return "Camera access was blocked. Allow it in your browser's site settings, then try again.";
-  }
-  if (name === "NotFoundError" || name === "OverconstrainedError") {
-    return "No camera was found on this device.";
-  }
-  if (name === "NotReadableError") {
-    return "The camera is already in use by another app or tab.";
-  }
-  return "The camera couldn't be started.";
-}
+/**
+ * The scanner's wording for each failure.
+ *
+ * The *classification* is the workspace's shared one (`lib/camera.ts`) — three
+ * apps had grown their own copy of the same DOMException-name mapping. Only the
+ * wording stays here, because it is the one part that is genuinely this app's:
+ * a scanner can suggest reading a code from a picture instead, which the others
+ * have no equivalent of.
+ */
+const CAMERA_MESSAGES: Record<CameraError, string> = {
+  unsupported: "This browser can't open a camera. Read a code from a picture instead.",
+  denied: "Camera access was blocked. Allow it in your browser's site settings, then try again.",
+  notfound: "No camera was found on this device.",
+  inuse: "The camera is already in use by another app or tab.",
+  insecure: "Using the camera needs a secure (https) connection. Read a code from a picture instead.",
+  unknown: "The camera couldn't be started.",
+};
+
+const cameraError = (error: unknown): string => CAMERA_MESSAGES[classifyCameraError(error)];
 
 /**
  * Open the camera and start looking for codes. Resolves once the stream is
@@ -61,16 +73,19 @@ export async function startScanner(options: ScannerOptions): Promise<Scanner | n
   const { video, onResult, onError, continuous = false, facing = "environment" } = options;
   const intervalMs = options.intervalMs ?? 100;
 
-  if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
-    onError?.("This browser can't open a camera.");
+  if (!cameraSupported()) {
+    onError?.(cameraError(new DOMException("unsupported", "NotSupportedError")));
     return null;
   }
 
   let stream: MediaStream;
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: facing }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      audio: false,
+    // 720p: big enough to resolve a dense code, small enough that a decode pass
+    // every 100ms stays cheap. Deliberately not the sensor's maximum.
+    stream = await openCamera({
+      facingMode: { ideal: facing },
+      width: { ideal: 1280 },
+      height: { ideal: 720 },
     });
   } catch (error) {
     onError?.(cameraError(error));
@@ -88,7 +103,7 @@ export async function startScanner(options: ScannerOptions): Promise<Scanner | n
     stopped = true;
     if (timer !== null) window.clearInterval(timer);
     timer = null;
-    for (const track of stream.getTracks()) track.stop();
+    closeCamera(stream);
     // Detaching the stream is what actually clears the "camera in use" state in
     // some browsers, even after the tracks have been stopped.
     video.srcObject = null;
