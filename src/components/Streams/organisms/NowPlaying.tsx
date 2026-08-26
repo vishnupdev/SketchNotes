@@ -44,13 +44,19 @@ export function NowPlaying() {
   return (
     <section
       aria-label="Now playing"
-      className="border-t border-border bg-paper px-[22px] py-3"
+      className="sticky top-0 z-20 border-b border-border bg-paper px-[22px] py-3"
     >
       <div className={cx("mx-auto flex max-w-[900px] gap-3", expanded ? "flex-col" : "items-center")}>
+        {/* Expanded, the frame is capped by the *viewport's* height, not the
+            column's width: at 16:9 a full-width video on a 360px phone is 200px
+            tall, and with the bar and the tabs around it there was barely a card
+            of station left to scroll. The cap is a max-width so the aspect ratio
+            still sets the height — clamping the height directly would stretch
+            the iframe. */}
         <div
           className={cx(
             "overflow-hidden rounded-xl border border-border bg-panel",
-            expanded ? "w-full" : "w-[116px] flex-none",
+            expanded ? "mx-auto w-full max-w-[calc(38svh*16/9)]" : "w-[116px] flex-none",
           )}
         >
           <div className="aspect-video w-full">
