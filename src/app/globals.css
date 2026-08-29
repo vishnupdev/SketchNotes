@@ -170,6 +170,7 @@
   --app-chrono: #a16207;
   --app-contrast: #7c1d6f;
   --app-api: #b91c1c;
+  --app-satellite: #0b6b8f;
 
   /* QR codes are read by a camera, not by a person, so these two are the one
      pair in the workspace that does *not* follow the theme: a scanner expects
@@ -248,6 +249,7 @@
   --app-chrono: #e0b341;
   --app-contrast: #e879c7;
   --app-api: #f87171;
+  --app-satellite: #45b7e0;
   --board-note: #fbbf24;
   --board-checklist: #4d94ff;
   --board-counter: #1fb89f;

@@ -45,6 +45,7 @@ export type AppId =
   | "snippets"
   | "markdown"
   | "chrono"
+  | "satellite"
   | "contrast";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
@@ -83,6 +84,7 @@ const ALL_APPS: AppId[] = [
   "text",
   "snippets",
   "chrono",
+  "satellite",
   "contrast",
   "api",
 ];

@@ -14,4 +14,6 @@ export const queryKeys = {
   translation: (mode: string, source: string, target: string, text: string) =>
     ["translation", mode, source, target, text] as const,
   theme: ["theme"] as const,
+  weatherFrames: ["satellite", "weather-frames"] as const,
+  placeSearch: (query: string) => ["satellite", "places", query] as const,
 };

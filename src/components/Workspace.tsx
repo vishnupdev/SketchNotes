@@ -63,6 +63,7 @@ const SnippetsApp = dynamic(APP_LOADERS.snippets, { ssr: false });
 const MarkdownApp = dynamic(APP_LOADERS.markdown, { ssr: false });
 const ChronoApp = dynamic(APP_LOADERS.chrono, { ssr: false });
 const ContrastApp = dynamic(APP_LOADERS.contrast, { ssr: false });
+const SatelliteApp = dynamic(APP_LOADERS.satellite, { ssr: false });
 
 /**
  * Every app's deep-link path — the one place a route is declared, read in both
@@ -111,6 +112,7 @@ const APP_PATHS: Record<AppId, string> = {
   markdown: "/markdown",
   chrono: "/chrono",
   contrast: "/contrast",
+  satellite: "/satellite",
 };
 
 const PDF_BASE = APP_PATHS.pdf;
@@ -408,6 +410,13 @@ export function Workspace() {
 
       <AppFrame active={activeApp === "contrast"} name="Contrast">
         <ContrastApp />
+      </AppFrame>
+
+      {/* Satellite Map. Unmounted on an app switch, which is what ends the
+          location watch and stops the live weather frames being fetched — a map
+          nobody is looking at has no business holding the GPS. */}
+      <AppFrame active={activeApp === "satellite"} name="Satellite Map">
+        <SatelliteApp />
       </AppFrame>
 
       {/* Assistant — the in-app AI guide. */}

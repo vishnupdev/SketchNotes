@@ -58,6 +58,7 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   markdown: () => import("@/components/Markdown/MarkdownApp").then((m) => m.MarkdownApp),
   chrono: () => import("@/components/Chrono/ChronoApp").then((m) => m.ChronoApp),
   contrast: () => import("@/components/Contrast/ContrastApp").then((m) => m.ContrastApp),
+  satellite: () => import("@/components/Satellite/SatelliteApp").then((m) => m.SatelliteApp),
 };
 
 /**
@@ -99,6 +100,10 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "news",
   "streams",
   "world",
+  // Warmed late and honestly: the app's chunk caches, but a map is its tiles,
+  // and third-party imagery is not something this worker precaches. Offline it
+  // opens and says so rather than pretending to have the world on disk.
+  "satellite",
   // Late, with the PDF editor: Scan shares its pdf-lib bundle.
   "scan",
   "pdf",
@@ -139,5 +144,6 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   snippets: "Snippets",
   markdown: "Markdown",
   chrono: "Chrono",
+  satellite: "Satellite Map",
   contrast: "Contrast",
 };

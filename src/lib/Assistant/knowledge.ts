@@ -48,6 +48,7 @@ export const APP_LABELS: Record<AppId, string> = {
   snippets: "Snippets",
   markdown: "Markdown",
   chrono: "Chrono",
+  satellite: "Satellite Map",
   contrast: "Contrast",
 };
 
@@ -365,6 +366,38 @@ export const APP_ALIASES: Record<AppId, string[]> = {
     "colour blindness",
     "is this readable",
   ],
+  // "map" and "satellite" are safe to claim outright — no other app here draws
+  // one. The weather phrasings are included because "is it raining" is how
+  // people actually ask for the live overlay, not "show me radar tiles".
+  satellite: [
+    "satellite map",
+    "satellite",
+    "satellite view",
+    "map",
+    "maps",
+    "world map",
+    "aerial view",
+    "aerial photo",
+    "from above",
+    "birds eye view",
+    "see my house",
+    "street map",
+    "terrain map",
+    "topographic map",
+    "coordinates",
+    "latitude and longitude",
+    "gps",
+    "where am i",
+    "my location",
+    "find a place",
+    "geocode",
+    "rain radar",
+    "weather radar",
+    "is it raining",
+    "todays satellite image",
+    "weather map",
+    "live weather",
+  ],
 };
 
 /**
@@ -421,6 +454,7 @@ export const APP_PATHS: Record<AppId, string> = {
   snippets: "/snippets",
   markdown: "/markdown",
   chrono: "/chrono",
+  satellite: "/satellite",
   contrast: "/contrast",
 };
 
@@ -473,6 +507,8 @@ export const APP_SUMMARIES: Record<AppId, string> = {
     "explain a cron expression and show when it next fires, read any timestamp in every form, and do arithmetic on durations",
   contrast:
     "grade a colour pair against every WCAG level, build a 50–950 token ramp, and preview a palette under colour-vision deficiency",
+  satellite:
+    "see any place on Earth from above, with live rain radar or today's satellite pass animated over it, and your own position on the map",
 };
 
 export const KNOWLEDGE: KnowledgeEntry[] = [
@@ -482,10 +518,10 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "What OneApp is",
     keywords: ["oneapp", "one app", "overview", "about", "what is this", "workspace", "summary", "purpose", "intro"],
     answer:
-      "OneApp is a single web workspace holding thirty-five tools, so you never install thirty-five apps.\n" +
+      "OneApp is a single web workspace holding thirty-six tools, so you never install thirty-six apps.\n" +
       "• Creative: Sketchnotes canvas, Image Studio, PDF Editor, Scan, Markdown\n" +
       "• Planning: Board, Todos, Reminders, Timer, Wallet, Voice Memos\n" +
-      "• Info: News, World Clock, System Info, Resource Monitor, Nearby Devices, Network Speed, Sound Meter, Color Lens, Convert\n" +
+      "• Info: News, World Clock, Satellite Map, System Info, Resource Monitor, Nearby Devices, Network Speed, Sound Meter, Color Lens, Convert\n" +
       "• Making things: Snippets, Chrono, Contrast, API Client, Text Kit, QR Codes\n" +
       "• Moving things: Handoff, Clone, File Drop, Streams\n" +
       "• Language: Translate, Malayalam Writer, Morse Code, and me — the Assistant, alongside Walkaround\n" +
@@ -972,6 +1008,23 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     followUps: ["List all the apps", "What is OneApp?", "How do I switch apps?"],
   },
 
+  {
+    id: "app-satellite",
+    title: "Satellite Map — anywhere on Earth from above, live",
+    app: "satellite",
+    keywords: ["satellite map", "satellite", "satellite view", "map", "maps", "aerial", "from above", "see my house", "street map", "terrain", "coordinates", "latitude", "longitude", "gps", "where am i", "my location", "find a place", "rain radar", "weather radar", "is it raining", "cloud cover", "weather map", "live weather", "nowcast"],
+    answer:
+      "Satellite Map shows any place on Earth from above, with what is happening over it right now drawn on top.\n" +
+      "• Three views of the ground — Satellite (photographic imagery), Streets, and Terrain — plus an optional sheet of place names and borders over any of them\n" +
+      "• Two current layers: rain radar, re-published every ten minutes with a short forecast ahead where one exists, and NASA's true-colour mosaic of the whole planet, rebuilt daily — the last week of it\n" +
+      "• Either one is a run of time-stamped frames you can play as an animation or scrub by hand; the app says how old the newest measured frame is, and marks forecast frames as forecast rather than letting them pass as observations\n" +
+      "• Search a place by name, or paste coordinates — coordinates are resolved on the device without asking anyone. You can also ask what is under the middle of the map, and keep places for next time\n" +
+      "• Locate me follows your GPS with a marker and an accuracy circle, reporting speed, heading, altitude and how old the fix is, and can keep the map centred as you move\n" +
+      "One thing worth being clear about: the imagery underneath is a photograph, months or years old — no public satellite service streams the ground in real time. What is genuinely live here is the weather over it and your own position.\n" +
+      "Your position is never stored and never sent anywhere, and leaving the app stops the location watch. Map tiles, place search and the live layers all need a connection.",
+    followUps: ["Which apps need internet?", "Is my data private?", "What is the World Clock?"],
+  },
+
   // ── Cross-cutting how-tos ────────────────────────────────────────────────
   {
     id: "network-needs",
@@ -981,6 +1034,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "Only these need a connection:\n" +
       "• Streams — the music and live channels come from YouTube\n" +
       "• News — headlines are fetched live\n" +
+      "• Satellite Map — map tiles, place search and the live weather layers all come from elsewhere\n" +
       "• Network Speed — it measures a real connection\n" +
       "• Online translation — offline mode avoids this entirely\n" +
       "• Malayalam handwriting recognition — typing and the keyboard don't\n" +

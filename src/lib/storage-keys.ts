@@ -70,6 +70,7 @@ const OWNERS: OwnerRule[] = [
   { app: "markdown", match: prefix("sknotes:markdown:") },
   { app: "chrono", match: prefix("sknotes:chrono:") },
   { app: "contrast", match: prefix("sknotes:contrast:") },
+  { app: "satellite", match: prefix("sknotes:satellite:") },
   // Scan deliberately stores nothing — its pages live in memory until exported —
   // so it has no rule here. Adding one would claim a prefix that never exists.
   // Sketchnotes keys a note by its bare id (`sknotes:<id>`) plus one index, so

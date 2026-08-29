@@ -151,7 +151,7 @@ export const ACCESS_ITEMS: AccessItem[] = [
     what: "Read where you are, and follow you as you move.",
     permission: "geolocation",
     probe: () => inNav("geolocation"),
-    usedBy: [],
+    usedBy: ["satellite"],
     action: "live",
   },
 

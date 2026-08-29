@@ -1588,6 +1588,70 @@ export const TOURS: Record<AppId, Tour> = {
       },
     ],
   },
+
+  satellite: {
+    tagline: "the ground from above, and the weather over it now",
+    intro: "A map of anywhere on Earth, with the live layer that makes it worth watching.",
+    layout: {
+      blocks: [
+        { label: "The map", grow: 2.6 },
+        { label: "Zoom & follow", span: 1 },
+        { label: "Scale & credits", span: 1 },
+        { label: "Panel for the chosen tab", grow: 1.5 },
+      ],
+      tabs: ["Find", "Layers", "Live"],
+    },
+    steps: [
+      {
+        at: "body:0",
+        title: "Move around the world",
+        direction:
+          "Drag to pan and pinch, scroll or double-tap to zoom — and the arrow keys and +/− do the same thing once the map has focus.",
+        suggestion:
+          "Zooming holds the point under your finger still rather than pulling towards the middle, so you can dive straight onto a rooftop without chasing it.",
+      },
+      {
+        at: "body:1",
+        title: "Zoom, and follow yourself",
+        direction:
+          "The three controls in the corner zoom in, zoom out, and lock the map onto your live position once you have one.",
+        suggestion:
+          "Follow stays on until you drag the map yourself — that gesture is treated as you taking the wheel back, so you never have to hunt for the off switch.",
+      },
+      {
+        at: "tab:1",
+        title: "What the map is made of",
+        direction:
+          "Layers picks the ground — satellite imagery, streets or terrain — puts place names over it, and turns on a live sheet of rain radar or NASA's daily pass.",
+        suggestion:
+          "Turn the overlay strength down rather than off: seeing the coastline through the rain is the whole reason to have both on one map.",
+      },
+      {
+        at: "tab:2",
+        title: "The part that is live",
+        direction:
+          "Live plays the weather frames and says how many minutes old the newest measured one is, alongside your own position, speed and accuracy.",
+        suggestion:
+          "Watch the timeline's ticks: the pale ones on the right are forecast, not radar. Playing straight through the seam is how a projection quietly becomes a fact.",
+      },
+      {
+        at: "tab:0",
+        title: "Find somewhere",
+        direction:
+          "Find searches a place by name, takes pasted coordinates, tells you what is under the crosshair, and keeps places for next time.",
+        suggestion:
+          "Coordinates never leave the device — they are already the answer. Only a name goes to the geocoder, and only when you press Search.",
+      },
+      {
+        at: "body:2",
+        title: "Read the small print",
+        direction:
+          "The scale bar and the credit line sit under the map, and both change with what you are looking at.",
+        suggestion:
+          "The imagery is a photograph months or years old — no public service streams the ground live. The weather over it and your own dot are the live parts.",
+      },
+    ],
+  },
 };
 
 /** Apps in the order their tours are authored — the picker's default order. */

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { AppId } from "@/store/useWorkspaceStore";
 /*
- * The glyphs below are drawn inline in this file, one per app. The nine imported
+ * The glyphs below are drawn inline in this file, one per app. The ten imported
  * here are the exception: they already exist in the shared icon set because each
  * app's own masthead uses the same mark, and drawing a second copy here would mean
  * two glyphs to keep in step (rule #2). Sized to 24 to match the inline ones.
@@ -11,6 +11,7 @@ import {
   ChronoIcon,
   ConvertIcon,
   MarkdownIcon,
+  SatelliteIcon,
   ScanDocIcon,
   SnippetIcon,
   SwatchIcon,
@@ -703,6 +704,13 @@ export const APPS: AppEntry[] = [
     tagline: "Check colour & build a ramp",
     icon: <SwatchIcon size={24} />,
     hue: "--app-contrast",
+  },
+  {
+    id: "satellite",
+    name: "Satellite Map",
+    tagline: "See anywhere from above, live",
+    icon: <SatelliteIcon size={24} />,
+    hue: "--app-satellite",
   },
   {
     id: "api",

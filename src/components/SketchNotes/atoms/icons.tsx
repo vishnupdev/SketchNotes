@@ -1068,3 +1068,20 @@ export const SwatchIcon = (p: IconProps) => (
     <path d="M14.6 7.7h6.2M6 14.6v6.2" />
   </Svg>
 );
+
+/**
+ * A satellite square-on: body, two solar panels, and a dish pointed at you.
+ * Drawn flat rather than in perspective — a rotated body reads as a squiggle
+ * once it is down at 20px, which is the size this is actually used at.
+ */
+export const SatelliteIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="10.1" y="9.4" width="3.8" height="5.6" rx="0.9" />
+    <rect x="2.6" y="10.2" width="6" height="4" rx="0.7" />
+    <rect x="15.4" y="10.2" width="6" height="4" rx="0.7" />
+    <path d="M8.6 12.2h1.5M13.9 12.2h1.5" />
+    <path d="M12 9.4V6.6" />
+    <path d="M9.4 5.4a3.6 3.6 0 0 1 5.2 0" />
+    <path d="M12 15v3.2M9.4 19.8h5.2" />
+  </Svg>
+);

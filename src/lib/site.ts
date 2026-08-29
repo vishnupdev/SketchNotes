@@ -207,6 +207,12 @@ export const APPS: AppEntry[] = [
     blurb:
       "check colour contrast against every WCAG level and get the nearest passing shade, build a 50–950 tonal ramp as CSS, Tailwind, SCSS or JSON tokens, and preview a palette under colour-vision deficiency",
   },
+  {
+    path: "/satellite",
+    name: "Satellite Map",
+    blurb:
+      "see any place on Earth from above — satellite imagery, street and terrain maps, live rain radar and NASA's daily global pass animated frame by frame, place search and your own live position",
+  },
 ];
 
 /** Keywords targeting the brand plus each tool's search intent. */

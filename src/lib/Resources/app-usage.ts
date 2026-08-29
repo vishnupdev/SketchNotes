@@ -30,6 +30,8 @@ export const APP_NETWORK: Partial<Record<AppId, string>> = {
   markdown:
     "Nothing. Mermaid diagrams are drawn on the device; the diagram engine is downloaded once, the first time a document contains one.",
   clone: "The copy runs device to device. Over a cable or on “this network only” nothing outside the two devices is contacted at all; “anywhere” asks a public STUN server for this device's address, and it never sees your data.",
+  satellite:
+    "Map tiles are fetched from Esri and OpenStreetMap as you pan, the live weather layers from RainViewer, and a place search from OpenStreetMap's geocoder — each of which therefore sees the area you are looking at. Your GPS position is never sent anywhere; it is read on the device and drawn on the map.",
   drop: "Files go straight to the other device. In “anywhere” mode a public STUN server is asked for this device's public address — it never sees the files; in “this network only” mode nothing outside the network is contacted at all.",
 };
 
@@ -47,6 +49,8 @@ export const APP_STORAGE_NOTE: Record<AppId, string> = {
   markdown: "The document you are writing.",
   chrono: "The expression, timestamp and duration you last worked on.",
   contrast: "The colours you last checked, your ramp, and your palette.",
+  satellite:
+    "Your last view and layer choices, and any places you kept — names and coordinates only. Never your own position.",
   pdf: "Nothing — files are opened, edited and saved back without being stored.",
   image: "Nothing — pictures are processed in memory only.",
   board: "The board and all its sections.",
