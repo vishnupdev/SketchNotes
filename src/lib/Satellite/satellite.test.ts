@@ -24,6 +24,7 @@ import {
   type WeatherFrame,
 } from "./weather";
 import { baseLayer, BASE_LAYERS, LABELS_SOURCE } from "./layers";
+import { streetViewUrl } from "./streetview";
 
 /**
  * The map's arithmetic.
@@ -289,6 +290,40 @@ describe("overlay tiles", () => {
   it("caps each live layer at the level it is actually published to", () => {
     expect(overlayMaxZoom("daily")).toBe(9);
     expect(overlayMaxZoom("radar")).toBe(12);
+  });
+});
+
+describe("streetViewUrl", () => {
+  const params = (url: string) => new URL(url).searchParams;
+
+  it("asks for the panorama nearest a point", () => {
+    const url = streetViewUrl({ lat: 48.8584, lon: 2.2945 });
+    expect(new URL(url).origin).toBe("https://www.google.com");
+    expect(params(url).get("api")).toBe("1");
+    expect(params(url).get("map_action")).toBe("pano");
+    expect(params(url).get("viewpoint")).toBe("48.858400,2.294500");
+  });
+
+  it("faces the way the device is facing, when it knows", () => {
+    expect(params(streetViewUrl({ lat: 1, lon: 2 }, 91.4)).get("heading")).toBe("91");
+    // A compass can read past a full turn, or below zero after a correction.
+    expect(params(streetViewUrl({ lat: 1, lon: 2 }, 451)).get("heading")).toBe("91");
+    expect(params(streetViewUrl({ lat: 1, lon: 2 }, -90)).get("heading")).toBe("270");
+  });
+
+  it("leaves the heading off rather than inventing one", () => {
+    // Most devices report no heading while stationary; "0" would be a claim of
+    // facing due north, which is a different statement from "not known".
+    for (const unknown of [null, undefined, Number.NaN]) {
+      expect(params(streetViewUrl({ lat: 1, lon: 2 }, unknown)).has("heading")).toBe(false);
+    }
+  });
+
+  it("normalises a longitude that has been panned past the dateline", () => {
+    // The map's own centre can legitimately read 200°; Google's would not.
+    expect(params(streetViewUrl({ lat: 10, lon: 200 })).get("viewpoint")).toBe(
+      "10.000000,-160.000000",
+    );
   });
 });
 

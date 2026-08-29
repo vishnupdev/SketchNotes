@@ -6,10 +6,14 @@ import { useSatelliteStore } from "@/store/useSatelliteStore";
 import { usePlaceSearch } from "@/hooks/usePlaceSearch";
 import { describePoint, type Place } from "@/lib/Satellite/geocode";
 import { distanceM, formatDecimal, formatDistance, formatDms, parseLatLon } from "@/lib/Satellite/mercator";
+import { useLivePosition } from "@/hooks/useLivePosition";
+import { STREET_VIEW_NOTE } from "@/lib/Satellite/streetview";
 import { PlaceRow } from "@/components/Satellite/molecules/PlaceRow";
+import { StreetViewLink } from "@/components/Satellite/molecules/StreetViewLink";
 import {
   CheckIcon,
   CopyIcon,
+  LocationIcon,
   PinIcon,
   SearchIcon,
   TrashSmallIcon,
@@ -47,6 +51,14 @@ export function FindPanel() {
   const center = useSatelliteStore((s) => s.center);
   const fix = useSatelliteStore((s) => s.fix);
 
+  const fixError = useSatelliteStore((s) => s.fixError);
+  const {
+    supported: canLocate,
+    locating,
+    start: locate,
+    stop: stopLocating,
+  } = useLivePosition();
+
   /** The term actually searched for — only ever set by submitting the form. */
   const [term, setTerm] = useState("");
   const [copied, setCopied] = useState(false);
@@ -63,6 +75,11 @@ export function FindPanel() {
   const goTo = (place: Place) => {
     setPin(place);
     setView(place, place.zoom);
+  };
+
+  /** Fly to the live fix, close enough in to see the street you are on. */
+  const centreOnMe = () => {
+    if (fix) setView(fix, Math.max(16, useSatelliteStore.getState().zoom));
   };
 
   const submit = (e: React.FormEvent) => {
@@ -124,10 +141,42 @@ export function FindPanel() {
             Search
           </button>
         </div>
-        <p className="text-[11.5px] leading-snug text-ink-soft">
-          A latitude and longitude pair is resolved on the device. A name is looked up with
-          OpenStreetMap&apos;s geocoder, and only when you press Search.
-        </p>
+        {/* The other way to answer "where is this" — and for most people the
+            first one they reach for, which is why it sits with the search box
+            rather than only in the Live tab. */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={locating ? stopLocating : fix ? centreOnMe : locate}
+            disabled={!canLocate}
+            className={cx(
+              "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-semibold disabled:opacity-40",
+              locating
+                ? "border-accent bg-accent-soft text-accent"
+                : "tint border-border bg-panel hover:border-accent hover:text-accent",
+            )}
+          >
+            <LocationIcon size={13} />
+            {!canLocate
+              ? "Location unavailable"
+              : locating
+                ? "Locating — tap to cancel"
+                : fix
+                  ? "Centre on me"
+                  : "Use my location"}
+          </button>
+
+          <p className="text-[11.5px] leading-snug text-ink-soft">
+            Coordinates are resolved on the device; a name is looked up with OpenStreetMap&apos;s
+            geocoder, and only when you press Search.
+          </p>
+        </div>
+
+        {fixError && (
+          <p role="status" className="text-[12px] leading-snug text-danger">
+            {fixError}
+          </p>
+        )}
       </form>
 
       {isFetching && <p className="text-[12.5px] text-ink-soft">Looking…</p>}
@@ -207,7 +256,11 @@ export function FindPanel() {
             {copied ? <CheckIcon size={13} /> : <CopyIcon size={13} />}
             {copied ? "Copied" : "Copy"}
           </button>
+
+          <StreetViewLink point={center} />
         </div>
+
+        <p className="mt-2 text-[11px] leading-snug text-ink-soft">{STREET_VIEW_NOTE}</p>
 
         {lookup.isError && (
           <p role="status" className="mt-2 text-[12px] text-danger">
@@ -222,11 +275,12 @@ export function FindPanel() {
       </section>
 
       {pin && (
-        <section aria-label="The pin" className="flex items-center gap-2">
+        <section aria-label="The pin" className="flex flex-wrap items-center gap-2">
           <p className="min-w-0 flex-1 truncate text-[12.5px]">
             <span className="text-ink-soft">Pinned: </span>
             <b className="font-semibold">{pin.name}</b>
           </p>
+          <StreetViewLink point={pin} />
           <button
             type="button"
             onClick={() => savePlace(pin)}

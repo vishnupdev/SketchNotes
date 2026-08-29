@@ -1085,3 +1085,18 @@ export const SatelliteIcon = (p: IconProps) => (
     <path d="M12 15v3.2M9.4 19.8h5.2" />
   </Svg>
 );
+
+/**
+ * A figure standing on the ground, seen from the side — the mark every map uses
+ * for "go down to street level". Generic on purpose: a person and a footprint,
+ * not any one service's mascot.
+ */
+export const StreetViewIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="4.6" r="2.1" />
+    <path d="M12 8v6.4" />
+    <path d="M8.6 10.2 12 8.6l3.4 1.6" />
+    <path d="M10.2 20.4 12 14.4l1.8 6" />
+    <ellipse cx="12" cy="20.6" rx="6.6" ry="1.7" />
+  </Svg>
+);

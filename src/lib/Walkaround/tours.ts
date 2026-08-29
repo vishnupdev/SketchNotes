@@ -1612,11 +1612,11 @@ export const TOURS: Record<AppId, Tour> = {
       },
       {
         at: "body:1",
-        title: "Zoom, and follow yourself",
+        title: "Locate, follow, look down",
         direction:
-          "The three controls in the corner zoom in, zoom out, and lock the map onto your live position once you have one.",
+          "The corner stack zooms, finds where you are, and opens Street View for whatever is under the crosshair.",
         suggestion:
-          "Follow stays on until you drag the map yourself — that gesture is treated as you taking the wheel back, so you never have to hunt for the off switch.",
+          "The locate control changes job as it goes: it asks for your position, then centres on it, then follows you. Dragging the map is what hands the wheel back — follow switches itself off rather than snatching the view.",
       },
       {
         at: "tab:1",
@@ -1636,11 +1636,19 @@ export const TOURS: Record<AppId, Tour> = {
       },
       {
         at: "tab:0",
-        title: "Find somewhere",
+        title: "Find somewhere, or yourself",
         direction:
-          "Find searches a place by name, takes pasted coordinates, tells you what is under the crosshair, and keeps places for next time.",
+          "Find searches a place by name, takes pasted coordinates, uses your own location, tells you what is under the crosshair, and keeps places for next time.",
         suggestion:
           "Coordinates never leave the device — they are already the answer. Only a name goes to the geocoder, and only when you press Search.",
+      },
+      {
+        at: "body:3",
+        title: "Down to street level",
+        direction:
+          "Street View opens the panorama for a point — from the map's corner, from a pin, or from where you are standing.",
+        suggestion:
+          "It is a link out to Google, not an embed, and deliberately so: every keyless open source of street-level photos has almost no coverage left. Only the coordinates travel with the link.",
       },
       {
         at: "body:2",

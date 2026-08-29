@@ -31,7 +31,7 @@ export const APP_NETWORK: Partial<Record<AppId, string>> = {
     "Nothing. Mermaid diagrams are drawn on the device; the diagram engine is downloaded once, the first time a document contains one.",
   clone: "The copy runs device to device. Over a cable or on “this network only” nothing outside the two devices is contacted at all; “anywhere” asks a public STUN server for this device's address, and it never sees your data.",
   satellite:
-    "Map tiles are fetched from Esri and OpenStreetMap as you pan, the live weather layers from RainViewer, and a place search from OpenStreetMap's geocoder — each of which therefore sees the area you are looking at. Your GPS position is never sent anywhere; it is read on the device and drawn on the map.",
+    "Map tiles are fetched from Esri as you pan, the live layers from RainViewer and NASA, and a place search from OpenStreetMap's geocoder — each of which therefore sees the area you are looking at. Street View is a link you choose to follow, carrying only the coordinates, and contacts nobody until you tap it. Your GPS position is never sent anywhere; it is read on the device and drawn on the map.",
   drop: "Files go straight to the other device. In “anywhere” mode a public STUN server is asked for this device's public address — it never sees the files; in “this network only” mode nothing outside the network is contacted at all.",
 };
 

@@ -395,6 +395,9 @@ export const APP_ALIASES: Record<AppId, string[]> = {
     "weather radar",
     "is it raining",
     "todays satellite image",
+    "street view",
+    "streetview",
+    "locate me",
     "weather map",
     "live weather",
   ],
@@ -508,7 +511,7 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   contrast:
     "grade a colour pair against every WCAG level, build a 50–950 token ramp, and preview a palette under colour-vision deficiency",
   satellite:
-    "see any place on Earth from above, with live rain radar or today's satellite pass animated over it, and your own position on the map",
+    "see any place on Earth from above, find where you are, drop to Street View, and watch live rain radar or today's satellite pass animated over it",
 };
 
 export const KNOWLEDGE: KnowledgeEntry[] = [
@@ -1012,14 +1015,15 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     id: "app-satellite",
     title: "Satellite Map — anywhere on Earth from above, live",
     app: "satellite",
-    keywords: ["satellite map", "satellite", "satellite view", "map", "maps", "aerial", "from above", "see my house", "street map", "terrain", "coordinates", "latitude", "longitude", "gps", "where am i", "my location", "find a place", "rain radar", "weather radar", "is it raining", "cloud cover", "weather map", "live weather", "nowcast"],
+    keywords: ["satellite map", "satellite", "satellite view", "map", "maps", "aerial", "from above", "see my house", "street view", "streetview", "ground level", "street map", "terrain", "coordinates", "latitude", "longitude", "gps", "where am i", "my location", "find a place", "rain radar", "weather radar", "is it raining", "cloud cover", "weather map", "live weather", "nowcast"],
     answer:
       "Satellite Map shows any place on Earth from above, with what is happening over it right now drawn on top.\n" +
       "• Three views of the ground — Satellite (photographic imagery), Streets, and Terrain — plus an optional sheet of place names and borders over any of them\n" +
       "• Two current layers: rain radar, re-published every ten minutes with a short forecast ahead where one exists, and NASA's true-colour mosaic of the whole planet, rebuilt daily — the last week of it\n" +
       "• Either one is a run of time-stamped frames you can play as an animation or scrub by hand; the app says how old the newest measured frame is, and marks forecast frames as forecast rather than letting them pass as observations\n" +
       "• Search a place by name, or paste coordinates — coordinates are resolved on the device without asking anyone. You can also ask what is under the middle of the map, and keep places for next time\n" +
-      "• Locate me follows your GPS with a marker and an accuracy circle, reporting speed, heading, altitude and how old the fix is, and can keep the map centred as you move\n" +
+      "• Locate me finds where you are and puts you on the map with an accuracy circle, reporting speed, heading, altitude and how old the fix is; it can then keep the map centred as you move, until you drag the map yourself. It's on the map's own controls, in Find, and in Live\n" +
+      "• Street View opens the ground-level panorama for a point — from the map's corner, from a pin, or from where you are standing. It's a link out to Google rather than a viewer inside the app, because every keyless open source of street-level photos (KartaView and the like) has almost no coverage left — nothing within five kilometres of most Indian cities. Only the coordinates go with the link\n" +
       "One thing worth being clear about: the imagery underneath is a photograph, months or years old — no public satellite service streams the ground in real time. What is genuinely live here is the weather over it and your own position.\n" +
       "Your position is never stored and never sent anywhere, and leaving the app stops the location watch. Map tiles, place search and the live layers all need a connection.",
     followUps: ["Which apps need internet?", "Is my data private?", "What is the World Clock?"],

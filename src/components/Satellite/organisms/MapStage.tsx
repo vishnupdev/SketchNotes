@@ -24,8 +24,17 @@ import {
   metresPerPixel,
   scaleBar,
 } from "@/lib/Satellite/mercator";
+import { useLivePosition } from "@/hooks/useLivePosition";
+import { STREET_VIEW_LABEL, streetViewUrl } from "@/lib/Satellite/streetview";
 import { MapButton } from "@/components/Satellite/atoms/MapButton";
-import { MinusIcon, PinIcon, PlusIcon, TargetIcon } from "@/components/SketchNotes/atoms/icons";
+import {
+  LocationIcon,
+  MinusIcon,
+  PinIcon,
+  PlusIcon,
+  StreetViewIcon,
+  TargetIcon,
+} from "@/components/SketchNotes/atoms/icons";
 
 /** How far one arrow-key press moves the map, in CSS pixels. */
 const KEY_PAN_PX = 90;
@@ -48,11 +57,14 @@ export function MapStage() {
   const opacity = useSatelliteStore((s) => s.opacity);
   const frame = useSatelliteStore((s) => s.frame);
   const fix = useSatelliteStore((s) => s.fix);
+  const fixError = useSatelliteStore((s) => s.fixError);
   const pin = useSatelliteStore((s) => s.pin);
   const follow = useSatelliteStore((s) => s.follow);
   const setView = useSatelliteStore((s) => s.setView);
   const zoomBy = useSatelliteStore((s) => s.zoomBy);
   const setFollow = useSatelliteStore((s) => s.setFollow);
+
+  const { supported: canLocate, locating, start: locate, stop: stopLocating } = useLivePosition();
 
   // Only the radar layer has an index to fetch — the daily mosaic is addressed
   // by date, so choosing it costs no request beyond the tiles themselves.
@@ -172,6 +184,14 @@ export function MapStage() {
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
+
+    // Presses that land on the floating controls are theirs, not the map's.
+    // Without this the host captures the pointer on the way up the tree, which
+    // retargets the rest of the gesture — including the `click` — away from the
+    // button that was actually pressed, leaving zoom, locate and Street View
+    // looking pressed and doing nothing.
+    if ((e.target as HTMLElement).closest?.("[data-map-control]")) return;
+
     e.currentTarget.setPointerCapture(e.pointerId);
     pointers.current.set(e.pointerId, localPoint(e));
     pinch.current = null;
@@ -283,6 +303,16 @@ export function MapStage() {
   const accuracyPx =
     fix && ready ? Math.min(size.width, fix.accuracy / metresPerPixel(fix.lat, zoom)) : 0;
 
+  const locateLabel = !canLocate
+    ? "This browser cannot report a location"
+    : locating
+      ? "Locating you — tap to cancel"
+      : !fix
+        ? "Locate me"
+        : follow
+          ? "Stop following my position"
+          : "Centre on me and follow";
+
   const credits = [
     layer.credit,
     labels ? LABELS_SOURCE.credit : null,
@@ -358,20 +388,39 @@ export function MapStage() {
           <span className="absolute left-1/2 top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink-soft/70" />
         </span>
 
-        <div className="absolute right-2.5 top-2.5 flex flex-col gap-1.5">
+        <div data-map-control className="absolute right-2.5 top-2.5 flex flex-col gap-1.5">
           <MapButton label="Zoom in" onClick={() => zoomBy(1)}>
             <PlusIcon size={16} />
           </MapButton>
           <MapButton label="Zoom out" onClick={() => zoomBy(-1)}>
             <MinusIcon size={16} />
           </MapButton>
+
+          {/* One control, three honest states. It used to be "follow", disabled
+              until a fix existed — which left the map with no way to locate you
+              at all and no hint that the button in the Live tab was the way in.
+              Locating is a state of its own because the permission prompt lives
+              there, and it can take a while with nothing to show for it. */}
           <MapButton
-            label={follow ? "Stop following my position" : "Follow my position"}
-            pressed={follow}
-            disabled={!fix}
-            onClick={() => setFollow(!follow)}
+            label={locateLabel}
+            pressed={fix ? follow : undefined}
+            active={locating}
+            disabled={!canLocate}
+            onClick={
+              locating
+                ? stopLocating
+                : fix
+                  ? () => setFollow(!follow)
+                  : locate
+            }
           >
-            <TargetIcon size={16} />
+            {fix ? <TargetIcon size={16} /> : <LocationIcon size={16} />}
+          </MapButton>
+
+          {/* A link, not a button: leaving for a panorama is a navigation, and
+              middle-click and "open in new tab" should work as they do anywhere. */}
+          <MapButton label={`${STREET_VIEW_LABEL} of the centre`} href={streetViewUrl(center)}>
+            <StreetViewIcon size={16} />
           </MapButton>
         </div>
 
@@ -392,6 +441,15 @@ export function MapStage() {
       <p id="map-help" className="sr-only">
         Drag or use the arrow keys to move the map. Use plus and minus to zoom, or pinch and scroll.
       </p>
+
+      {/* Locating can now be started from the map, so its failure has to be
+          reportable from the map — otherwise a denied permission is a button
+          that silently does nothing. */}
+      {fixError && (
+        <p role="status" className="text-[12px] leading-snug text-danger">
+          {fixError}
+        </p>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <p className="font-mono text-[11px] text-ink-soft">

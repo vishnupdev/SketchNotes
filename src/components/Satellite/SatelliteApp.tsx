@@ -7,6 +7,7 @@ import { MapStage } from "@/components/Satellite/organisms/MapStage";
 import { FindPanel } from "@/components/Satellite/organisms/FindPanel";
 import { LayersPanel } from "@/components/Satellite/organisms/LayersPanel";
 import { LivePanel } from "@/components/Satellite/organisms/LivePanel";
+import { useLivePositionWatch } from "@/hooks/useLivePosition";
 import { NavView } from "@/components/SketchNotes/atoms/NavView";
 import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
@@ -63,6 +64,12 @@ export function SatelliteApp() {
   const tab = useSatelliteStore((s) => s.tab);
   const setTab = useSatelliteStore((s) => s.setTab);
   const hydrate = useSatelliteStore((s) => s.hydrate);
+
+  // The single owner of the GPS watch. Three places now offer to locate you —
+  // the map control, Find and Live — and each of them only issues the intent; if
+  // they each ran the watch themselves, having two on screen would mean two
+  // `watchPosition` calls racing fixes into the same store on twice the battery.
+  useLivePositionWatch();
 
   // Adopt the saved view and places once, after mount (avoids an SSR mismatch).
   useEffect(() => {

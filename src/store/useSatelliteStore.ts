@@ -17,6 +17,9 @@ export const SATELLITE_TABS: SatelliteTab[] = ["find", "layers", "live"];
 /** Zoom 2 fits the world on a phone; 19 is as deep as the imagery goes. */
 export const MIN_ZOOM = 2;
 
+/** Where "locate me" lands you: close enough to recognise the street you are on. */
+const LOCATE_ZOOM = 16;
+
 /** Where a first-time visitor lands: the whole world, so nothing is presumed. */
 const DEFAULT_VIEW: LatLon = { lat: 20, lon: 0 };
 
@@ -61,6 +64,13 @@ interface SatelliteState {
   fixError: string | null;
   /** Keep re-centring the map on the live position as it moves. */
   follow: boolean;
+  /**
+   * A one-shot "take me there when you find me". Set by the locate controls and
+   * spent by the first fix that arrives, which is what separates *asking where
+   * you are* from *following you around* — the first should move the map once,
+   * the second forever.
+   */
+  centreOnNextFix: boolean;
 
   /** The pin currently on the map — a search result, or a tapped point. */
   pin: Place | null;
@@ -72,8 +82,6 @@ interface SatelliteState {
   setTab: (tab: SatelliteTab) => void;
   /** Move the map. Latitude is clamped to what Mercator can draw. */
   setView: (center: LatLon, zoom?: number) => void;
-  /** Pan/zoom from the canvas — same as setView, but never breaks `follow`. */
-  nudgeView: (center: LatLon, zoom: number) => void;
   zoomBy: (delta: number) => void;
   setBase: (base: BaseLayerId) => void;
   setLabels: (labels: boolean) => void;
@@ -84,6 +92,8 @@ interface SatelliteState {
   setFix: (fix: LiveFix | null) => void;
   setTracking: (tracking: boolean) => void;
   setFixError: (message: string | null) => void;
+  /** Ask for the map to jump to the next fix, once. */
+  requestCentreOnFix: () => void;
   setFollow: (follow: boolean) => void;
   setPin: (pin: Place | null) => void;
   setQuery: (query: string) => void;
@@ -120,6 +130,7 @@ export const useSatelliteStore = create<SatelliteState>((set, get) => ({
   tracking: false,
   fixError: null,
   follow: false,
+  centreOnNextFix: false,
   pin: null,
   saved: [],
   query: "",
@@ -141,11 +152,9 @@ export const useSatelliteStore = create<SatelliteState>((set, get) => ({
     persist(get());
   },
 
-  nudgeView: (center, zoom) => {
-    set({ center: cleanPoint(center), zoom: clampZoom(zoom, get().base) });
-    persist(get());
-  },
-
+  // Deliberately does *not* clear `follow`: this is the +/− control and the
+  // keyboard, which change how close you are without saying anything about
+  // where you want to be. Panning is the gesture that means "not there".
   zoomBy: (delta) => {
     set({ zoom: clampZoom(get().zoom + delta, get().base) });
     persist(get());
@@ -173,10 +182,28 @@ export const useSatelliteStore = create<SatelliteState>((set, get) => ({
   setFrame: (frame) => set({ frame: Math.max(0, Math.round(frame)) }),
 
   setFix: (fix) => {
+    const { follow, centreOnNextFix, zoom } = get();
     set({ fix, fixError: fix ? null : get().fixError });
-    if (fix && get().follow) set({ center: cleanPoint(fix) });
+    if (!fix) return;
+
+    if (centreOnNextFix) {
+      // Answering "where am I" by acquiring a fix and leaving the map on the
+      // other side of the world is not an answer. Zoom in far enough to see the
+      // street, unless the map is already closer than that.
+      set({ center: cleanPoint(fix), zoom: Math.max(zoom, LOCATE_ZOOM), centreOnNextFix: false });
+    } else if (follow) {
+      set({ center: cleanPoint(fix) });
+    }
   },
-  setTracking: (tracking) => set({ tracking, follow: tracking ? get().follow : false }),
+  requestCentreOnFix: () => set({ centreOnNextFix: true }),
+  // A stopped watch drops the pending intent with it: a fix that lands after
+  // you have given up and panned somewhere else must not yank the map back.
+  setTracking: (tracking) =>
+    set({
+      tracking,
+      follow: tracking ? get().follow : false,
+      centreOnNextFix: tracking ? get().centreOnNextFix : false,
+    }),
   setFixError: (fixError) => set({ fixError }),
   setFollow: (follow) => {
     const fix = get().fix;

@@ -9,6 +9,7 @@ import { framesFor, liveFrameIndex, minutesBehind, OVERLAYS } from "@/lib/Satell
 import { formatDecimal, formatDistance } from "@/lib/Satellite/mercator";
 import { FrameTimeline } from "@/components/Satellite/molecules/FrameTimeline";
 import { FactRow } from "@/components/Satellite/molecules/FactRow";
+import { StreetViewLink } from "@/components/Satellite/molecules/StreetViewLink";
 import { LocationIcon, RefreshIcon } from "@/components/SketchNotes/atoms/icons";
 import { cx } from "@/lib/utils";
 
@@ -125,6 +126,14 @@ export function LivePanel() {
               >
                 Keep centred
               </button>
+              {/* Opened facing the way the device says you are facing, where it
+                  knows — so the panorama matches what is actually in front of
+                  you rather than an arbitrary compass direction. */}
+              <StreetViewLink
+                point={fix}
+                heading={fix.heading}
+                label="Street View here"
+              />
             </>
           )}
         </div>

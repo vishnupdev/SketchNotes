@@ -211,7 +211,7 @@ export const APPS: AppEntry[] = [
     path: "/satellite",
     name: "Satellite Map",
     blurb:
-      "see any place on Earth from above — satellite imagery, street and terrain maps, live rain radar and NASA's daily global pass animated frame by frame, place search and your own live position",
+      "see any place on Earth from above — satellite imagery, street and terrain maps, live rain radar and NASA's daily global pass animated frame by frame, place search, one-tap Street View, and your own live position tracked on the map",
   },
 ];
 

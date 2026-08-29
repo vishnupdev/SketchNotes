@@ -107,5 +107,5 @@ export const APP_SEARCH_TERMS: Record<AppId, string[]> = {
   markdown: ["markdown", "md", "readme", "mermaid", "preview markdown", "markdown editor"],
   chrono: ["cron", "crontab", "cron expression", "timestamp", "epoch", "unix time", "duration", "timezone convert"],
   contrast: ["contrast", "wcag", "accessibility", "a11y", "colour ramp", "color ramp", "tokens", "colour blind", "color blind"],
-  satellite: ["map", "satellite", "aerial", "earth", "globe", "terrain", "gps", "location", "coordinates", "radar", "rain", "clouds", "weather"],
+  satellite: ["map", "satellite", "street view", "streetview", "aerial", "earth", "globe", "terrain", "gps", "locate me", "location", "coordinates", "radar", "rain", "clouds", "weather"],
 };
