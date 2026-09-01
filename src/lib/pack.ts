@@ -40,14 +40,16 @@ export function fromBase64Url(text: string): Uint8Array {
 export type PackEncoding = "z" | "b";
 
 /**
- * Compress text with the platform's deflate, where it has one.
+ * Compress bytes with the platform's deflate, where it has one.
  *
  * Returns the plain bytes when compression is unavailable *or* when it made
- * things bigger, which short payloads reliably do — hence the encoding tag
+ * things bigger — which short payloads reliably do, and so does anything
+ * already compressed (a JPEG, an MP4, a .docx). Hence the encoding tag
  * travelling with the data rather than being assumed.
  */
-export async function deflateText(text: string): Promise<{ data: Uint8Array; enc: PackEncoding }> {
-  const bytes = new TextEncoder().encode(text);
+export async function deflateBytes(
+  bytes: Uint8Array,
+): Promise<{ data: Uint8Array; enc: PackEncoding }> {
   if (typeof CompressionStream === "undefined") return { data: bytes, enc: "b" };
   try {
     const stream = new Blob([bytes as BlobPart])
@@ -60,15 +62,23 @@ export async function deflateText(text: string): Promise<{ data: Uint8Array; enc
   }
 }
 
-export async function inflateText(data: Uint8Array, enc: PackEncoding): Promise<string> {
-  if (enc === "b") return new TextDecoder().decode(data);
+export async function inflateBytes(data: Uint8Array, enc: PackEncoding): Promise<Uint8Array> {
+  if (enc === "b") return data;
   if (typeof DecompressionStream === "undefined") {
     throw new Error("This browser can't unpack that.");
   }
   const stream = new Blob([data as BlobPart])
     .stream()
     .pipeThrough(new DecompressionStream("deflate-raw"));
-  return new Response(stream).text();
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+/** The same, for text — the shape the QR frame protocol and the codes use. */
+export const deflateText = (text: string): Promise<{ data: Uint8Array; enc: PackEncoding }> =>
+  deflateBytes(new TextEncoder().encode(text));
+
+export async function inflateText(data: Uint8Array, enc: PackEncoding): Promise<string> {
+  return new TextDecoder().decode(await inflateBytes(data, enc));
 }
 
 /* ------------------------------- checksums ---------------------------- */

@@ -54,6 +54,7 @@ const OWNERS: OwnerRule[] = [
   { app: "translate", match: exact("sknotes:translate-prefs") },
   { app: "color", match: exact("sknotes:colorlens-picks") },
   { app: "qr", match: prefix("sknotes:qr:") },
+  { app: "qrfiles", match: prefix("sknotes:qrfiles:") },
   { app: "text", match: prefix("sknotes:text:") },
   { app: "drop", match: prefix("sknotes:drop:") },
   { app: "clone", match: prefix("sknotes:clone:") },

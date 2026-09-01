@@ -923,6 +923,22 @@ export const QrIcon = (p: IconProps) => (
   </Svg>
 );
 
+/**
+ * A document with a code where its contents would be — a file that has become
+ * codes. Deliberately not the QR mark with a corner folded off: the point of
+ * this app is the *whole* file living inside the squares.
+ */
+export const FileQrIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M13.4 2.9H7.2A1.7 1.7 0 0 0 5.5 4.6v14.8a1.7 1.7 0 0 0 1.7 1.7h9.6a1.7 1.7 0 0 0 1.7-1.7V7.6z" />
+    <path d="M13.2 3v4.5h4.9" />
+    <rect x="8" y="10.4" width="3.2" height="3.2" rx=".8" />
+    <rect x="8" y="15.2" width="3.2" height="3.2" rx=".8" />
+    <rect x="12.8" y="10.4" width="3.2" height="3.2" rx=".8" />
+    <path d="M12.8 15.4h1.4M15.9 15.4v1.5M13.6 18.4h2.4" />
+  </Svg>
+);
+
 /** A viewfinder's corner brackets — aim at a code. */
 export const ScanIcon = (p: IconProps) => (
   <Svg {...p}>

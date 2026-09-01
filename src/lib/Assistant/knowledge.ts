@@ -34,6 +34,7 @@ export const APP_LABELS: Record<AppId, string> = {
   sound: "Sound Meter",
   color: "Color Lens",
   qr: "QR Codes",
+  qrfiles: "QR Files",
   handoff: "Handoff",
   clone: "Clone",
   drop: "File Drop",
@@ -189,6 +190,22 @@ export const APP_ALIASES: Record<AppId, string[]> = {
     "scanner",
     "wifi code",
     "vcard",
+  ],
+  // Narrow on purpose: the bare QR words belong to the app next door, and only
+  // a phrasing that names a *file* should outrank it.
+  qrfiles: [
+    "qr files",
+    "file to qr",
+    "file as qr",
+    "image to qr",
+    "photo to qr",
+    "pdf to qr",
+    "document to qr",
+    "audio to qr",
+    "video to qr",
+    "encode a file as qr",
+    "print a file as codes",
+    "paper backup",
   ],
   handoff: [
     "handoff",
@@ -443,6 +460,7 @@ export const APP_PATHS: Record<AppId, string> = {
   sound: "/soundmeter",
   color: "/color",
   qr: "/qr",
+  qrfiles: "/qrfiles",
   handoff: "/handoff",
   clone: "/clone",
   drop: "/drop",
@@ -487,6 +505,8 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   sound: "measure sound frequency, musical pitch and loudness from the microphone",
   color: "read any colour out of a photo — every code, its name, contrast and palette",
   qr: "scan a QR code with the camera or from a picture, and make codes for links, Wi-Fi, contacts and more",
+  qrfiles:
+    "turn any file — a photo, a PDF, a song, a clip — into QR codes you can print or show, and read them back into the identical file",
   handoff: "move this browser's data to another device by camera — no account, no upload, no cable",
   clone: "copy this whole device onto another one — by cable, over a network, or with no network at all",
   drop: "send files of any size straight from one device to another, on the same network with no internet at all, or across the internet",
@@ -521,11 +541,11 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "What OneApp is",
     keywords: ["oneapp", "one app", "overview", "about", "what is this", "workspace", "summary", "purpose", "intro"],
     answer:
-      "OneApp is a single web workspace holding thirty-six tools, so you never install thirty-six apps.\n" +
+      "OneApp is a single web workspace holding thirty-seven tools, so you never install thirty-seven apps.\n" +
       "• Creative: Sketchnotes canvas, Image Studio, PDF Editor, Scan, Markdown\n" +
       "• Planning: Board, Todos, Reminders, Timer, Wallet, Voice Memos\n" +
       "• Info: News, World Clock, Satellite Map, System Info, Resource Monitor, Nearby Devices, Network Speed, Sound Meter, Color Lens, Convert\n" +
-      "• Making things: Snippets, Chrono, Contrast, API Client, Text Kit, QR Codes\n" +
+      "• Making things: Snippets, Chrono, Contrast, API Client, Text Kit, QR Codes, QR Files\n" +
       "• Moving things: Handoff, Clone, File Drop, Streams\n" +
       "• Language: Translate, Malayalam Writer, Morse Code, and me — the Assistant, alongside Walkaround\n" +
       "Everything is free, needs no account, and keeps your data in your own browser.",
@@ -966,6 +986,22 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "You can also just type a hex code in to look it up. The picture is decoded on your device and never uploaded, so it all works offline — the camera needs permission, and it's released as soon as you capture or close the viewfinder.",
     followUps: ["Is my data private?", "What can Image Studio do?", "List all the apps"],
   },
+  {
+    id: "app-qrfiles",
+    title: "QR Files — a whole file, carried by QR codes",
+    app: "qrfiles",
+    keywords: ["qr files", "file to qr", "file as qr code", "image to qr", "photo to qr", "picture to qr", "pdf to qr", "document to qr", "audio to qr", "song to qr", "video to qr", "encode a file", "print a file as codes", "paper backup", "file on paper", "send a file without internet", "file with no network", "scan a file back", "rebuild a file from codes"],
+    answer:
+      "QR Files turns a whole file into QR codes, and turns them back. A picture, a document, a song, a clip — anything up to 4 MB.\n" +
+      "• Encode reads the file on your device, compresses it and splits it across as many numbered codes as it needs. Before it builds anything it tells you the cost: how many codes, how many printed pages, how long the loop runs\n" +
+      "• Three ways to get them out — a loop played on screen for another device to read, a printed sheet, or every code saved as a PNG in a zip with a note explaining how to rebuild them\n" +
+      "• Rebuild reads them back, with the camera or one picture at a time, in any order. Re-reading a code you already have is harmless, and it tells you which parts are still missing\n" +
+      "• Nothing is saved until the whole set has arrived and its checksum matches, so you never get a file that looks fine and is quietly corrupt\n" +
+      "Be realistic about the size: a QR code holds about a kilobyte, so a phone photo is a couple of hundred codes and a video is thousands. If both devices are on one network, File Drop sends the same file in one go and is far faster. This is for when there is no network at all — or when the file has to end up on paper, which is the one thing nothing else here can do.\n" +
+      "It is all local: the file is read in the browser, drawn as codes on the device and never uploaded, and only the names and sizes of what passed through are kept.",
+    followUps: ["What is File Drop?", "Which apps need internet?", "What can the QR Codes app do?"],
+  },
+
   {
     id: "app-clone",
     title: "Clone — copy a whole device onto another one",

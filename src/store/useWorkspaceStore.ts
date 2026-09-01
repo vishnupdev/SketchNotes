@@ -46,7 +46,8 @@ export type AppId =
   | "markdown"
   | "chrono"
   | "satellite"
-  | "contrast";
+  | "contrast"
+  | "qrfiles";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
 const ALL_APPS: AppId[] = [
@@ -78,6 +79,7 @@ const ALL_APPS: AppId[] = [
   "sound",
   "color",
   "qr",
+  "qrfiles",
   "handoff",
   "clone",
   "drop",

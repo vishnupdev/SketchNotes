@@ -961,6 +961,70 @@ export const TOURS: Record<AppId, Tour> = {
     ],
   },
 
+  qrfiles: {
+    tagline: "any file, as a wall of codes",
+    intro: "A whole file turned into QR codes, and turned back — and what that actually costs.",
+    layout: {
+      blocks: [
+        { label: "The file, and what it will cost", grow: 1.1 },
+        { label: "Code size \u00b7 error correction", grow: 0.9 },
+        { label: "Loop / Sheet", grow: 2.2 },
+        { label: "Print \u00b7 Save the images", grow: 0.7 },
+      ],
+      tabs: ["Encode", "Rebuild", "History"],
+    },
+    steps: [
+      {
+        at: "tab:0",
+        title: "Any file, one door",
+        direction:
+          "Drop or pick a picture, a document, a song or a clip \u2014 up to 4 MB. It is read on this device and never uploaded.",
+        suggestion:
+          "There is no \"choose a type\" step because the app doesn't care what the file is. Everything past this point is just bytes.",
+      },
+      {
+        at: "body:0",
+        title: "The cost, before you spend it",
+        direction:
+          "Before a single code is drawn it says how many there will be, how many printed pages that is, and how long the on-screen loop runs.",
+        suggestion:
+          "This is the number to react to. A phone photo is a couple of hundred codes \u2014 shrink it in Image Studio first and the same picture becomes a sheet you can actually scan.",
+      },
+      {
+        at: "body:1",
+        title: "Two dials, one trade",
+        direction:
+          "Code size sets how much each code carries, and error correction how much damage it survives.",
+        suggestion:
+          "Denser codes mean fewer of them and a harder scan. Reading off a screen a foot away, go dense; photographing a printed sheet later, don't \u2014 a code you can't read is worse than ten more of them.",
+      },
+      {
+        at: "body:3",
+        title: "Off the screen entirely",
+        direction:
+          "The same codes print as a numbered sheet, or save as one PNG each in a zip with a note explaining how to rebuild them.",
+        suggestion:
+          "This is the thing nothing else here does: paper outlives every format and every device. It is also the slowest way to move a file \u2014 if both devices are on one network, File Drop sends it in one go.",
+      },
+      {
+        at: "tab:1",
+        title: "Reading it back",
+        direction:
+          "Point the camera at the loop or the sheet, or add one picture of one code at a time \u2014 in any order, and re-reading one you already have is harmless.",
+        suggestion:
+          "Nothing is saved until the whole set has arrived and its checksum matches, so a misread code is reported rather than handed back as a file that looks fine and isn't.",
+      },
+      {
+        at: "tab:2",
+        title: "Names only, on purpose",
+        direction:
+          "History lists what passed through \u2014 each file's name, size and code count, never its contents.",
+        suggestion:
+          "So a row can't re-open a file, and doesn't pretend to. What it is good for is planning the next one: how many codes was that photo, at which setting.",
+      },
+    ],
+  },
+
   handoff: {
     tagline: "move your data to another device",
     intro: "Getting this browser's data onto another device with nothing in between.",

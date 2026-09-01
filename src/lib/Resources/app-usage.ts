@@ -69,6 +69,7 @@ export const APP_STORAGE_NOTE: Record<AppId, string> = {
   sound: "Reference pitch, view and dB offset.",
   color: "Recently picked colours.",
   qr: "Codes you have scanned or made on this device.",
+  qrfiles: "The names and sizes of files you converted — never the files themselves.",
   text: "The text you are working on, kept so a refresh doesn't lose it.",
   drop: "Nothing — files stream through and are written where you choose.",
   handoff: "Nothing — a transfer is held in memory only until you accept it.",

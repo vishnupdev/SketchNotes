@@ -119,6 +119,12 @@ export const APPS: AppEntry[] = [
       "scan a QR code with your camera or from a picture, and create codes for links, Wi-Fi, contacts, email and locations",
   },
   {
+    path: "/qrfiles",
+    name: "QR Files",
+    blurb:
+      "turn any file — a photo, a PDF, a song, a video clip — into a set of QR codes you can print, save as images or play as a loop, then read them back into the identical file with a camera",
+  },
+  {
     path: "/handoff",
     name: "Handoff",
     blurb:
@@ -314,6 +320,12 @@ export const SITE_KEYWORDS = [
   "wifi qr code generator",
   "vcard qr code",
   "read qr code on my screen",
+  "file to qr code",
+  "image to qr code",
+  "pdf to qr code",
+  "convert file to qr code online",
+  "qr code from a video",
+  "print a file as qr codes",
   "transfer data between devices offline",
   "send notes to my phone",
   "share data without internet",

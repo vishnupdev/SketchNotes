@@ -49,6 +49,7 @@ const SoundMeterApp = dynamic(APP_LOADERS.sound, { ssr: false });
 const ColorLensApp = dynamic(APP_LOADERS.color, { ssr: false });
 const AssistantApp = dynamic(APP_LOADERS.assistant, { ssr: false });
 const QrToolApp = dynamic(APP_LOADERS.qr, { ssr: false });
+const QrFilesApp = dynamic(APP_LOADERS.qrfiles, { ssr: false });
 const HandoffApp = dynamic(APP_LOADERS.handoff, { ssr: false });
 const CloneApp = dynamic(APP_LOADERS.clone, { ssr: false });
 const FileDropApp = dynamic(APP_LOADERS.drop, { ssr: false });
@@ -96,6 +97,7 @@ const APP_PATHS: Record<AppId, string> = {
   sound: "/soundmeter",
   color: "/color",
   qr: "/qr",
+  qrfiles: "/qrfiles",
   handoff: "/handoff",
   clone: "/clone",
   drop: "/drop",
@@ -339,6 +341,13 @@ export function Workspace() {
           camera if the scanner was left running. */}
       <AppFrame active={activeApp === "qr"} name="QR Codes">
         <QrToolApp />
+      </AppFrame>
+
+      {/* QR Files. Unmounted on an app switch, which releases the camera if
+          the rebuild scanner was left running — and discards a half-collected
+          set of codes, which is deliberate: an incomplete file is not a file. */}
+      <AppFrame active={activeApp === "qrfiles"} name="QR Files">
+        <QrFilesApp />
       </AppFrame>
 
       {/* Handoff. Unmounting is what ends both the camera and any open

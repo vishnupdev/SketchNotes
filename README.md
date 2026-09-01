@@ -146,7 +146,7 @@ The whole workspace is usable with a weak connection or none at all. Four pieces
 | Offline UI | [`src/components/Offline/`](./src/components/Offline) | App-wide connection pill, and one shared notice used by every network-dependent feature (News, online translate, handwriting, speed test, public IP). |
 
 Apps that are fully local — Sketchnotes, PDF Editor, Image Studio, Todos,
-Reminders, Timer, System Info, QR Codes, Handoff, Malayalam typing, on-device
+Reminders, Timer, System Info, QR Codes, QR Files, Handoff, Malayalam typing, on-device
 Translate, Assistant — behave identically offline, and both File Drop's
 same-network mode and Clone's cable and no-network routes contact nothing
 outside the two devices. The rest degrade explicitly rather
@@ -196,6 +196,9 @@ renderer, under a second:
   in `public/llms.txt` and are therefore a contract;
 - the [QR frame protocol](./src/lib/qr/frames.test.ts) — frames read out of order, repeated,
   interleaved with another sender, and corrupted;
+- the [QR file protocol](./src/lib/qr/file-frames.test.ts) — the same, for the binary streams
+  QR Files carries a whole file over, plus that a Handoff frame is ignored rather than
+  half-read, and that a corrupted code fails loudly instead of yielding a plausible file;
 - [connection codes](./src/lib/rtc/code.test.ts) and
   [File Drop's framing, checksums and name sanitiser](./src/lib/FileDrop/filedrop.test.ts) —
   including that a half-copied code says so, and that a file name from another device can't

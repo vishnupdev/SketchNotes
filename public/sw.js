@@ -46,7 +46,7 @@
 // the /nearby route; v10 adds the share target, background reminder checks and
 // the /qr and /handoff routes; v11 adds the /drop route and File Drop's
 // streaming downloads; v12 adds the /clone route.
-const VERSION = "oneapp-v15";
+const VERSION = "oneapp-v16";
 const SHELL_CACHE = `oneapp-shell-${VERSION}`;
 const STATIC_CACHE = `oneapp-static-${VERSION}`;
 const DATA_CACHE = `oneapp-data-${VERSION}`;
@@ -117,6 +117,7 @@ const SHELL_URLS = [
   "/soundmeter",
   "/color",
   "/qr",
+  "/qrfiles",
   "/handoff",
   "/clone",
   "/drop",

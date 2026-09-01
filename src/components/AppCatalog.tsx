@@ -10,6 +10,7 @@ import {
   ApiIcon,
   ChronoIcon,
   ConvertIcon,
+  FileQrIcon,
   MarkdownIcon,
   SatelliteIcon,
   ScanDocIcon,
@@ -627,6 +628,13 @@ export const APPS: AppEntry[] = [
     tagline: "Scan one, or make one",
     icon: QrGlyph,
     hue: "--app-qr",
+  },
+  {
+    id: "qrfiles",
+    name: "QR Files",
+    tagline: "Any file, as a wall of codes",
+    icon: <FileQrIcon size={24} />,
+    hue: "--app-qrfiles",
   },
   {
     id: "handoff",
