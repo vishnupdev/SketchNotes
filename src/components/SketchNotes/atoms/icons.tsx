@@ -1116,3 +1116,182 @@ export const StreetViewIcon = (p: IconProps) => (
     <ellipse cx="12" cy="20.6" rx="6.6" ry="1.7" />
   </Svg>
 );
+
+/**
+ * A key, drawn as the shape a key actually is at 20px: a ringed head and a
+ * shank with two teeth. Vault's mark, and the one glyph that reads as "the
+ * thing that opens something" without a padlock's ambiguity — LockIcon already
+ * means "this is closed" elsewhere in the workspace.
+ */
+export const KeyIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="7.6" cy="16.4" r="3.4" />
+    <path d="M10 14 19.4 4.6" />
+    <path d="M15.6 8.4l2.2 2.2" />
+    <path d="M17.8 6.2 20 8.4" />
+  </Svg>
+);
+
+/** A countdown ring — the life of a one-time code, not a clock face. */
+export const CodeRingIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3.6a8.4 8.4 0 1 1-6.6 3.2" />
+    <path d="M5.4 3.4v3.6h3.6" />
+    <path d="M9 12h1.6M13.4 12H15" />
+  </Svg>
+);
+
+/** A grid with a heavier first row: a table, headers and all. */
+export const TableIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.2" y="4.4" width="17.6" height="15.2" rx="2" />
+    <path d="M3.2 9.2h17.6" />
+    <path d="M3.2 14.4h17.6" />
+    <path d="M9.6 9.2v10.4M15.4 9.2v10.4" />
+  </Svg>
+);
+
+/** Three bars off a baseline — a chart, with the axis it is measured against. */
+export const BarChartIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 20.2h16.4" />
+    <path d="M7.4 20.2V13" />
+    <path d="M12 20.2V6.4" />
+    <path d="M16.6 20.2v-5.4" />
+  </Svg>
+);
+
+/** A line with its points, for the other half of the chart panel. */
+export const LineChartIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 20.2h16.4" />
+    <path d="M5.4 16.2l4-4.6 3.4 2.6 5.6-6.4" />
+    <circle cx="9.4" cy="11.6" r="1.1" />
+    <circle cx="12.8" cy="14.2" r="1.1" />
+  </Svg>
+);
+
+/** A column of figures with a sigma — a summary of a column, not a chart. */
+export const SummaryIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4.4 5.4h7.2L7 12l4.6 6.6H4.4" />
+    <path d="M15 8.2h5M15 12h5M15 15.8h5" />
+  </Svg>
+);
+
+/** A camera body with a record dot in the lens — recording, not photographing. */
+export const RecordIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="2.6" y="7" width="13.4" height="10" rx="2.2" />
+    <path d="M16 11.4l5-3.2v7.6l-5-3.2" />
+    <circle cx="9.3" cy="12" r="2.3" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+/** A strip of film — the recorded clips, as a library. */
+export const FilmIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.2" y="5" width="17.6" height="14" rx="2" />
+    <path d="M8 5v14M16 5v14" />
+    <path d="M3.2 12h4.8M16 12h4.8" />
+  </Svg>
+);
+
+/** Two stacked cards, the front one offset — a deck being flipped through. */
+export const CardsIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="6.6" y="3.4" width="13.8" height="10" rx="2" />
+    <path d="M16.6 16.4a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2V8.6" />
+    <path d="M10.4 8.4h6.2" />
+  </Svg>
+);
+
+/** A card mid-flip, showing its back — the review screen's mark. */
+export const FlipIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.4" y="5.6" width="7.2" height="12.8" rx="1.8" />
+    <path d="M13.4 5.6h5.4a1.8 1.8 0 0 1 1.8 1.8v9.2a1.8 1.8 0 0 1-1.8 1.8h-5.4" strokeDasharray="2.6 2.4" />
+    <path d="M12 3.2v17.6" />
+  </Svg>
+);
+
+/** A luggage tag — metadata attached to a thing, rather than part of it. */
+export const TagIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12.6 3.6H19a1.4 1.4 0 0 1 1.4 1.4v6.4a1.4 1.4 0 0 1-.4 1l-8 8a1.4 1.4 0 0 1-2 0l-6.4-6.4a1.4 1.4 0 0 1 0-2l8-8a1.4 1.4 0 0 1 1-.4Z" />
+    <circle cx="16.4" cy="7.6" r="1.3" />
+  </Svg>
+);
+
+/** A broom sweeping a surface — taking the metadata back out of a picture. */
+export const BroomIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M14.4 3.6 9.6 8.4" />
+    <path d="M7.4 6.6 11 10.2l-4.4 4.4a3 3 0 0 1-4.2 0l.6-.6a3 3 0 0 0 0-4.2Z" />
+    <path d="M13.6 20.4h7M15.6 16.8h5M17.6 13.2h3" />
+  </Svg>
+);
+
+/** A calculator: a display over a keypad, with the one key that isn't a digit. */
+export const CalcIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="4.2" y="2.8" width="15.6" height="18.4" rx="2.4" />
+    <path d="M7.4 6.4h9.2v3H7.4z" />
+    <path d="M8.2 13h.01M12 13h.01M15.8 13h.01M8.2 17.4h.01M12 17.4h.01M15.8 17.4h.01" />
+  </Svg>
+);
+
+/** A paper tape curling out of a machine — a column of figures, kept. */
+export const TapeIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M5 3.6h14v13.2a3.6 3.6 0 0 1-3.6 3.6H5z" />
+    <path d="M19 20.4a3.6 3.6 0 0 0 0-7.2h-2.4" />
+    <path d="M8.2 7.6h7.6M8.2 11h5.4M8.2 14.4h3.2" />
+  </Svg>
+);
+
+/** Ones and zeroes stacked — a value read as its bits. */
+export const BinaryIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.4" y="3.6" width="6.2" height="7.4" rx="2.4" />
+    <rect x="14.4" y="13" width="6.2" height="7.4" rx="2.4" />
+    <path d="M15.6 3.6h1.8v7.4M14.4 11h5.4" />
+    <path d="M4.6 13h1.8v7.4M3.4 20.4h5.4" />
+  </Svg>
+);
+
+/** The percent sign itself, drawn as a glyph rather than typeset. */
+export const PercentIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M19 5 5 19" />
+    <circle cx="7.6" cy="7.6" r="2.9" />
+    <circle cx="16.4" cy="16.4" r="2.9" />
+  </Svg>
+);
+
+/** A page with a magnifier over its lines — looking for the text in a picture. */
+export const ScanTextIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 8.4V5.4a1.6 1.6 0 0 1 1.6-1.6h3M15.4 3.8h3A1.6 1.6 0 0 1 20 5.4v3M20 15.6v3a1.6 1.6 0 0 1-1.6 1.6h-3M8.6 20.2h-3A1.6 1.6 0 0 1 4 18.6v-3" />
+    <path d="M8 9.4h8M8 12.4h8M8 15.4h4.6" />
+  </Svg>
+);
+
+/** Sliders — the knobs that change what the engine is given. */
+export const TuneIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M5 3.4v6.2M5 14.4v6.2M12 3.4v3.2M12 11.4v9.2M19 3.4v9.2M19 17.4v3.2" />
+    <circle cx="5" cy="12" r="2.4" />
+    <circle cx="12" cy="9" r="2.4" />
+    <circle cx="19" cy="15" r="2.4" />
+  </Svg>
+);
+
+/** Stacked pages — a folder of pictures run in one pass. */
+export const StackIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="7.6" y="2.8" width="12.6" height="14.4" rx="2" />
+    <path d="M16.4 20.4H5.8a2 2 0 0 1-2-2V7.2" />
+    <path d="M11 7.4h5.8M11 11h5.8" />
+  </Svg>
+);

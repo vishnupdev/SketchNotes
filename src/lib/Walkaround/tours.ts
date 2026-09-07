@@ -1472,6 +1472,405 @@ export const TOURS: Record<AppId, Tour> = {
     ],
   },
 
+  vault: {
+    tagline: "codes and secrets, sealed on this device",
+    intro: "The three jobs around a password, on a device that keeps no copy.",
+    layout: {
+      blocks: [
+        { label: "Locked \u2014 passphrase", grow: 1 },
+        { label: "Accounts, counting down", grow: 1.8 },
+        { label: "Add an account", span: 1, grow: 0.8 },
+        { label: "Lock", span: 1, grow: 0.8 },
+      ],
+      tabs: ["Codes", "Generate", "Notes"],
+    },
+    steps: [
+      {
+        at: "body:0",
+        title: "One passphrase, no reset",
+        direction:
+          "The passphrase encrypts everything here, and it is the only thing that can decrypt it again.",
+        suggestion:
+          "There is nobody to ask if you forget it \u2014 that is the same property that makes the stored blob safe. Put the passphrase somewhere physical before you put anything valuable in.",
+      },
+      {
+        at: "tab:0",
+        title: "Codes with a countdown",
+        direction:
+          "Paste an otpauth:// address and the code appears, with a ring showing how long it has left.",
+        suggestion:
+          "If a site only offers a QR code, read it in the QR Codes app and paste the result here. The codes are computed on the device, so they work with no signal at all.",
+      },
+      {
+        at: "tab:1",
+        title: "Generate works while locked",
+        direction:
+          "A password from the classes you choose, or a passphrase from a 256-word list.",
+        suggestion:
+          "It reads nothing and writes nothing, so it needs no vault \u2014 the one tab you can use without unlocking anything.",
+      },
+      {
+        at: "tab:2",
+        title: "Where recovery codes go",
+        direction: "Notes hold anything text, each hidden until you ask for it.",
+        suggestion:
+          "The obvious first entry is the recovery codes a site gives you when you switch 2FA on. They are what gets you back in when the codes on the first tab are on a phone you have lost.",
+      },
+      {
+        at: "body:1",
+        title: "It can leave again",
+        direction:
+          "Every account row can show the same otpauth:// QR code it was added from.",
+        suggestion:
+          "Scan it with a phone and both devices give the same codes. Treat the picture as the secret itself \u2014 a photograph of it is a permanent copy of your second factor.",
+      },
+      {
+        at: "body:3",
+        title: "Leaving locks it",
+        direction:
+          "Switching app drops the derived key, so the vault is locked again when you come back.",
+        suggestion:
+          "Which is deliberate rather than annoying: an unlocked vault sitting behind whatever app is on screen would make the passphrase decorative.",
+      },
+    ],
+  },
+
+  sheets: {
+    tagline: "read a table, and see what is in it",
+    intro: "What is in this file, is the column what you think, and what does it look like.",
+    layout: {
+      blocks: [
+        { label: "Search \u2014 every column", span: 1, grow: 0.8 },
+        { label: "Export", span: 1, grow: 0.8 },
+        { label: "Where \u2026 filter", grow: 0.8 },
+        { label: "The table", grow: 2.6 },
+      ],
+      tabs: ["Table", "Summary", "Chart"],
+    },
+    steps: [
+      {
+        at: "body:3",
+        title: "Sort, filter, and edit",
+        direction:
+          "Tap a heading to sort, tap a cell to change it, and the type under each heading says how it will be compared.",
+        suggestion:
+          "Sorting never rearranges the file \u2014 it is an ordering over the rows \u2014 so an edit lands on the right record however the table is arranged.",
+      },
+      {
+        at: "body:2",
+        title: "Filters know the type",
+        direction:
+          "The conditions offered depend on the column: more-than for numbers and dates, contains for text.",
+        suggestion:
+          "Combine it with the search box above: the search narrows to rows mentioning a word, the filter narrows to a range, and the chart plots whatever survives both.",
+      },
+      {
+        at: "tab:1",
+        title: "Is this column what I think",
+        direction:
+          "Summary gives blanks, distinct values, and the mean beside the median for a numeric column.",
+        suggestion:
+          "When the mean and the median disagree, the column is skewed and averaging it is about to mislead you. A text column where every value is unique is an id, not a category.",
+      },
+      {
+        at: "tab:2",
+        title: "The axis starts at zero",
+        direction: "Chart plots one measure against one grouping, as bars or a line.",
+        suggestion:
+          "Bar length is the value, so its axis always includes zero \u2014 a floating baseline is how a 4% difference gets drawn as a fivefold one. The line chart may float, and says where it starts.",
+      },
+      {
+        at: "body:1",
+        title: "Out as four formats",
+        direction: "Export writes CSV, TSV, a Markdown table or JSON records.",
+        suggestion:
+          "It exports the rows you can see, in the order you can see them \u2014 so filter first and you have a clean extract rather than the whole file again.",
+      },
+    ],
+  },
+
+  clip: {
+    tagline: "record the screen, keep it on the device",
+    intro: "Screen and camera recording, encoded here and never uploaded.",
+    layout: {
+      blocks: [
+        { label: "Live preview", grow: 2 },
+        { label: "Start recording", grow: 0.8 },
+        { label: "What to capture", grow: 1.4 },
+      ],
+      tabs: ["Record", "Clips"],
+    },
+    steps: [
+      {
+        at: "body:2",
+        title: "Screen, camera, or both",
+        direction:
+          "Pick the source and where the sound comes from \u2014 microphone, the screen itself, both or neither.",
+        suggestion:
+          "Both composites the camera into the corner of the screen recording as one video, rather than two tracks half of which most players ignore.",
+      },
+      {
+        at: "body:1",
+        title: "Stopping from the browser",
+        direction:
+          "Recording ends either from this button or from the browser's own sharing bar.",
+        suggestion:
+          "Both are handled, so a recording stopped from the bar is still saved rather than left running against a dead capture.",
+      },
+      {
+        at: "body:2",
+        title: "The countdown, then record",
+        direction:
+          "A three-second pre-roll runs after you grant permission, and can be cancelled.",
+        suggestion:
+          "That order is the point: the browser's own permission dialog is never in the take, and the level meter beside it is live during the count \u2014 so a muted microphone is caught before the ten minutes, not after.",
+      },
+      {
+        at: "tab:1",
+        title: "Clips are not saved",
+        direction:
+          "Recordings are held in this tab's memory, so closing or reloading loses them.",
+        suggestion:
+          "Save the ones you want before you leave. A minute of 1080p is tens of megabytes \u2014 keeping them in the browser's storage would push every other app here out of its share.",
+      },
+      {
+        at: "body:0",
+        title: "A frame as a picture",
+        direction: "Play a clip to a moment, then Still saves that frame as a PNG.",
+        suggestion:
+          "It is the quickest way to a screenshot of something that only happens for an instant \u2014 record it, then scrub to the frame.",
+      },
+    ],
+  },
+
+  cards: {
+    tagline: "remember it on a schedule, not in an evening",
+    intro: "Spaced repetition: a card you know comes back later each time.",
+    layout: {
+      blocks: [
+        { label: "New \u00b7 learning \u00b7 due", grow: 0.6 },
+        { label: "The card", grow: 2 },
+        { label: "Again / Hard / Good / Easy", grow: 0.9 },
+      ],
+      tabs: ["Review", "Decks", "Progress"],
+    },
+    steps: [
+      {
+        at: "body:2",
+        title: "Each button says when",
+        direction:
+          "The four answers carry the interval they would give \u2014 a minute, three days, a month.",
+        suggestion:
+          "That figure is what makes Good against Easy a real choice. It comes from the same scheduler the answer will run, so the button never promises something else.",
+      },
+      {
+        at: "body:1",
+        title: "Space flips, 1\u20134 answer",
+        direction: "The whole card is the screen, and the keyboard drives it.",
+        suggestion:
+          "Which is the difference between reviewing thirty cards and reviewing five \u2014 reaching for the mouse each time is what makes a session feel long.",
+      },
+      {
+        at: "tab:1",
+        title: "Paste a list you have",
+        direction:
+          "Decks takes a tab-separated export, front | back lines, or a dash \u2014 one card a line.",
+        suggestion:
+          "It picks the separator from the lines themselves and tells you which lines it could not split, rather than quietly leaving a third of your file out.",
+      },
+      {
+        at: "tab:2",
+        title: "Known is weighted",
+        direction:
+          "Progress reports how much is known by how far out each card is scheduled.",
+        suggestion:
+          "So failing the same card ten times moves nothing. It also flags cards missed six times as worth rewriting \u2014 those are usually asking two things at once.",
+      },
+      {
+        at: "body:0",
+        title: "Back up the schedule",
+        direction:
+          "A text export shares the words; a backup export carries the review history too.",
+        suggestion:
+          "Keep the backup. Months of reviews are the one thing a list of front-and-back lines cannot preserve.",
+      },
+    ],
+  },
+
+  ocr: {
+    tagline: "text out of any picture",
+    intro: "Reading a picture on this device — and knowing which words to trust.",
+    layout: {
+      blocks: [
+        { label: "The picture, with word boxes", grow: 1.5 },
+        { label: "Read the text", span: 1 },
+        { label: "Confidence", grow: 0.8 },
+        { label: "The text, in four shapes", grow: 1.4 },
+      ],
+      tabs: ["Read", "Tune", "Batch"],
+    },
+    steps: [
+      {
+        at: "body:1",
+        title: "The first read fetches the engine",
+        direction:
+          "About 7 MB — Tesseract compiled to WebAssembly, plus the English model. The progress line says which part is arriving.",
+        suggestion:
+          "It happens once per device and is then stored here, so every read after the first works with no connection at all. This is the only app here that needs one even briefly.",
+      },
+      {
+        at: "body:2",
+        title: "Read the score, not just the text",
+        direction:
+          "Every word carries a score, and the page's verdict says what to do about it rather than only how sure it is.",
+        suggestion:
+          "This is the whole point. OCR does not fail loudly — it returns “5” where the page said “S”, in exactly the same tone as the words it got right.",
+      },
+      {
+        at: "body:0",
+        title: "See what it guessed at",
+        direction:
+          "Show words boxes every word on the picture, with the uncertain ones filled in red.",
+        suggestion:
+          "Faster than proofreading: glance at the red boxes, check those spots against the original, and ignore the rest.",
+      },
+      {
+        at: "body:3",
+        title: "Four shapes, not one",
+        direction:
+          "Paragraphs rejoins the lines the page merely wrapped; Lines keeps the layout exactly as it was.",
+        suggestion:
+          "Paragraphs for prose you are pasting into a document — it also heals words hyphenated across a line break. Lines for a receipt or a table, where the layout is the information.",
+      },
+      {
+        at: "tab:1",
+        title: "Tune is where a bad read is fixed",
+        direction:
+          "It shows the actual bitmap the engine will be handed, next to the original.",
+        suggestion:
+          "Scale first — the engine wants a capital letter 20–30 pixels tall and screenshots are often half that, which is the commonest cause of nonsense. Invert if the text is light on dark.",
+      },
+      {
+        at: "tab:2",
+        title: "A folder at a time",
+        direction:
+          "Batch reads up to forty pictures in one pass, with each one's confidence beside it.",
+        suggestion:
+          "Set Tune up on one picture first — the batch applies the same settings to all of them. A file the browser cannot decode is reported and skipped rather than stopping the run.",
+      },
+    ],
+  },
+
+  calc: {
+    tagline: "a tape, not a keypad",
+    intro: "A calculator shaped like a document — and the two things it gets right.",
+    layout: {
+      blocks: [
+        { label: "One calculation a line", grow: 1.6 },
+        { label: "Total", grow: 0.7 },
+        { label: "Every line, with its answer", grow: 1.5 },
+      ],
+      tabs: ["Tape", "Bases", "Percent"],
+    },
+    steps: [
+      {
+        at: "body:0",
+        title: "A line at a time",
+        direction:
+          "Type one calculation a line. Name any of them — “rate = 4200” — and the lines below can use the name.",
+        suggestion:
+          "“ans” is the line above, so a long calculation reads down the page instead of living in your head. A wrong line reports itself and the others carry on.",
+      },
+      {
+        at: "body:1",
+        title: "The column adds itself up",
+        direction:
+          "Every plain line goes into the total. Lines you gave a name to are left out of it.",
+        suggestion:
+          "Which is what makes a shopping list and a working-out sit in the same tape: name the intermediates, and only the figures you meant to add are added.",
+      },
+      {
+        at: "body:2",
+        title: "A percent knows its neighbour",
+        direction:
+          "“1250 + 18%” is 1475 — a percent added to something is a percent of that something.",
+        suggestion:
+          "On its own “18%” is 0.18, and “20% of 80” is 16. Remainders are spelled “mod”, because “%” is already doing this job.",
+      },
+      {
+        at: "tab:1",
+        title: "The bits, not just the number",
+        direction:
+          "Bases shows a value in hex, binary, octal and decimal at once, and lays out its bits numbered from zero. Tap one to flip it.",
+        suggestion:
+          "Pick the width — 8, 16, 32 or 64 — and the arithmetic is exact there. The browser's own bitwise operators are not: they coerce to 32-bit signed, so a 64-bit mask comes out wrong.",
+      },
+      {
+        at: "tab:2",
+        title: "Reverse is the one to know",
+        direction:
+          "Percent asks the four questions in words and shows the arithmetic under each answer.",
+        suggestion:
+          "A price of 118 that already includes 18% tax was 100, not 96.76. Taking 18% off 118 is the commonest percentage mistake there is, and it looks like a perfectly good answer.",
+      },
+    ],
+  },
+
+  exif: {
+    tagline: "what your pictures are telling people",
+    intro: "Every tag a photo carries \u2014 and how to take them out without harming it.",
+    layout: {
+      blocks: [
+        { label: "The picture", grow: 1.4 },
+        { label: "Where it was taken", grow: 0.9 },
+        { label: "Tags, by group", grow: 1.6 },
+      ],
+      tabs: ["Read", "Clean", "Batch"],
+    },
+    steps: [
+      {
+        at: "body:1",
+        title: "Location comes first",
+        direction:
+          "If the file carries GPS tags, the coordinates are shown at the top, to a few metres.",
+        suggestion:
+          "Copy them into Satellite Map's Find box to see where that is. Nothing here contacts a map service, so the coordinates stay on the device unless you take them somewhere.",
+      },
+      {
+        at: "body:2",
+        title: "The thumbnail surprise",
+        direction:
+          "Tags are grouped, and the embedded thumbnail is listed as its own group.",
+        suggestion:
+          "On some cameras and editors that thumbnail predates a crop \u2014 so a cropped photo can still be carrying a small copy of what you cropped out.",
+      },
+      {
+        at: "tab:1",
+        title: "Cleaned, not re-encoded",
+        direction:
+          "Clean drops the metadata blocks and copies every other byte through untouched.",
+        suggestion:
+          "Which is why it is worth using over the usual canvas trick: that one strips the metadata and a generation of JPEG quality with it. Here the image data is bit-for-bit identical.",
+      },
+      {
+        at: "body:0",
+        title: "What deliberately stays",
+        direction:
+          "The JFIF header, the ICC colour profile and Adobe's transform flag are kept.",
+        suggestion:
+          "They are instructions for decoding the picture, not facts about you \u2014 dropping the profile visibly shifts the colours of a wide-gamut photo.",
+      },
+      {
+        at: "tab:2",
+        title: "A folder at a time",
+        direction:
+          "Batch takes up to sixty pictures, cleans each the same lossless way, and returns one zip.",
+        suggestion:
+          "The line worth reading is how many of them carried a location \u2014 that is usually more than people expect, and it is the number the whole app exists to show you.",
+      },
+    ],
+  },
+
   snippets: {
     tagline: "the code you keep looking up",
     intro: "One screen and one search box, on purpose.",

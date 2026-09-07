@@ -65,6 +65,13 @@ const MarkdownApp = dynamic(APP_LOADERS.markdown, { ssr: false });
 const ChronoApp = dynamic(APP_LOADERS.chrono, { ssr: false });
 const ContrastApp = dynamic(APP_LOADERS.contrast, { ssr: false });
 const SatelliteApp = dynamic(APP_LOADERS.satellite, { ssr: false });
+const VaultApp = dynamic(APP_LOADERS.vault, { ssr: false });
+const SheetsApp = dynamic(APP_LOADERS.sheets, { ssr: false });
+const ClipApp = dynamic(APP_LOADERS.clip, { ssr: false });
+const CardsApp = dynamic(APP_LOADERS.cards, { ssr: false });
+const ExifApp = dynamic(APP_LOADERS.exif, { ssr: false });
+const CalcApp = dynamic(APP_LOADERS.calc, { ssr: false });
+const OcrApp = dynamic(APP_LOADERS.ocr, { ssr: false });
 
 /**
  * Every app's deep-link path — the one place a route is declared, read in both
@@ -115,6 +122,13 @@ const APP_PATHS: Record<AppId, string> = {
   chrono: "/chrono",
   contrast: "/contrast",
   satellite: "/satellite",
+  vault: "/vault",
+  sheets: "/sheets",
+  clip: "/clip",
+  cards: "/cards",
+  exif: "/exif",
+  calc: "/calc",
+  ocr: "/ocr",
 };
 
 const PDF_BASE = APP_PATHS.pdf;
@@ -419,6 +433,45 @@ export function Workspace() {
 
       <AppFrame active={activeApp === "contrast"} name="Contrast">
         <ContrastApp />
+      </AppFrame>
+
+      {/* Vault. Unmounted on an app switch, which is what drops the derived
+          key — the vault relocks itself rather than staying open behind
+          whatever app is on screen. */}
+      <AppFrame active={activeApp === "vault"} name="Vault">
+        <VaultApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "sheets"} name="Sheets">
+        <SheetsApp />
+      </AppFrame>
+
+      {/* Clip. Unmounting ends any capture and releases the screen and camera,
+          which is the only thing that turns the recording indicator off. */}
+      <AppFrame active={activeApp === "clip"} name="Clip">
+        <ClipApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "cards"} name="Cards">
+        <CardsApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "calc"} name="Calc">
+        <CalcApp />
+      </AppFrame>
+
+      {/* OCR. Unmounting releases the engine's worker and its wasm heap — tens
+          of megabytes that a workspace keeping every app mounted has no
+          business holding for an app nobody is looking at. */}
+      <AppFrame active={activeApp === "ocr"} name="OCR">
+        <OcrApp />
+      </AppFrame>
+
+      {/* Exif. Unmounting drops the picture and its preview URL — a photo
+          whose location was just on screen has no business outliving the
+          app. */}
+      <AppFrame active={activeApp === "exif"} name="Exif">
+        <ExifApp />
       </AppFrame>
 
       {/* Satellite Map. Unmounted on an app switch, which is what ends the

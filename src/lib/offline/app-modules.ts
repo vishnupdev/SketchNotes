@@ -60,6 +60,13 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   chrono: () => import("@/components/Chrono/ChronoApp").then((m) => m.ChronoApp),
   contrast: () => import("@/components/Contrast/ContrastApp").then((m) => m.ContrastApp),
   satellite: () => import("@/components/Satellite/SatelliteApp").then((m) => m.SatelliteApp),
+  vault: () => import("@/components/Vault/VaultApp").then((m) => m.VaultApp),
+  sheets: () => import("@/components/Sheets/SheetsApp").then((m) => m.SheetsApp),
+  clip: () => import("@/components/Clip/ClipApp").then((m) => m.ClipApp),
+  cards: () => import("@/components/Cards/CardsApp").then((m) => m.CardsApp),
+  exif: () => import("@/components/Exif/ExifApp").then((m) => m.ExifApp),
+  calc: () => import("@/components/Calc/CalcApp").then((m) => m.CalcApp),
+  ocr: () => import("@/components/Ocr/OcrApp").then((m) => m.OcrApp),
 };
 
 /**
@@ -85,8 +92,16 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "text",
   // Light, entirely-local tools — cheap to warm and among the most used.
   "convert",
+  "calc",
   "chrono",
   "contrast",
+  "vault",
+  "cards",
+  "sheets",
+  // Exif and Clip are last of the light group: both are single-purpose tools
+  // reached deliberately rather than browsed into.
+  "exif",
+  "clip",
   "snippets",
   "wallet",
   "markdown",
@@ -149,4 +164,11 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   chrono: "Chrono",
   satellite: "Satellite Map",
   contrast: "Contrast",
+  vault: "Vault",
+  sheets: "Sheets",
+  clip: "Clip",
+  cards: "Cards",
+  exif: "Exif",
+  calc: "Calc",
+  ocr: "OCR",
 };

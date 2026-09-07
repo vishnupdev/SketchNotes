@@ -10,7 +10,13 @@
  * animation frames; the two-pass version is ~1 ms with the same accuracy.
  */
 
+import { measureLoudness, SILENT_DB, toDbfs } from "@/lib/audio-level";
 import type { Level, Pitch } from "./types";
+
+// The level maths lives in `lib/audio-level.ts` because Clip's recording meter
+// needs the same primitive and may not import this app (rule #5). Re-exported
+// here so this module's own API is unchanged.
+export { SILENT_DB, toDbfs };
 
 /** Quietest window worth measuring, as a linear RMS amplitude (≈ −44 dBFS). */
 const SILENCE_RMS = 0.006;
@@ -25,30 +31,8 @@ export const PITCH_MAX_HZ = 2000;
  */
 export const CLARITY_FLOOR = 0.55;
 
-/** dBFS reported for digital silence, instead of −Infinity. */
-export const SILENT_DB = -100;
-
-/** Convert a linear amplitude (0→1) to dBFS, floored so meters stay finite. */
-export const toDbfs = (amplitude: number): number =>
-  amplitude > 0 ? Math.max(SILENT_DB, 20 * Math.log10(amplitude)) : SILENT_DB;
-
 /** RMS and peak level of a window, plus whether the input is clipping. */
-export function measureLevel(buf: Float32Array): Level {
-  let sumSq = 0;
-  let peak = 0;
-  for (let i = 0; i < buf.length; i++) {
-    const s = buf[i];
-    sumSq += s * s;
-    const abs = s < 0 ? -s : s;
-    if (abs > peak) peak = abs;
-  }
-  return {
-    rms: toDbfs(Math.sqrt(sumSq / buf.length)),
-    peak: toDbfs(peak),
-    // Anything at or beyond full scale has already lost information.
-    clipping: peak >= 0.999,
-  };
-}
+export const measureLevel = (buf: Float32Array): Level => measureLoudness(buf);
 
 /** Linear RMS amplitude of a window (not dB) — used as the silence gate. */
 function rmsAmplitude(buf: Float32Array): number {

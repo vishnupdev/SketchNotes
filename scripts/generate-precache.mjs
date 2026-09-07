@@ -70,11 +70,23 @@ if (files.length === 0) {
  * diagram renders offline like everything else. The only thing given up is a
  * diagram working offline *before* it has ever been rendered online.
  *
+ * Tesseract is the second case, and it is the same shape: OCR's recognition
+ * engine is a ~7 MB WebAssembly build fetched from a CDN at run time, and the
+ * ~260 KB of glue that fetches it is only ever needed by someone who opens that
+ * one app. It is named here explicitly because two of its chunks were already
+ * being deferred *by accident* — they happen to contain a string matching the
+ * Mermaid half of this pattern — and an accident is not a decision. A future
+ * build that split them differently would have silently made them eager again.
+ *
  * Matched on content rather than filename because Next content-hashes chunk
  * names, so there is no stable pattern to match on. Reading the build output
  * costs a few megabytes of I/O once per build.
+ *
+ * Anything added here needs a sensible offline-before-first-use message in the
+ * feature itself: `MermaidFigure` has one, and OCR says on its opening screen
+ * that the first read needs a connection.
  */
-const LAZY_ONLY = /mermaid|flowchart-v2|sequenceDiagram|cytoscape|dagre/;
+const LAZY_ONLY = /mermaid|flowchart-v2|sequenceDiagram|cytoscape|dagre|tesseract/;
 
 const eager = [];
 let deferred = 0;

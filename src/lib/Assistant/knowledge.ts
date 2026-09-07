@@ -51,6 +51,13 @@ export const APP_LABELS: Record<AppId, string> = {
   chrono: "Chrono",
   satellite: "Satellite Map",
   contrast: "Contrast",
+  vault: "Vault",
+  sheets: "Sheets",
+  clip: "Clip",
+  cards: "Cards",
+  exif: "Exif",
+  calc: "Calc",
+  ocr: "OCR",
 };
 
 /**
@@ -383,6 +390,83 @@ export const APP_ALIASES: Record<AppId, string[]> = {
     "colour blindness",
     "is this readable",
   ],
+  vault: [
+    "vault",
+    "password vault",
+    "authenticator",
+    "two factor",
+    "two-factor",
+    "2fa",
+    "totp",
+    "one time code",
+    "one-time code",
+    "otp",
+    "password generator",
+    "passphrase",
+    "password",
+    "recovery codes",
+    "secrets",
+  ],
+  sheets: ["sheets", "sheet", "csv", "tsv", "spreadsheet", "table", "excel file", "data file"],
+  clip: [
+    "clip",
+    "screen recorder",
+    "screen recording",
+    "record my screen",
+    "screen capture",
+    "screencast",
+    "record the camera",
+    "webcam recorder",
+    "video recorder",
+  ],
+  cards: [
+    "cards",
+    "flashcards",
+    "flash cards",
+    "spaced repetition",
+    "anki",
+    "srs",
+    "revision",
+    "study cards",
+    "memorise",
+    "memorize",
+  ],
+  ocr: [
+    "ocr",
+    "text from a picture",
+    "read text from an image",
+    "extract text",
+    "image to text",
+    "screenshot to text",
+    "photo of a page",
+    "copy text from a photo",
+    "recognise text",
+  ],
+  calc: [
+    "calc",
+    "calculator",
+    "work out",
+    "add up",
+    "percentage",
+    "percent off",
+    "vat",
+    "tax on a price",
+    "hex to binary",
+    "bitwise",
+    "twos complement",
+  ],
+  exif: [
+    "exif",
+    "metadata",
+    "photo metadata",
+    "image metadata",
+    "strip metadata",
+    "remove exif",
+    "geotag",
+    "geotagging",
+    "photo location",
+    "where was this photo taken",
+  ],
   // "map" and "satellite" are safe to claim outright — no other app here draws
   // one. The weather phrasings are included because "is it raining" is how
   // people actually ask for the live overlay, not "show me radar tiles".
@@ -477,6 +561,13 @@ export const APP_PATHS: Record<AppId, string> = {
   chrono: "/chrono",
   satellite: "/satellite",
   contrast: "/contrast",
+  vault: "/vault",
+  sheets: "/sheets",
+  clip: "/clip",
+  cards: "/cards",
+  exif: "/exif",
+  calc: "/calc",
+  ocr: "/ocr",
 };
 
 /** One-line summary per app, used when listing the whole workspace. */
@@ -532,6 +623,20 @@ export const APP_SUMMARIES: Record<AppId, string> = {
     "grade a colour pair against every WCAG level, build a 50–950 token ramp, and preview a palette under colour-vision deficiency",
   satellite:
     "see any place on Earth from above, find where you are, drop to Street View, and watch live rain radar or today's satellite pass animated over it",
+  vault:
+    "two-factor codes computed on this device, a password and passphrase generator, and notes encrypted under a passphrase only you know",
+  sheets:
+    "open a CSV — sort, filter and edit it, see what each column really holds, chart it, and export to CSV, TSV, Markdown or JSON",
+  clip:
+    "record the screen, the camera, or both composited into one video, encoded in the browser and never uploaded",
+  cards:
+    "flashcards on a spaced-repetition schedule — a card you know comes back later each time, one you miss comes back in a minute",
+  exif:
+    "see every tag a picture carries, the location included, then strip it without re-encoding the image",
+  calc:
+    "a calculator shaped like a document — a calculation a line, each one named and reusable, plus number bases and the four percentage questions",
+  ocr:
+    "read the text out of a photo, a screenshot or a scan, on this device, with a confidence for every word so you know what it guessed at",
 };
 
 export const KNOWLEDGE: KnowledgeEntry[] = [
@@ -541,11 +646,12 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     title: "What OneApp is",
     keywords: ["oneapp", "one app", "overview", "about", "what is this", "workspace", "summary", "purpose", "intro"],
     answer:
-      "OneApp is a single web workspace holding thirty-seven tools, so you never install thirty-seven apps.\n" +
-      "• Creative: Sketchnotes canvas, Image Studio, PDF Editor, Scan, Markdown\n" +
-      "• Planning: Board, Todos, Reminders, Timer, Wallet, Voice Memos\n" +
+      "OneApp is a single web workspace holding forty-two tools, so you never install forty-two apps.\n" +
+      "• Creative: Sketchnotes canvas, Image Studio, PDF Editor, Scan, Markdown, Clip\n" +
+      "• Planning: Board, Todos, Reminders, Timer, Wallet, Voice Memos, Cards\n" +
       "• Info: News, World Clock, Satellite Map, System Info, Resource Monitor, Nearby Devices, Network Speed, Sound Meter, Color Lens, Convert\n" +
-      "• Making things: Snippets, Chrono, Contrast, API Client, Text Kit, QR Codes, QR Files\n" +
+      "• Making things: Snippets, Chrono, Contrast, API Client, Text Kit, QR Codes, QR Files, Sheets\n" +
+      "• Keeping things safe: Vault, Exif\n" +
       "• Moving things: Handoff, Clone, File Drop, Streams\n" +
       "• Language: Translate, Malayalam Writer, Morse Code, and me — the Assistant, alongside Walkaround\n" +
       "Everything is free, needs no account, and keeps your data in your own browser.",
@@ -1064,6 +1170,111 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "Your position is never stored and never sent anywhere, and leaving the app stops the location watch. Map tiles, place search and the live layers all need a connection.",
     followUps: ["Which apps need internet?", "Is my data private?", "What is the World Clock?"],
   },
+  {
+    id: "app-vault",
+    title: "Vault — codes, passwords and secrets",
+    app: "vault",
+    keywords: ["vault", "password", "passwords", "password manager", "password generator", "passphrase", "generate a password", "strong password", "2fa", "two factor", "two-factor", "totp", "authenticator", "authenticator app", "one time code", "otp", "6 digit code", "recovery codes", "secret", "secrets", "encrypted notes", "encryption", "aes", "pbkdf2"],
+    answer:
+      "Vault does the three jobs around a password, and keeps nothing anybody else can read.\n" +
+      "• Codes — two-factor codes, with a ring showing how long each one has left. Add an account by pasting its otpauth:// address; if the site only shows a QR code, read it in the QR Codes app and paste the result. The codes are computed here from the secret, so they work with no connection at all — which is exactly when you tend to need one\n" +
+      "• Generate — a password from whichever character classes you pick, or a passphrase from a 256-word list. The strength shown is computed from the alphabet and the length rather than guessed from the characters, and it tells you how long the password would take to guess at a hundred billion tries a second\n" +
+      "• Notes — anything text: recovery codes, licence keys, the answer to a security question you invented. Each stays hidden until you ask for it, so the list is safe to open with someone watching\n" +
+      "Any account can also be handed back out: each row can show the same otpauth:// QR code it was added from, so you can put it on a phone or a second device, or print it as a paper backup. Treat that picture as the secret itself — a photograph of it is a permanent copy of your second factor, so it stays behind an explicit tap and never appears on its own.\n" +
+      "Everything is encrypted with AES-GCM under a key derived from your passphrase by 600,000 rounds of PBKDF2. What sits in this browser is one blob and nothing else, and the key exists only while the vault is open — leaving the app locks it.\n" +
+      "The honest limits: a forgotten passphrase cannot be recovered, by me or anyone, because there is no copy of it anywhere. And while the vault is open, anything already running on the machine can read what is on screen — this is not a hardware key. The generator needs no vault, so you can use it while everything is locked.",
+    followUps: ["Is my data private?", "What can the QR Codes app do?", "Does it work offline?"],
+  },
+  {
+    id: "app-sheets",
+    title: "Sheets — read a CSV properly",
+    app: "sheets",
+    keywords: ["sheets", "sheet", "csv", "tsv", "spreadsheet", "table", "excel", "open a csv", "read a csv", "csv viewer", "delimiter", "semicolon separated", "column stats", "average of a column", "median", "chart a csv", "graph my data", "csv to json", "csv to markdown", "export csv"],
+    answer:
+      "Sheets answers the three questions you actually have about a CSV. It is not a spreadsheet — no formulas, no cell references.\n" +
+      "• Table — sort by any column, filter with operators that match the column's type, search every cell, and edit a value in place. Quoted commas, quoted newlines, escaped quotes, a semicolon or tab delimiter and Excel's byte-order mark are all handled; ragged rows are padded and reported rather than silently shifting your columns\n" +
+      "• Summary — what a column really holds: how many values are blank, how many are distinct, the mean beside the median so you can see when it is skewed, the middle half, and the commonest values for a text column\n" +
+      "• Chart — one measure against one grouping, as bars or a line. A bar chart's axis always starts at zero, because bar length is the value; the line chart may float its baseline and says where it starts\n" +
+      "Every column is typed from its values, and only if every value fits — one stray \"n/a\" makes a column text, which is the conservative answer. Dates are only read in unambiguous forms: 03/04/2024 is two different days depending on where you live, so it stays text rather than being guessed.\n" +
+      "Export gives you CSV, TSV, a Markdown table or JSON records — of the rows you can see, in the order you can see them. The file is read on the device and never uploaded; under 2 MB it is kept so a reload doesn't lose it.",
+    followUps: ["What can the Markdown app do?", "Is my data private?", "List all the apps"],
+  },
+  {
+    id: "app-clip",
+    title: "Clip — record the screen or camera",
+    app: "clip",
+    keywords: ["clip", "record", "recording", "screen recorder", "record my screen", "screen capture", "screencast", "record a video", "webcam", "camera recording", "record with sound", "microphone recording", "screenshot from video", "video frame", "mp4", "webm"],
+    answer:
+      "Clip records video in the browser and never uploads it.\n" +
+      "• Capture the screen, the camera, or both at once — with both, the camera is drawn into the corner of the screen recording and the two are composited into one video, rather than saved as two tracks that most players would half ignore\n" +
+      "• Sound from the microphone, from the screen (on Chromium desktop), both, or none\n" +
+      "• Choose the frame rate and a height cap; the app tells you roughly how many megabytes a second that costs before you start\n" +
+      "• A countdown (three seconds by default) runs *after* you grant permission and before recording starts, so the browser's own dialog is never in the take — and it can be cancelled without recording anything\n" +
+      "• A microphone level meter runs from the moment the capture is live, including during the countdown. Recording ten minutes against a muted or wrong mic is the most expensive mistake here and it is invisible without one\n" +
+      "• Clips play back in the app, save as WebM or MP4 depending on what your browser records, and any single frame can be saved as a PNG — which is how a screen recording becomes a screenshot of the one moment you wanted\n" +
+      "One thing to know: recordings are held in memory, not stored. Closing or reloading the tab loses them, so save what you want to keep. That is deliberate — a minute of 1080p video is tens of megabytes, and keeping clips in the browser's storage would push every other app here out of its share of it.\n" +
+      "Stopping the share from the browser's own bar ends the recording properly. iOS Safari has no screen-capture API at all, so there the camera works and the screen does not.",
+    followUps: ["What can Voice Memos do?", "Is my data private?", "What does Resource Monitor show?"],
+  },
+  {
+    id: "app-cards",
+    title: "Cards — flashcards that space themselves",
+    app: "cards",
+    keywords: ["cards", "flashcards", "flash cards", "spaced repetition", "srs", "anki", "revise", "revision", "study", "memorise", "memorize", "learn vocabulary", "deck", "decks", "review schedule", "leech"],
+    answer:
+      "Cards is spaced repetition: a card you know comes back later each time, and one you miss comes back in a minute.\n" +
+      "• Review shows one card at a time. Space or Enter flips it, then 1–4 answer it — and each button says when the card will next appear, so Good against Easy is a real choice rather than a guess\n" +
+      "• Decks is where cards come from. Write them one at a time, or paste a list you already have: a tab-separated export, front | back lines, or a dash. It works out the separator from the lines themselves and tells you which lines it could not read instead of dropping them quietly\n" +
+      "• Progress reports how much is known — weighted by how far out each card is scheduled, not by how many you have answered, so failing the same card ten times moves nothing — plus what falls due over the next fortnight, and which cards are worth rewriting\n" +
+      "The schedule is SM-2, the algorithm Anki made ordinary: each card carries an ease factor, a correct answer multiplies its interval by it, and a wrong answer sends it back to the one-and-ten-minute learning steps. A card failed six times is flagged as worth rewriting rather than reviewing — it is usually asking two things at once.\n" +
+      "Export as text to share or edit; export as a backup to keep the review history, which is the one thing a text file cannot carry. Everything stays on this device and it works offline.",
+    followUps: ["What can Morse Code do?", "What is the Malayalam Writer?", "Is my data private?"],
+  },
+  {
+    id: "app-ocr",
+    title: "OCR — text out of any picture",
+    app: "ocr",
+    keywords: ["ocr", "optical character recognition", "text from a picture", "text from an image", "read text from a photo", "extract text", "image to text", "photo to text", "screenshot to text", "copy text from a picture", "copy text from a screenshot", "photo of a page", "recognise text", "recognize text", "scanned page to text", "receipt to text", "tesseract", "text recognition"],
+    answer:
+      "OCR reads the text out of a picture — a photo of a page, a screenshot, a receipt, a sign — and it does it on this device.\n" +
+      "• Read opens a picture (choose it, drop it, or paste a screenshot straight from the clipboard) and gives you the text, with a **confidence for every word**. That is the part that matters: OCR does not fail loudly, it returns “5” where the page said “S” in the same tone as everything it got right. The uncertain words are listed, can be marked in place for proofreading, and can be lit up as boxes on the picture itself\n" +
+      "• The text comes in four shapes because the right one depends on the picture: Paragraphs rejoins the lines the page merely wrapped and heals words hyphenated across a break (for pasting into a document); Lines keeps the layout exactly (for receipts, tables and code); For checking marks every uncertain word inline; Spreadsheet gives a row per word with its confidence and position\n" +
+      "• Tune is where a bad read becomes a good one, and it shows you the actual bitmap the engine will be given rather than an impression of it. Upscaling a small picture is the single biggest improvement — the engine wants a capital letter 20–30 pixels tall and screenshots are often half that. Ink/paper thresholding (by Otsu's method, so it copes with a shadowed page) removes the shading and coloured backgrounds the classifier reads as texture, and Invert fixes light-on-dark text like a terminal or a dark-mode screenshot\n" +
+      "• Batch reads up to forty pictures in one pass, one after another, reporting each one's confidence beside it and never letting one unreadable file stop the run\n" +
+      "One thing to know: the recognition engine is about 7 MB — a WebAssembly build of Tesseract plus the English model — so it is **downloaded the first time you read something**, which makes this the only app here that needs a connection once. It is then stored on this device, and every later read works with no connection at all. The picture itself is never uploaded: the engine is fetched to the picture, not the other way round, and neither the picture nor the text it gave is ever stored.\n" +
+      "For photographing a page into a PDF use Scan; for what a photo says about you in its metadata use Exif.",
+    followUps: ["What can Scan do?", "What can Exif do?", "Which apps need an internet connection?"],
+  },
+  {
+    id: "app-calc",
+    title: "Calc — a tape, not a keypad",
+    app: "calc",
+    keywords: ["calc", "calculator", "calculate", "work this out", "arithmetic", "maths", "math", "add up", "sum", "total", "percentage", "percent", "percent off", "discount", "vat", "gst", "tax on a price", "reverse percentage", "remove vat", "tip", "hex", "hexadecimal", "binary", "octal", "base convert", "bitwise", "bit mask", "twos complement", "signed integer", "register", "modulo", "remainder", "factorial", "trigonometry"],
+    answer:
+      "Calc is a calculator shaped like a document rather than a keypad.\n" +
+      "• Tape takes one calculation a line and keeps every answer on screen. Name a line with “rate = 4200” and the lines below can use the name; “ans” is the line above; every plain line is added into a running total, and named lines are left out of it so an intermediate is not counted twice. A “#” line is a heading and “//” starts a note. One bad line reports its own error and the rest carry on — you are always mid-edit somewhere\n" +
+      "• A percent knows what it is next to. “1250 + 18%” is 1475, because a percent added to something means a percent *of* that something; on its own “18%” is 0.18, and “20% of 80” is 16. Remainders are spelled “mod”, since “%” is already taken — a calculator that quietly gives you one when you meant the other is worse than one that makes you write the word\n" +
+      "• Bases shows a value in hex, binary, octal and decimal at once, lays out its bits numbered from zero — tap one to flip it — and does AND, OR, XOR, NOT and shifts at 8, 16, 32 or 64 bits, signed or unsigned. It is exact at every width, which the browser's own bitwise operators are not: they coerce to 32-bit signed, so “0xffffffff | 0” is −1 there\n" +
+      "• Percent asks the four percentage questions in words and shows the arithmetic it used. The one worth knowing is Reverse: a price of 118 that *includes* 18% tax was 100, not 96.76 — the percentage went onto the smaller figure, so it comes off by dividing, never by subtracting\n" +
+      "Hex, binary and octal literals (0xff, 0b1010, 0o17) can be mixed into any line, 1_000_000 reads as a million, and there are functions for roots, logs, rounding, min/max, gcd and trigonometry in degrees or radians. Only the tape and your mode choices are kept; it all works offline and nothing leaves the device.\n" +
+      "For units, sizes and currency use Convert; for cron, timestamps and durations use Chrono.",
+    followUps: ["What can Convert do?", "What can Chrono do?", "Is my data private?"],
+  },
+  {
+    id: "app-exif",
+    title: "Exif — what your photos are telling people",
+    app: "exif",
+    keywords: ["exif", "metadata", "photo metadata", "image metadata", "strip metadata", "remove exif", "clear metadata", "geotag", "gps", "photo location", "where was this photo taken", "camera model from photo", "iptc", "xmp", "thumbnail in photo", "anonymise a photo"],
+    answer:
+      "Exif shows what a picture carries besides the picture, and takes it out.\n" +
+      "• Read lists every tag: the camera and lens, the exposure, the software, the time to the second — and the GPS coordinates, which come first because they are the ones with consequences. It also lists every block the file is made of, and flags the embedded thumbnail, which on some cameras predates a crop and can still show what you cropped out\n" +
+      "• Clean removes the metadata and saves a copy beside the original\n" +
+      "• Batch does the same for up to sixty pictures at once and gives you one zip back, reporting per file what came out — and how many of them carried a location, which is usually more than people expect. It is the way the app is actually used: nobody strips one holiday photo\n" +
+      "The part that matters: the picture is not re-encoded. Most browser tools strip metadata by redrawing the photo through a canvas, which does remove it — along with a generation of JPEG quality and the colour profile. This edits the file's structure instead, dropping the metadata segments and copying every other byte through, so the image data is bit-for-bit identical. JPEG, PNG and WebP all work this way.\n" +
+      "The JFIF header, the ICC colour profile and Adobe's colour-transform flag are deliberately kept: they are instructions for decoding the picture correctly, not facts about you, and dropping the profile visibly shifts the colours of a wide-gamut photo.\n" +
+      "Nothing is uploaded and nothing is stored — the file is read in memory and dropped when you close it, which for a photo carrying your home address is the only defensible behaviour.",
+    followUps: ["What can Image Studio do?", "Is my data private?", "What is the Satellite Map?"],
+  },
 
   // ── Cross-cutting how-tos ────────────────────────────────────────────────
   {
@@ -1078,6 +1289,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "• Network Speed — it measures a real connection\n" +
       "• Online translation — offline mode avoids this entirely\n" +
       "• Malayalam handwriting recognition — typing and the keyboard don't\n" +
+      "• OCR — but only **once**: the recognition engine is about 7 MB and is downloaded the first time you read a picture, then kept on the device. Every read after that works offline\n" +
       "Everything else, including all PDF, image, note, task and timer work, runs fully offline.",
     followUps: ["Does it work offline?", "Is my data private?"],
   },

@@ -121,5 +121,12 @@ export const APP_SEARCH_TERMS: Record<AppId, string[]> = {
   markdown: ["markdown", "md", "readme", "mermaid", "preview markdown", "markdown editor"],
   chrono: ["cron", "crontab", "cron expression", "timestamp", "epoch", "unix time", "duration", "timezone convert"],
   contrast: ["contrast", "wcag", "accessibility", "a11y", "colour ramp", "color ramp", "tokens", "colour blind", "color blind"],
+  vault: ["vault", "password", "passphrase", "password generator", "2fa", "two factor", "totp", "authenticator", "one time code", "otp", "secret", "recovery codes", "encrypt"],
+  sheets: ["sheet", "sheets", "csv", "tsv", "spreadsheet", "table", "excel", "column", "pivot", "chart data", "delimiter"],
+  clip: ["clip", "record screen", "screen recorder", "screen capture", "screencast", "record camera", "webcam", "video record", "still frame"],
+  cards: ["cards", "flashcards", "flash cards", "anki", "spaced repetition", "srs", "revise", "memorise", "memorize", "deck", "study"],
+  exif: ["exif", "metadata", "photo metadata", "strip metadata", "remove exif", "geotag", "gps in photo", "image location", "iptc", "xmp"],
+  ocr: ["ocr", "text from image", "read text", "extract text", "image to text", "photo to text", "screenshot to text", "scan text", "recognise text", "recognize text", "tesseract"],
+  calc: ["calc", "calculator", "maths", "math", "arithmetic", "percent", "percentage", "hex", "binary", "octal", "bitwise", "two's complement", "tape", "sum"],
   satellite: ["map", "satellite", "street view", "streetview", "aerial", "earth", "globe", "terrain", "gps", "locate me", "location", "coordinates", "radar", "rain", "clouds", "weather"],
 };

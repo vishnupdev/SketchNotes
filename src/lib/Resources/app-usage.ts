@@ -49,6 +49,14 @@ export const APP_STORAGE_NOTE: Record<AppId, string> = {
   markdown: "The document you are writing.",
   chrono: "The expression, timestamp and duration you last worked on.",
   contrast: "The colours you last checked, your ramp, and your palette.",
+  vault:
+    "One encrypted blob holding your two-factor secrets and notes, plus your generator settings. The passphrase and the key derived from it are never stored.",
+  sheets: "Your generator settings, the chart you last built, and the last table you opened if it is under 2 MB.",
+  cards: "Your decks, and every card's review schedule.",
+  clip: "Only the capture settings. Recordings are held in memory and never written to storage.",
+  exif: "Nothing — the picture is read in memory and dropped when you close it.",
+  ocr: "Your layout, output and picture-adjustment choices. Never the picture or the text it gave.",
+  calc: "Your tape, and your base, width and angle choices. Nothing from the Bases or Percent boxes.",
   satellite:
     "Your last view and layer choices, and any places you kept — names and coordinates only. Never your own position.",
   pdf: "Nothing — files are opened, edited and saved back without being stored.",

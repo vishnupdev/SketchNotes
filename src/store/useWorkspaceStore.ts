@@ -47,7 +47,14 @@ export type AppId =
   | "chrono"
   | "satellite"
   | "contrast"
-  | "qrfiles";
+  | "qrfiles"
+  | "vault"
+  | "sheets"
+  | "clip"
+  | "cards"
+  | "exif"
+  | "calc"
+  | "ocr";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
 const ALL_APPS: AppId[] = [
@@ -62,10 +69,17 @@ const ALL_APPS: AppId[] = [
   "reminders",
   "timer",
   "wallet",
+  "vault",
   "scan",
+  "ocr",
+  "exif",
   "voice",
+  "clip",
   "convert",
+  "calc",
   "markdown",
+  "sheets",
+  "cards",
   "system",
   "resources",
   "nearby",

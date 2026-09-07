@@ -172,6 +172,13 @@
   --app-contrast: #7c1d6f;
   --app-api: #b91c1c;
   --app-satellite: #0b6b8f;
+  --app-vault: #4c1d95;
+  --app-sheets: #0369a1;
+  --app-clip: #c2410c;
+  --app-cards: #0f766e;
+  --app-exif: #b45309;
+  --app-calc: #166534;
+  --app-ocr: #9a3412;
 
   /* QR codes are read by a camera, not by a person, so these two are the one
      pair in the workspace that does *not* follow the theme: a scanner expects
@@ -252,6 +259,13 @@
   --app-contrast: #e879c7;
   --app-api: #f87171;
   --app-satellite: #45b7e0;
+  --app-vault: #c4b5fd;
+  --app-sheets: #7dd3fc;
+  --app-clip: #fdba74;
+  --app-cards: #5eead4;
+  --app-exif: #fcd34d;
+  --app-calc: #86efac;
+  --app-ocr: #fdb896;
   --board-note: #fbbf24;
   --board-checklist: #4d94ff;
   --board-counter: #1fb89f;

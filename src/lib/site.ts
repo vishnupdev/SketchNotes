@@ -219,6 +219,48 @@ export const APPS: AppEntry[] = [
     blurb:
       "see any place on Earth from above — satellite imagery, street and terrain maps, live rain radar and NASA's daily global pass animated frame by frame, place search, one-tap Street View, and your own live position tracked on the map",
   },
+  {
+    path: "/vault",
+    name: "Vault",
+    blurb:
+      "two-factor codes, a password generator and encrypted notes — the 2FA secrets are sealed with AES-GCM under a passphrase only you know, the codes are computed on the device and work with no connection at all",
+  },
+  {
+    path: "/sheets",
+    name: "Sheets",
+    blurb:
+      "open a CSV or TSV and actually read it — sort, filter, search and edit, see what every column really contains, chart one measure against one grouping, and export back to CSV, TSV, Markdown or JSON",
+  },
+  {
+    path: "/clip",
+    name: "Clip",
+    blurb:
+      "record your screen, your camera, or both composited into one video, with microphone or screen sound — encoded in the browser, never uploaded, and a single frame savable as a PNG",
+  },
+  {
+    path: "/cards",
+    name: "Cards",
+    blurb:
+      "flashcards with spaced repetition — an SM-2 schedule that brings a card back later each time you know it, bulk import from any list you already have, and a backup that carries the review history",
+  },
+  {
+    path: "/ocr",
+    name: "OCR",
+    blurb:
+      "read the text out of a photo, a screenshot or a scanned page, entirely on this device — with a confidence for every word so you can see what it guessed at, the output shaped for pasting or for keeping the layout, controls that show you exactly what the engine is given, and a batch mode for a folder at a time",
+  },
+  {
+    path: "/calc",
+    name: "Calc",
+    blurb:
+      "a calculator shaped like a document — one calculation a line, each answer named and reusable by the lines below it, a running total of the column, a percent that knows what it sits next to, plus hex, binary and octal with the bits laid out and bitwise arithmetic at 8, 16, 32 or 64 bits",
+  },
+  {
+    path: "/exif",
+    name: "Exif",
+    blurb:
+      "see what your pictures are telling people — every EXIF tag, the GPS coordinates, the embedded thumbnail — then take the metadata out without re-encoding the image, so the photo is bit-for-bit unchanged",
+  },
 ];
 
 /** Keywords targeting the brand plus each tool's search intent. */
@@ -402,4 +444,48 @@ export const SITE_KEYWORDS = [
   "tailwind colour tokens",
   "colour blindness simulator",
   "accessible colour palette",
+  "totp authenticator online",
+  "2fa code generator",
+  "offline authenticator app",
+  "password generator",
+  "passphrase generator",
+  "encrypted notes in browser",
+  "store recovery codes",
+  "csv viewer online",
+  "open csv in browser",
+  "csv to json",
+  "csv to markdown table",
+  "column statistics",
+  "chart a csv",
+  "screen recorder online",
+  "record screen in browser",
+  "screen and webcam recorder",
+  "screen recording no upload",
+  "video frame to png",
+  "flashcards online",
+  "spaced repetition",
+  "anki alternative browser",
+  "srs flashcards free",
+  "exif viewer online",
+  "remove exif data",
+  "strip photo metadata",
+  "photo gps location",
+  "lossless metadata removal",
+  "online calculator",
+  "tape calculator",
+  "multi line calculator",
+  "percentage calculator",
+  "reverse percentage calculator",
+  "remove vat from a price",
+  "hex to binary converter",
+  "bitwise calculator",
+  "twos complement calculator",
+  "ocr online",
+  "image to text",
+  "photo to text",
+  "screenshot to text",
+  "extract text from image",
+  "copy text from a picture",
+  "free ocr no upload",
+  "offline ocr in browser",
 ];

@@ -71,7 +71,16 @@ const OWNERS: OwnerRule[] = [
   { app: "markdown", match: prefix("sknotes:markdown:") },
   { app: "chrono", match: prefix("sknotes:chrono:") },
   { app: "contrast", match: prefix("sknotes:contrast:") },
+  { app: "vault", match: prefix("sknotes:vault:") },
+  { app: "sheets", match: prefix("sknotes:sheets:") },
+  { app: "cards", match: prefix("sknotes:cards:") },
+  { app: "calc", match: prefix("sknotes:calc:") },
+  { app: "ocr", match: prefix("sknotes:ocr:") },
+  { app: "clip", match: prefix("sknotes:clip:") },
   { app: "satellite", match: prefix("sknotes:satellite:") },
+  // Exif stores nothing either — the picture is read in memory and dropped on
+  // close, which for a photo carrying a home address is the only defensible
+  // behaviour — so it has no rule here.
   // Scan deliberately stores nothing — its pages live in memory until exported —
   // so it has no rule here. Adding one would claim a prefix that never exists.
   // Sketchnotes keys a note by its bare id (`sknotes:<id>`) plus one index, so
