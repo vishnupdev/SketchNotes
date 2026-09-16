@@ -179,6 +179,8 @@
   --app-exif: #b45309;
   --app-calc: #166534;
   --app-ocr: #9a3412;
+  --app-specs: #7b2d4e;
+  --app-latest: #a21caf;
 
   /* QR codes are read by a camera, not by a person, so these two are the one
      pair in the workspace that does *not* follow the theme: a scanner expects
@@ -266,6 +268,8 @@
   --app-exif: #fcd34d;
   --app-calc: #86efac;
   --app-ocr: #fdb896;
+  --app-specs: #eb9ab8;
+  --app-latest: #f5b8ff;
   --board-note: #fbbf24;
   --board-checklist: #4d94ff;
   --board-counter: #1fb89f;
@@ -1434,8 +1438,22 @@ svg {
    already occupies its own space at the end of the scroll — counting it here
    would leave a screenful of dead air. Just the bar, its 10px offset, and a
    little breathing room. */
+/*
+ * Clearance for the fixed furniture at the bottom of every tabbed app.
+ *
+ * Two things sit down there, stacked: the sticky footer occupies the last
+ * `--footer-h`, and the floating tab bar is offset *above* it (see BottomNav:
+ * `bottom: calc(var(--footer-h) + 0.625rem)`), so the obstructed band is the
+ * footer **plus** the bar, not the bar alone.
+ *
+ * This reserved only the bar, which left the difference — 54px on a 390×844
+ * phone — of content sitting under the chrome at full scroll. Measured rather
+ * than reasoned: the band runs 148px up from the bottom while the old value
+ * reserved 94px, and an accessibility audit of two unrelated apps each found
+ * interactive rows partly unreachable because of it.
+ */
 @utility bottom-nav-clear {
-  padding-bottom: calc(var(--bottom-nav-h) + 1.375rem);
+  padding-bottom: calc(var(--bottom-nav-h) + var(--footer-h) + 1.375rem);
 }
 
 @utility scroll-slim {
@@ -1533,5 +1551,105 @@ svg {
 @keyframes app-intro-fade {
   from {
     opacity: 0;
+  }
+}
+
+/*
+ * Printing.
+ *
+ * Several apps here produce something a person legitimately wants on paper — a
+ * spec sheet, a comparison, a contrast report, a CSV summary — and until now
+ * printing any of them produced the screen: a fixed bottom tab bar stamped
+ * across the middle, a sticky footer repeated on every page, and the workspace's
+ * dark paper flooding the sheet with ink.
+ *
+ * These rules are shell-level because the furniture they hide is shell-level.
+ * They change nothing on screen: every selector here is inside `@media print`,
+ * and the rule is only ever "this piece of chrome is not part of the document".
+ *
+ * `--paper`/`--text` are forced to plain white and near-black rather than left
+ * to the theme, because a theme is a screen decision — printing a dark theme
+ * means a page of solid toner, and no printer thanks you for it.
+ */
+@media print {
+  /*
+   * The theme tokens are declared on `[data-theme]` / `[data-dark]`, which are
+   * attributes on <body> rather than on the root element — so an override on
+   * `:root` alone loses to them for every descendant, and the page prints in
+   * whichever theme was on screen. `[data-theme][data-dark]` is two attribute
+   * selectors against the themes' one (their `:where()` contributes nothing),
+   * and this block is later in the file, so it wins on both counts.
+   */
+  :root,
+  [data-theme],
+  [data-dark],
+  [data-theme][data-dark] {
+    --paper: #ffffff;
+    --panel: #ffffff;
+    --accent-soft: #eeeeee;
+    --text: #111111;
+    --ink-soft: #444444;
+    --border: #cccccc;
+    --shadow: none;
+  }
+
+  /* The workspace scrolls inside a fixed element, which prints as one screenful
+     unless the height is released. This is the rule that makes a long sheet
+     print as a long document instead of as its first page. */
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+  body * {
+    box-shadow: none !important;
+  }
+
+  /* App frames are `position: fixed; inset: 0` — see AppFrame in Workspace.tsx. */
+  body [class*="fixed"] {
+    position: static !important;
+    overflow: visible !important;
+  }
+
+  /* Chrome, not content: the tab bar, the app-switcher button, the credit
+     footer, and anything explicitly marked as screen-only.
+     `[title="Switch app"]` is the Apps button, which every app's header carries
+     with that exact title — one rule rather than a `data-print` attribute added
+     to forty-five components. */
+  [role="tablist"],
+  [data-print="hide"],
+  [title="Switch app"],
+  footer,
+  nav {
+    display: none !important;
+  }
+
+  /* A picture sized for a phone screen becomes a full page on A4. Cap it so the
+     document stays a document rather than a photo album, and let a caption stay
+     with the picture it belongs to. */
+  img {
+    max-height: 9cm !important;
+    object-fit: contain;
+  }
+  figure,
+  [class*="aspect-"] {
+    break-inside: avoid;
+    max-height: 10cm !important;
+  }
+
+  /* A table split across a page break is unreadable; keep each row whole. */
+  tr,
+  li,
+  dl > div {
+    break-inside: avoid;
+  }
+
+  /* A link's target is invisible on paper, so print it once, after the text. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #444444;
+    word-break: break-all;
   }
 }

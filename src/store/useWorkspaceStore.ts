@@ -54,7 +54,9 @@ export type AppId =
   | "cards"
   | "exif"
   | "calc"
-  | "ocr";
+  | "ocr"
+  | "specs"
+  | "latest";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
 const ALL_APPS: AppId[] = [
@@ -81,6 +83,12 @@ const ALL_APPS: AppId[] = [
   "sheets",
   "cards",
   "system",
+  // System Info reads the device you are holding; Spec Analyser reads any other
+  // one. They answer the same kind of question and sit together — and Latest
+  // Tech follows them, being the same question asked of things you have not
+  // bought yet.
+  "specs",
+  "latest",
   "resources",
   "nearby",
   "speed",

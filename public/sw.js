@@ -45,8 +45,9 @@
 // chunk, not just the ones visited) and query-tolerant static lookups; v8 adds
 // the /nearby route; v10 adds the share target, background reminder checks and
 // the /qr and /handoff routes; v11 adds the /drop route and File Drop's
-// streaming downloads; v12 adds the /clone route.
-const VERSION = "oneapp-v19";
+// streaming downloads; v12 adds the /clone route; v21 adds the /latest route
+// and Latest Tech's listings endpoint.
+const VERSION = "oneapp-v21";
 const SHELL_CACHE = `oneapp-shell-${VERSION}`;
 const STATIC_CACHE = `oneapp-static-${VERSION}`;
 const DATA_CACHE = `oneapp-data-${VERSION}`;
@@ -141,6 +142,8 @@ const SHELL_URLS = [
   "/exif",
   "/calc",
   "/ocr",
+  "/specs",
+  "/latest",
 ];
 
 /** Non-HTML files the workspace can't start (or edit PDFs) without. */
@@ -157,8 +160,23 @@ const CORE_ASSET_URLS = ["/manifest.webmanifest", "/icon.svg", "/pdf.worker.min.
  */
 const BUILD_MANIFEST_URL = "/precache-manifest.json";
 
-/** Remote hosts whose images may be cached (news publisher logos, country flags, video art). */
-const MEDIA_HOSTS = ["www.google.com", "news.google.com", "flagcdn.com", "i.ytimg.com"];
+/**
+ * Remote hosts whose images may be cached (news publisher logos, country flags,
+ * video art, product photographs).
+ *
+ * The Wikimedia pair is what makes Spec Analyser's offline claim true rather than
+ * nearly true: the sheet itself replays from DATA, so without its photograph
+ * cached alongside it a product you looked up yesterday comes back offline as a
+ * complete specification with a hole where the thing itself should be.
+ */
+const MEDIA_HOSTS = [
+  "www.google.com",
+  "news.google.com",
+  "flagcdn.com",
+  "i.ytimg.com",
+  "thumb.wikimedia.org",
+  "upload.wikimedia.org",
+];
 
 /*
  * Share target. The manifest points the platform's share sheet at this path; the
@@ -380,16 +398,20 @@ function isRevalidatingAsset(url) {
 /**
  * Same-origin API responses safe to replay from cache: news headlines and
  * stream listings (stale beats blank — a station still shows what it found last
- * time, even though playing it needs the network) and translations
+ * time, even though playing it needs the network), translations
  * (deterministic for a given query, so a cached hit is the same answer the
- * network would give).
+ * network would give) and product spec sheets (a shipped product's
+ * specification does not change, and every sheet is stamped with the time it
+ * was read, so a replayed one is never passed off as fresh).
  */
 function isCacheableApi(url) {
   return (
     url.pathname === "/api/news" ||
     url.pathname === "/api/streams" ||
     url.pathname === "/api/worldclock/news" ||
-    url.pathname === "/api/translate"
+    url.pathname === "/api/translate" ||
+    url.pathname.startsWith("/api/specs/") ||
+    url.pathname.startsWith("/api/latest/")
   );
 }
 

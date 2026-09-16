@@ -58,6 +58,8 @@ export const APP_LABELS: Record<AppId, string> = {
   exif: "Exif",
   calc: "Calc",
   ocr: "OCR",
+  specs: "Spec Analyser",
+  latest: "Latest Tech",
 };
 
 /**
@@ -431,6 +433,39 @@ export const APP_ALIASES: Record<AppId, string[]> = {
     "memorise",
     "memorize",
   ],
+  specs: [
+    "spec analyser",
+    "spec analyzer",
+    "spec sheet",
+    "specs",
+    "specifications",
+    "product specs",
+    "device specs",
+    "tech specs",
+    "full specs",
+    "compare products",
+    "compare two phones",
+    "which is better",
+    "rate a product",
+  ],
+  latest: [
+    "latest tech",
+    "latest",
+    "newest",
+    "new releases",
+    "what's new",
+    "latest products",
+    "latest phones",
+    "latest laptops",
+    "latest tv",
+    "latest monitor",
+    "latest gpu",
+    "new graphics card",
+    "latest processor",
+    "newest gadgets",
+    "by brand",
+    "product catalogue",
+  ],
   ocr: [
     "ocr",
     "text from a picture",
@@ -568,6 +603,8 @@ export const APP_PATHS: Record<AppId, string> = {
   exif: "/exif",
   calc: "/calc",
   ocr: "/ocr",
+  specs: "/specs",
+  latest: "/latest",
 };
 
 /** One-line summary per app, used when listing the whole workspace. */
@@ -637,6 +674,10 @@ export const APP_SUMMARIES: Record<AppId, string> = {
     "a calculator shaped like a document — a calculation a line, each one named and reusable, plus number bases and the four percentage questions",
   ocr:
     "read the text out of a photo, a screenshot or a scan, on this device, with a confidence for every word so you know what it guessed at",
+  specs:
+    "the full specification of any product — phone, laptop, camera, console, car or motorcycle — quoted from its source article, with what it replaced, a side-by-side comparison and a spec score that says how much of itself it could measure",
+  latest:
+    "what has just come out — the newest phones, laptops, TVs, monitors, graphics cards, processors, tablets, consoles, watches, headphones and cameras — browsed by kind or by brand, each with the complete specification the maker publishes, its launch price and how long ago it arrived",
 };
 
 export const KNOWLEDGE: KnowledgeEntry[] = [
@@ -1153,6 +1194,41 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     followUps: ["List all the apps", "What is OneApp?", "How do I switch apps?"],
   },
 
+  {
+    id: "app-specs",
+    title: "Spec Analyser — the full specification of any product",
+    app: "specs",
+    keywords: ["spec analyser", "spec analyzer", "analyser", "analyzer", "spec", "specs", "specification", "specifications", "spec sheet", "tech specs", "full specs", "product specs", "device specs", "gadget", "gadgets", "what are the specs", "how much ram", "battery capacity", "screen size", "compare phones", "compare two products", "side by side", "which is better", "rate this phone", "is it good", "product rating", "phone specs", "laptop specs", "camera specs", "car specs", "engine size", "horsepower", "graphics card specs", "product images", "product photos", "where to buy", "price comparison", "compare prices", "cheapest price", "customer reviews", "user reviews", "what do buyers say"],
+    answer:
+      "Spec Analyser looks up what a product is actually made of — and not only phones: anything with an encyclopedia article, so laptops, cameras, consoles, graphics cards, cars, motorcycles, aircraft and appliances all work the same way.\n" +
+      "• Find works two ways. **Browse** picks a kind (phones, laptops, tablets, cameras, consoles, graphics cards, watches, cars, motorcycles, audio) and then a maker or a year, listing every model from the encyclopedia's own maintained category — around a thousand handsets across Apple, Samsung, Google, Xiaomi, OnePlus, Oppo, Vivo, Motorola, Nokia, Sony, HTC, Huawei and Asus, and laptops from Apple, Lenovo, ThinkPad, Dell, HP, Microsoft, Toshiba, Asus and Acer. A maker with no category of its own falls back to a search, and the list says which of the two you are reading. **Search** does the rest by model name.\n" +
+      "• Searching by name: \"Galaxy S24\" finds a sheet; \"Samsung\" finds a company — the more specific the model, the better the sheet\n" +
+      "• Sheet shows every specification the source states, grouped into chip and memory, display, cameras, power, body and the rest, in the source's own order, with a gallery of the article's photographs above it. Nothing is folded away behind a \"show more\"; on a long sheet a filter box narrows it, searching the values as well as the labels, so \"wireless\" finds the charging row\n" +
+      "• Prices lists the shops that sell it, in whichever of a dozen countries you are buying in — India, the US, the UK, Germany, France, Canada, Australia, Japan, the UAE, Singapore, Brazil and South Africa — plus Google Shopping and PriceRunner, and it quotes the launch price off the spec sheet. It shows no live prices, on purpose: no shop publishes them without a registered key, and a scraped figure that is stale, for the wrong variant or from a marketplace seller is worse than no figure on a purchase this size. Every row opens that shop's own results, where the price is current by definition\n" +
+      "• Similar opens with **what changed** against whatever this product replaced — every comparable measure, how far it moved, and which way counts as better (a heavier phone is a bigger number and a worse outcome, so direction of change and direction of improvement are tracked apart). Release year is excluded, since a successor is newer by definition, and no verdict is offered on whether the change is worth paying for. Then it lists what the article says this replaced, what replaced it and what sold beside it, then others of the same kind found by search — labelled as such, so an inferred neighbour is never mistaken for one the article named. Tick up to four and they line up beside it in a table, measure by measure, with the leading figure in each row picked out, a \"differences only\" switch that hides every row they agree on (comparing by value, so \"5000 mAh\" and \"5,000 mAh\" count as agreement), and a grid underneath scoring each one axis by axis\n" +
+      "• Rating keeps three separate claims apart, and never averages them. The spec score places each stated measure on a fixed scale for that kind of product — a phone battery runs 3000 to 6000 mAh — and averages them by weight, showing every band it used and which spec row each number came from. A **shortlist** on Find keeps the products you are deciding between — unlike the recents beside it, nothing drops off it on its own, and \"compare these\" fills the comparison table from it in one tap. Both the sheet and the comparison also **print** as a clean document, without the tab bar or the dark theme. Beside it sit links to what buyers actually wrote — the shops for your chosen country, then Trustpilot, Reddit and YouTube for owners a year in — and your own star rating and note, which stays in this browser\n" +
+      "Two things worth being clear about. The score measures what the maker claims, not what the thing is like to own: it is arithmetic over a spec sheet, not a review, and megapixels and refresh rates are proxies. And it refuses to score what it cannot score honestly — there is no defensible scale ranking one refrigerator or one airliner above another, so those show their specs and no number.\n" +
+      "Everything is quoted from a public source article, linked at the top of every sheet with the time it was read, so you can check the app read it right. Coverage is article-shaped: famous products have deep sheets, a mid-range appliance may have no article at all, and the app says which of those happened rather than showing a thin sheet as though it were the whole truth.\n" +
+"• Both the sheet and the comparison export as Markdown, CSV or JSON, copied or saved, and every export carries the source address and the minute it was read so the figures stay checkable after they leave\n" +
+      "Looking something up needs a connection; sheets you have already opened are cached and open again offline.",
+    followUps: ["Which apps need internet?", "What is System Info?", "List all the apps"],
+  },
+  {
+    id: "app-latest",
+    title: "Latest Tech — what just came out, by kind and by brand",
+    app: "latest",
+    keywords: ["latest tech", "latest", "newest", "new releases", "what's new", "just released", "new products", "latest products", "latest phones", "newest phone", "latest smartphones", "latest laptops", "latest tv", "new tv", "best tv", "latest monitor", "new monitor", "latest gpu", "new graphics card", "latest cpu", "new processor", "latest tablet", "new console", "latest smartwatch", "new headphones", "latest camera", "newest gadgets", "by brand", "brands", "which brands", "flagship", "launch price", "release date", "when did it come out", "product catalogue", "shortlist products"],
+    answer:
+      "Latest Tech is the browsing app: what has just come out, arranged by kind and by maker, each with the whole specification.\n" +
+      "• New lists eleven kinds — phones, laptops, TVs, monitors, graphics cards, processors, tablets, consoles, smartwatches, headphones and cameras — newest first. Every row carries the brand, the release date, **how long ago that was in plain words** (\"This month\", \"8 months ago\"), and the launch price, so you can compare without opening anything\n" +
+      "• Details is the full sheet: every specification group the maker publishes, the few things that genuinely set the product apart from its own siblings, and a link to the manufacturer's specification page that every figure was read from\n" +
+      "• Brands groups everything by who makes it, ordered by how wide each maker's range is rather than A–Z, with the count on every chip\n" +
+      "• Saved holds a search across the catalogue and the shortlist you are deciding between, kept in this browser and never uploaded\n" +
+      "It is not the same app as Spec Analyser, and the difference is the point: Spec Analyser starts from a name you already have and reads whatever an article says about it; Latest Tech starts from nothing — \"show me the newest monitors\" — which is a question a search box cannot answer.\n" +
+      "Two halves, deliberately kept apart. The **catalogue** is curated and ships inside the app, so browsing, searching and reading every sheet works offline from the first load and contacts nobody. It is curated because that is the only honest way to cover televisions and monitors: the open encyclopedia this workspace reads documents display technology in depth and individual models not at all — its computer-monitor category holds twelve pages, most of them companies, and no maker has a television category. Beside it runs a **live** feed of what has been newly listed under this year's \"introduced in\" categories, which keeps finding releases after the catalogue was last reviewed. Those rows are drawn as links, not sheets, because they carry a description and no specifications — and the app never presents one as though it did.\n" +
+      "The catalogue states the date it was last reviewed on every screen that shows it, since a list of \"the latest\" that cannot say how recent it is looks exactly like a current one until you act on it. Prices are the launch price, labelled as history rather than a live quote. Brightness figures keep the window they were measured on, graphics cards are listed at their reference specification rather than a partner card's, clock speeds are boost figures, and a TV sheet names the panel size its numbers apply to.",
+    followUps: ["What is Spec Analyser?", "Does it work offline?", "List all the apps"],
+  },
   {
     id: "app-satellite",
     title: "Satellite Map — anywhere on Earth from above, live",

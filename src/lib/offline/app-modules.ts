@@ -67,6 +67,8 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   exif: () => import("@/components/Exif/ExifApp").then((m) => m.ExifApp),
   calc: () => import("@/components/Calc/CalcApp").then((m) => m.CalcApp),
   ocr: () => import("@/components/Ocr/OcrApp").then((m) => m.OcrApp),
+  specs: () => import("@/components/Specs/SpecsApp").then((m) => m.SpecsApp),
+  latest: () => import("@/components/Latest/LatestApp").then((m) => m.LatestApp),
 };
 
 /**
@@ -117,6 +119,14 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "news",
   "streams",
   "world",
+  // Unlike the feeds above it and Spec Analyser below, Latest Tech's catalogue
+  // is *inside* its chunk: warming it caches every product sheet too, so the
+  // app is complete offline and only its "newly listed" half needs a network.
+  "latest",
+  // Like the feeds above it: the app's own chunk caches and opens offline, but
+  // a sheet it has never fetched is not on this device, and it says so rather
+  // than pretending otherwise.
+  "specs",
   // Warmed late and honestly: the app's chunk caches, but a map is its tiles,
   // and third-party imagery is not something this worker precaches. Offline it
   // opens and says so rather than pretending to have the world on disk.
@@ -171,4 +181,6 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   exif: "Exif",
   calc: "Calc",
   ocr: "OCR",
+  specs: "Spec Analyser",
+  latest: "Latest Tech",
 };

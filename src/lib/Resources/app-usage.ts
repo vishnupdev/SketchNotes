@@ -30,6 +30,10 @@ export const APP_NETWORK: Partial<Record<AppId, string>> = {
   markdown:
     "Nothing. Mermaid diagrams are drawn on the device; the diagram engine is downloaded once, the first time a document contains one.",
   clone: "The copy runs device to device. Over a cable or on “this network only” nothing outside the two devices is contacted at all; “anywhere” asks a public STUN server for this device's address, and it never sees your data.",
+  specs:
+    "Looking a product up asks this site’s own server, which fetches the article from Wikipedia and sends back only the parsed sheet — so Wikipedia sees the server, not you. Nothing about what you looked up is sent anywhere else, and a sheet you have already opened is answered from the cache without contacting anyone. Product photographs load from Wikimedia. The shop and review rows are ordinary links that contact nobody until you tap one, and they carry no referrer when you do.",
+  latest:
+    "Nothing, for the catalogue — every product sheet is part of the app itself and is read on the device, so browsing and searching them contacts nobody. Only the “newly listed” rows need a connection: that asks this site’s own server, which fetches the listing from Wikipedia and sends back just the titles and descriptions, so Wikipedia sees the server rather than you. The source links on each sheet are ordinary links that contact the manufacturer only if you tap one, and carry no referrer when you do.",
   satellite:
     "Map tiles are fetched from Esri as you pan, the live layers from RainViewer and NASA, and a place search from OpenStreetMap's geocoder — each of which therefore sees the area you are looking at. Street View is a link you choose to follow, carrying only the coordinates, and contacts nobody until you tap it. Your GPS position is never sent anywhere; it is read on the device and drawn on the map.",
   drop: "Files go straight to the other device. In “anywhere” mode a public STUN server is asked for this device's public address — it never sees the files; in “this network only” mode nothing outside the network is contacted at all.",
@@ -57,6 +61,8 @@ export const APP_STORAGE_NOTE: Record<AppId, string> = {
   exif: "Nothing — the picture is read in memory and dropped when you close it.",
   ocr: "Your layout, output and picture-adjustment choices. Never the picture or the text it gave.",
   calc: "Your tape, and your base, width and angle choices. Nothing from the Bases or Percent boxes.",
+  specs: "The products you have opened, the shortlist you are deciding from, your own star ratings and notes, which products you last compared, and the country and browse list you chose.",
+  latest: "The products you saved, and which kind and maker you were last browsing. Nothing else — the catalogue itself ships with the app rather than being stored.",
   satellite:
     "Your last view and layer choices, and any places you kept — names and coordinates only. Never your own position.",
   pdf: "Nothing — files are opened, edited and saved back without being stored.",

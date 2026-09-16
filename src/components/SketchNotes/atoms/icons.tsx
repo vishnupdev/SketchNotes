@@ -1295,3 +1295,75 @@ export const StackIcon = (p: IconProps) => (
     <path d="M11 7.4h5.8M11 11h5.8" />
   </Svg>
 );
+
+/**
+ * A spec sheet: a document whose rows are a label and a figure, with the figures
+ * ruled off down the right. The split column is what separates it from every
+ * other page glyph here — a spec sheet is a *table*, and that is the thing worth
+ * showing at 20px.
+ */
+export const SpecSheetIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.8" y="3.2" width="16.4" height="17.6" rx="2.2" />
+    <path d="M14.2 3.4v17.2" />
+    <path d="M7 8.2h4M7 12h4M7 15.8h2.6" />
+    <path d="M16.6 8.2h1.2M16.6 12h1.2M16.6 15.8h1.2" />
+  </Svg>
+);
+
+/**
+ * A star, for a rating the reader gave themselves. Takes `fill` from the caller
+ * rather than always outlining, because a half-filled row of five is the whole
+ * point of the control it sits in.
+ */
+export const StarIcon = ({ filled = false, ...p }: IconProps & { filled?: boolean }) => (
+  <Svg {...p}>
+    <path
+      d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.78L12 16.9l-5.2 2.73 1-5.78-4.2-4.1 5.8-.85z"
+      fill={filled ? "currentColor" : "none"}
+    />
+  </Svg>
+);
+
+/**
+ * A new release: a shipping box seen head-on, with a burst at its corner. The
+ * box says "a product" and the burst says "new" — which is the whole of what
+ * Latest Tech is, and the pair reads at 20px where either alone would not
+ * (a bare box is indistinguishable from a folder, a bare burst from a sparkle).
+ */
+export const NewReleaseIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 8.3 12 4.2l8 4.1v7.4L12 19.8 4 15.7z" />
+    <path d="M4 8.3 12 12.4l8-4.1" />
+    <path d="M12 12.4v7.4" />
+    <path d="M18.6 3.2v3.2M17 4.8h3.2" />
+  </Svg>
+);
+
+/**
+ * Brands: a storefront with an awning. Chosen over a price tag (already spoken
+ * for) and over a generic building, because the awning is what reads as
+ * "a maker's shop" rather than "an office" at this size.
+ */
+export const BrandsIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4.2 9.4h15.6v10.4H4.2z" />
+    <path d="M3.2 9.4 5 4.6h14l1.8 4.8" />
+    <path d="M8.1 4.6 7.4 9.4M15.9 4.6l.7 4.8" />
+    <path d="M9.8 19.8v-5.6h4.4v5.6" />
+  </Svg>
+);
+
+/**
+ * A bookmark, for the products someone chose to keep. Outline by default and
+ * filled when the thing is saved, so one glyph carries both states of the
+ * control it sits in — the same trick {@link StarIcon} uses.
+ */
+export const BookmarkIcon = ({ filled = false, ...p }: IconProps & { filled?: boolean }) => (
+  <Svg {...p}>
+    <path
+      d="M6.4 4.2h11.2v16l-5.6-3.9-5.6 3.9z"
+      fill={filled ? "currentColor" : "none"}
+    />
+  </Svg>
+);

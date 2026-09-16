@@ -16,4 +16,9 @@ export const queryKeys = {
   theme: ["theme"] as const,
   weatherFrames: ["satellite", "weather-frames"] as const,
   placeSearch: (query: string) => ["satellite", "places", query] as const,
+  specsSearch: (query: string) => ["specs", "search", query] as const,
+  specsProduct: (title: string) => ["specs", "product", title] as const,
+  specsSimilar: (title: string) => ["specs", "similar", title] as const,
+  specsBrowse: (kind: string, source: string) => ["specs", "browse", kind, source] as const,
+  latestFeed: (category: string, year: number) => ["latest", "feed", category, year] as const,
 };

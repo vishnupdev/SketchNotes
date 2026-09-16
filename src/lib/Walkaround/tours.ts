@@ -2123,6 +2123,191 @@ export const TOURS: Record<AppId, Tour> = {
       },
     ],
   },
+
+  specs: {
+    tagline: "what a product is actually made of",
+    intro:
+      "Browse or search any product, read every specification, see what changed since the last one, price it, compare it and score it.",
+    layout: {
+      blocks: [
+        { label: "Search a name", grow: 0.7 },
+        { label: "Browse by kind & maker", grow: 0.9 },
+        { label: "Shortlist & recents", span: 1 },
+        { label: "Find in this sheet", span: 1 },
+        { label: "Pictures & the spec sheet", grow: 1.6 },
+        { label: "What changed since", span: 1 },
+        { label: "Where to buy", span: 1 },
+        { label: "Similar & side by side", grow: 1 },
+        { label: "Scores, reviews & your rating", span: 1 },
+        { label: "Export & print", span: 1 },
+      ],
+      tabs: ["Find", "Sheet", "Prices", "Similar", "Rating"],
+    },
+    steps: [
+      {
+        at: "body:0",
+        title: "Search a name you know",
+        direction:
+          "Type the model as it is sold — and not only phones: laptops, cameras, consoles, graphics cards, cars, motorcycles and aircraft all work the same way.",
+        suggestion:
+          "The more specific the model, the better the sheet. “Galaxy S24” finds a specification; “Samsung” finds a company. If a product line comes back thin, try the exact variant — “Classic 350” rather than “Classic”.",
+      },
+      {
+        at: "body:1",
+        title: "Or browse, with no name",
+        direction:
+          "Under the box, pick a kind and then a maker or a year — every iPhone, every Galaxy, every ThinkPad, every Toyota.",
+        suggestion:
+          "These are the encyclopedia's own maintained categories rather than search results, so a maker's list is as complete as the encyclopedia is, and the line under each list tells you which of the two you are reading. One to know: “Samsung” is the Galaxy line, and “Samsung (pre-Galaxy)” is a second real category whose newest phone is from 2010.",
+      },
+      {
+        at: "body:2",
+        title: "Keep the ones you mean",
+        direction:
+          "Add a product to the shortlist from its own sheet, and it waits here until you take it off — unlike the recents below it.",
+        suggestion:
+          "“Compare these” is the payoff: it opens the first and puts the rest beside it in the table in one tap, instead of you finding each one again and ticking it.",
+      },
+      {
+        at: "body:3",
+        title: "Jump to one figure",
+        direction:
+          "On a long sheet, the filter box narrows it to the rows that match — and it searches the values as well as the labels.",
+        suggestion:
+          "That second half is the useful half. Typing “wireless” finds the charging row, and “120” finds the refresh rate, neither of which has the word you typed in its name.",
+      },
+      {
+        at: "body:4",
+        title: "The whole sheet, grouped",
+        direction:
+          "The article's photographs, then every specification it states, sorted into chip and memory, display, cameras, power and body.",
+        suggestion:
+          "Nothing is folded away behind a “show more”, and a spec sold in several variants keeps all of them — so a row listing three battery sizes is three real products, not a formatting slip.",
+      },
+      {
+        at: "body:5",
+        title: "Is it worth upgrading",
+        direction:
+          "Similar opens with the diff against whatever this replaced: what moved, by how much, and what stayed the same.",
+        suggestion:
+          "Read the word beside each percentage rather than the sign. A heavier phone is a bigger number and a worse outcome, so “up” and “better” are tracked separately — and the app deliberately offers no verdict on whether the change is worth paying for.",
+      },
+      {
+        at: "body:6",
+        title: "Where to buy it",
+        direction:
+          "Prices lists the shops that sell it in your country — pick from a dozen — and quotes the launch price off the spec sheet.",
+        suggestion:
+          "Read the panel's first paragraph once. It carries no live prices on purpose: no shop publishes them without a key, and a scraped number that is stale or for the wrong variant is worse than no number on a purchase this size.",
+      },
+      {
+        at: "body:7",
+        title: "Line up the rivals",
+        direction:
+          "Under the diff, what sold beside it — tick up to four and they stand in a table with it, measure by measure, scored axis by axis.",
+        suggestion:
+          "Turn on “Differences only” once the table is long. It hides every row they agree on, comparing by value rather than by wording, so “5000 mAh” and “5,000 mAh” count as agreement.",
+      },
+      {
+        at: "body:8",
+        title: "Three ratings, kept apart",
+        direction:
+          "The spec score against published bands, links to what buyers wrote at each shop, and your own stars — never averaged together.",
+        suggestion:
+          "The line above the dial is the one that matters: it says how many of the measures the sheet actually answered. Two out of five is a sketch, however confident the number looks.",
+      },
+      {
+        at: "body:9",
+        title: "Take it, or print it",
+        direction:
+          "Both the sheet and the comparison copy or save as Markdown, CSV or JSON, and print as a clean document.",
+        suggestion:
+          "Every export carries the source address and the minute the sheet was read, so a table pasted into a document stays checkable. Printing drops the tab bar and the dark theme rather than putting the screen on paper.",
+      },
+    ],
+  },
+
+
+
+
+  latest: {
+    tagline: "what just came out, in full",
+    intro:
+      "Browse the newest products by kind or by maker, read the whole specification, and keep the ones you are deciding between.",
+    layout: {
+      blocks: [
+        { label: "Kind of product", grow: 0.6 },
+        { label: "The latest, with full specs", grow: 1.6 },
+        { label: "Newly listed elsewhere", grow: 1 },
+        { label: "Makers, widest range first", span: 1 },
+        { label: "One maker's products", span: 1 },
+        { label: "Name, date, age & launch price", grow: 0.8 },
+        { label: "What sets it apart", span: 1 },
+        { label: "The full specification", grow: 1.4 },
+        { label: "Source & review date", span: 1 },
+        { label: "Search & shortlist", span: 1 },
+      ],
+      tabs: ["New", "Brands", "Details", "Saved"],
+    },
+    steps: [
+      {
+        at: "body:0",
+        title: "Pick a kind",
+        direction:
+          "Eleven rows of chips across the top: phones, laptops, TVs, monitors, graphics, processors, tablets, consoles, watches, audio and cameras.",
+        suggestion:
+          "TVs and monitors are here for a reason worth knowing — no open encyclopedia lists individual television or monitor models, so those two are covered entirely by the hand-checked catalogue, and the panel underneath says so rather than looking empty.",
+      },
+      {
+        at: "body:1",
+        title: "Read the third line",
+        direction:
+          "Each row gives the maker, the release date, how old it is in words, and the launch price — enough to compare without opening anything.",
+        suggestion:
+          "“8 months ago” is the line that earns its place. A date makes you work out whether a product is still current; this does it for you, and it is the fastest way to spot the one model in a list that is quietly two years old.",
+      },
+      {
+        at: "body:2",
+        title: "Links, not sheets",
+        direction:
+          "Below the catalogue sits what an open encyclopedia has newly filed under this year — pick a year with the small chips.",
+        suggestion:
+          "These are drawn differently on purpose: they carry a one-line description and no specifications, so they open at the source instead of as a sheet here. It is the half that keeps finding things after the catalogue above was last reviewed.",
+      },
+      {
+        at: "body:3",
+        title: "By who makes it",
+        direction:
+          "Brands lists every maker in the catalogue with the number of products each has, widest range first rather than alphabetically.",
+        suggestion:
+          "Tapping the chip you are already on clears it and returns you to the directory — quicker than scrolling back, and the only way to see the whole list again once a maker is open.",
+      },
+      {
+        at: "body:7",
+        title: "The whole sheet",
+        direction:
+          "Details gives every specification group the maker publishes — display, performance, cameras, power, body — with nothing folded away.",
+        suggestion:
+          "Read the qualifiers, they are deliberate: a brightness figure keeps the window it was measured on, a graphics card is listed at reference speed rather than a partner card's, and a TV sheet names the panel size its numbers apply to.",
+      },
+      {
+        at: "body:8",
+        title: "Check the app's work",
+        direction:
+          "At the foot of every sheet is a link to the manufacturer's own specification page, and the date this catalogue was last reviewed.",
+        suggestion:
+          "Both lines are the point. The link is how you confirm a figure was copied correctly; the date is how you judge how fresh the list is — a stale list of “the latest” looks exactly like a current one until you act on it.",
+      },
+      {
+        at: "body:9",
+        title: "Keep a shortlist",
+        direction:
+          "The bookmark on any row keeps it under Saved, alongside a search across every product in the catalogue.",
+        suggestion:
+          "The search covers names, makers and kinds but deliberately not the spec rows — “120” appears in a refresh rate, a battery figure and a model number at once, and a search that matches everything is no search at all.",
+      },
+    ],
+  },
 };
 
 /** Apps in the order their tours are authored — the picker's default order. */

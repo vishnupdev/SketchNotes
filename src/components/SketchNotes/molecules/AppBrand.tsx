@@ -47,7 +47,6 @@ export function AppBrand({ icon, name, tagline, heading = false, onLeave }: AppB
         setActiveApp("sketchnotes");
       }}
       title="Back to home"
-      aria-label={`${name} — back to the home app`}
       className="-m-1 flex items-center gap-3.5 rounded-[15px] p-1 hover:opacity-90"
     >
       <span className="grid size-[46px] flex-none place-items-center rounded-[13px] bg-accent text-on-accent shadow-[0_0_0_4px_var(--accent-soft)]">
@@ -60,6 +59,18 @@ export function AppBrand({ icon, name, tagline, heading = false, onLeave }: AppB
           by Vishnu P
         </div>
       </div>
+
+      {/*
+        Where the destination is announced, rather than an `aria-label` on the
+        link. WCAG 2.5.3 (Label in Name) asks that a control's accessible name
+        contain its visible text, and an `aria-label` *replaces* that text — so
+        "Spec Analyser — back to the home app" silently dropped the tagline and
+        the byline a sighted reader can see, and a voice-control user asking for
+        the block by what it says would not be understood. Putting the purpose
+        inside the link instead appends to the visible name rather than
+        overwriting it.
+      */}
+      <span className="sr-only">— back to the home app</span>
     </a>
   );
 }

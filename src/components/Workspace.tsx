@@ -72,6 +72,8 @@ const CardsApp = dynamic(APP_LOADERS.cards, { ssr: false });
 const ExifApp = dynamic(APP_LOADERS.exif, { ssr: false });
 const CalcApp = dynamic(APP_LOADERS.calc, { ssr: false });
 const OcrApp = dynamic(APP_LOADERS.ocr, { ssr: false });
+const SpecsApp = dynamic(APP_LOADERS.specs, { ssr: false });
+const LatestApp = dynamic(APP_LOADERS.latest, { ssr: false });
 
 /**
  * Every app's deep-link path — the one place a route is declared, read in both
@@ -129,6 +131,8 @@ const APP_PATHS: Record<AppId, string> = {
   exif: "/exif",
   calc: "/calc",
   ocr: "/ocr",
+  specs: "/specs",
+  latest: "/latest",
 };
 
 const PDF_BASE = APP_PATHS.pdf;
@@ -450,6 +454,17 @@ export function Workspace() {
           which is the only thing that turns the recording indicator off. */}
       <AppFrame active={activeApp === "clip"} name="Clip">
         <ClipApp />
+      </AppFrame>
+
+      <AppFrame active={activeApp === "specs"} name="Spec Analyser">
+        <SpecsApp />
+      </AppFrame>
+
+      {/* Latest Tech — the newest products by kind and maker. Its catalogue is
+          in the bundle, so it works offline from the first load; only the
+          "newly listed" half needs the network. */}
+      <AppFrame active={activeApp === "latest"} name="Latest Tech">
+        <LatestApp />
       </AppFrame>
 
       <AppFrame active={activeApp === "cards"} name="Cards">

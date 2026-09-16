@@ -216,6 +216,20 @@ renderer, under a second:
   storage;
 - [QR payload formats](./src/lib/qr/payload.test.ts), including that a scanned code can
   never produce a `javascript:` link;
+- [Spec Analyser's wikitext reader, unit extraction and scoring](./src/lib/Specs/specs.test.ts) —
+  where a parser slip produces no error at all, just a confidently wrong figure: a phone with a
+  1.8-tonne battery, or a car whose *lightest* listed weight is its heaviest. Covers the shapes
+  that actually broke it — pipes inside wikilinks inside list templates, `{{convert}}` ranges and
+  dimensions, core counts written as words — and that an unstated measure scores nothing rather
+  than zero;
+- [Latest Tech's catalogue, ordering and date formatting](./src/lib/Latest/latest.test.ts) — a
+  hand-maintained product catalogue fails quietly or not at all: a list that is no longer
+  newest-first looks exactly like one that is, a record that lost its source link still renders a
+  tidy sheet, and `new Date("2025-09")` parses as UTC so every release west of Greenwich reads as
+  the month before. Covers those, that every product resolves to a real brand and a non-empty
+  sheet, that no category chip opens onto nothing, and that the live feed only ever reads a
+  by-year category — the fallback it replaced sorted a standing category by a year two thirds of
+  its rows do not state, and put a 1995 graphics card at the top of a list headed "newly listed";
 - [canvas geometry](./src/engine/geometry.test.ts) and the
   [palette ranking](./src/lib/palette/match.test.ts).
 
