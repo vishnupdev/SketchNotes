@@ -78,15 +78,32 @@ if (files.length === 0) {
  * Mermaid half of this pattern — and an accident is not a decision. A future
  * build that split them differently would have silently made them eager again.
  *
+ * TensorFlow is the third, and the largest: Detect's object detector pulls in
+ * ~0.9 MB of TensorFlow.js across six chunks for an app whose whole point is a
+ * camera most visitors will never point at anything. It is worth noting that
+ * this is only the *runtime* — the trained weights are several megabytes more,
+ * fetched from Google's model host and held by the service worker in its own
+ * unversioned cache (see `handleModel` in `public/sw.js`), so neither half is
+ * ever downloaded by someone who does not open the app.
+ *
+ * `kernelName` is in the pattern alongside `tensorflow` because one backend
+ * chunk carries the second string and not the first — matching on only the
+ * obvious one would have left 34 KB eager and, worse, would have quietly
+ * started including the rest the first time a build split them differently.
+ * Note that this is why neither the command palette's search terms nor the
+ * Assistant's keywords name the library: a workspace string matching this
+ * pattern would drop a chunk the workspace needs offline, silently.
+ *
  * Matched on content rather than filename because Next content-hashes chunk
  * names, so there is no stable pattern to match on. Reading the build output
  * costs a few megabytes of I/O once per build.
  *
  * Anything added here needs a sensible offline-before-first-use message in the
- * feature itself: `MermaidFigure` has one, and OCR says on its opening screen
- * that the first read needs a connection.
+ * feature itself: `MermaidFigure` has one, OCR says on its opening screen that
+ * the first read needs a connection, and Detect states the detector's size
+ * before you choose it and explains the failure if it cannot be fetched.
  */
-const LAZY_ONLY = /mermaid|flowchart-v2|sequenceDiagram|cytoscape|dagre|tesseract/;
+const LAZY_ONLY = /mermaid|flowchart-v2|sequenceDiagram|cytoscape|dagre|tesseract|tensorflow|kernelName/;
 
 const eager = [];
 let deferred = 0;

@@ -12,6 +12,7 @@ import {
   CardsIcon,
   ChronoIcon,
   ConvertIcon,
+  DetectIcon,
   FileQrIcon,
   KeyIcon,
   MarkdownIcon,
@@ -791,6 +792,13 @@ export const APPS: AppEntry[] = [
     tagline: "Read & strip photo metadata",
     icon: <TagIcon size={24} />,
     hue: "--app-exif",
+  },
+  {
+    id: "detect",
+    name: "Detect",
+    tagline: "Name what the camera sees",
+    icon: <DetectIcon size={24} />,
+    hue: "--app-detect",
   },
   {
     id: "api",

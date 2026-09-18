@@ -104,7 +104,7 @@ export const ACCESS_ITEMS: AccessItem[] = [
     what: "See through the camera and record video.",
     permission: "camera",
     probe: () => hasMedia("getUserMedia"),
-    usedBy: ["color", "scan", "nearby"],
+    usedBy: ["color", "scan", "nearby", "detect"],
     action: "live",
   },
   {

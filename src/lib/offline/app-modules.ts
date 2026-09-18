@@ -69,6 +69,7 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   ocr: () => import("@/components/Ocr/OcrApp").then((m) => m.OcrApp),
   specs: () => import("@/components/Specs/SpecsApp").then((m) => m.SpecsApp),
   latest: () => import("@/components/Latest/LatestApp").then((m) => m.LatestApp),
+  detect: () => import("@/components/Detect/DetectApp").then((m) => m.DetectApp),
 };
 
 /**
@@ -127,6 +128,12 @@ export const WARMUP_ORDER: LazyAppId[] = [
   // a sheet it has never fetched is not on this device, and it says so rather
   // than pretending otherwise.
   "specs",
+  // Honest for the same reason, from the other end: Detect's own chunk is
+  // small and caches here, but the thing it needs is a few megabytes of trained
+  // weights that are deliberately *not* precached for a workspace where most
+  // people will never open this app. Warming it offline gets you the screen and
+  // the message explaining that, which is the truthful outcome.
+  "detect",
   // Warmed late and honestly: the app's chunk caches, but a map is its tiles,
   // and third-party imagery is not something this worker precaches. Offline it
   // opens and says so rather than pretending to have the world on disk.
@@ -183,4 +190,5 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   ocr: "OCR",
   specs: "Spec Analyser",
   latest: "Latest Tech",
+  detect: "Detect",
 };

@@ -273,6 +273,12 @@ export const APPS: AppEntry[] = [
     blurb:
       "see what your pictures are telling people — every EXIF tag, the GPS coordinates, the embedded thumbnail — then take the metadata out without re-encoding the image, so the photo is bit-for-bit unchanged",
   },
+  {
+    path: "/detect",
+    name: "Detect",
+    blurb:
+      "point your camera at something and it names what it sees — a labelled, scored box round every person, vehicle, animal, device, piece of furniture and item of food it recognises, live or in a photo you already have, with the detector running entirely on your own device and no picture ever uploaded",
+  },
 ];
 
 /** Keywords targeting the brand plus each tool's search intent. */
@@ -480,6 +486,12 @@ export const SITE_KEYWORDS = [
   "srs flashcards free",
   "exif viewer online",
   "remove exif data",
+  "object detection online",
+  "detect objects in a photo",
+  "what is this object",
+  "camera object recognition",
+  "image recognition in browser",
+  "count people in a photo",
   "strip photo metadata",
   "photo gps location",
   "lossless metadata removal",

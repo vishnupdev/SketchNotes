@@ -2308,6 +2308,69 @@ export const TOURS: Record<AppId, Tour> = {
       },
     ],
   },
+  detect: {
+    tagline: "name what the camera sees",
+    intro: "Point a camera at something and have it named — and find out what it will never name.",
+    layout: {
+      blocks: [
+        { label: "Camera / picture", grow: 3 },
+        { label: "Start · flip · save", span: 1 },
+        { label: "What it found", grow: 1.1 },
+        { label: "Detector & confidence", grow: 1.2 },
+      ],
+      tabs: ["Live", "Picture", "Seen"],
+    },
+    steps: [
+      {
+        at: "body:0",
+        title: "The camera stays off",
+        direction:
+          "The stage is blank until you start the camera, and once it is running every recognised thing gets corner brackets and a name.",
+        suggestion:
+          "Nothing is uploaded and no frame is kept — the detector is downloaded to the camera, not the other way round.",
+      },
+      {
+        at: "body:1",
+        title: "Start, flip, keep",
+        direction:
+          "Start and stop the camera here, flip between front and rear where there is more than one, and save the current frame with the boxes drawn into it.",
+        suggestion:
+          "The saved picture is the full sensor frame, not a screenshot of the preview, so the boxes come out sharp at the photo's own size.",
+      },
+      {
+        at: "body:2",
+        title: "Read it as words",
+        direction:
+          "Under the picture is the same result written out — how many of each thing, and how sure it is of each.",
+        suggestion:
+          "This is the half that works at arm's length, and it is what a screen reader announces; the labels on a moving frame are the illustration.",
+      },
+      {
+        at: "body:3",
+        title: "The two settings that matter",
+        direction:
+          "Fast keeps up with live video, Accurate finds smaller and more crowded things, and the slider sets how sure it has to be before it says anything.",
+        suggestion:
+          "Raise the slider when something is being named confidently and wrongly. Below about 40% a blank wall starts sprouting furniture.",
+      },
+      {
+        at: "tab:1",
+        title: "No camera needed",
+        direction:
+          "Picture runs the same detector over a photo you drop, paste or pick — which is the whole app on a desktop with no webcam, or after you have refused the permission.",
+        suggestion:
+          "This is where Accurate belongs: a still has all the time in the world, so the slower model costs you nothing but the wait.",
+      },
+      {
+        at: "tab:2",
+        title: "What it can never see",
+        direction:
+          "Seen gathers what has turned up so far, and lists the eighty categories the detector knows — searchable, with the ones you have found marked.",
+        suggestion:
+          "Check here before deciding it is broken. Keys, faces, text, brands and dog breeds are not on the list, and no amount of better light will put them there.",
+      },
+    ],
+  },
 };
 
 /** Apps in the order their tours are authored — the picker's default order. */

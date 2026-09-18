@@ -56,7 +56,8 @@ export type AppId =
   | "calc"
   | "ocr"
   | "specs"
-  | "latest";
+  | "latest"
+  | "detect";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
 const ALL_APPS: AppId[] = [
@@ -74,6 +75,9 @@ const ALL_APPS: AppId[] = [
   "vault",
   "scan",
   "ocr",
+  // Detect sits with the other two camera-and-picture readers: Scan takes the
+  // page, OCR takes its words, Detect names what the lens is actually pointed at.
+  "detect",
   "exif",
   "voice",
   "clip",

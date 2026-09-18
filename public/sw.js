@@ -46,8 +46,9 @@
 // the /nearby route; v10 adds the share target, background reminder checks and
 // the /qr and /handoff routes; v11 adds the /drop route and File Drop's
 // streaming downloads; v12 adds the /clone route; v21 adds the /latest route
-// and Latest Tech's listings endpoint.
-const VERSION = "oneapp-v21";
+// and Latest Tech's listings endpoint; v22 adds the /detect route and the
+// model cache below.
+const VERSION = "oneapp-v22";
 const SHELL_CACHE = `oneapp-shell-${VERSION}`;
 const STATIC_CACHE = `oneapp-static-${VERSION}`;
 const DATA_CACHE = `oneapp-data-${VERSION}`;
@@ -144,6 +145,7 @@ const SHELL_URLS = [
   "/ocr",
   "/specs",
   "/latest",
+  "/detect",
 ];
 
 /** Non-HTML files the workspace can't start (or edit PDFs) without. */
@@ -177,6 +179,29 @@ const MEDIA_HOSTS = [
   "thumb.wikimedia.org",
   "upload.wikimedia.org",
 ];
+
+/*
+ * Detect's trained model.
+ *
+ * The one third-party download in this workspace that an app genuinely cannot
+ * work without: a few megabytes of weights fetched from Google's model host the
+ * first time somebody runs a detection. Unlike OCR's engine, which writes its
+ * language model into IndexedDB itself, this one has no cache of its own — left
+ * alone it leans on the HTTP cache, which is evictable and offers no offline
+ * guarantee at all, so "works offline after the first run" would be a claim the
+ * app could not keep.
+ *
+ * Hence cache-first, in a cache that is deliberately **not** versioned and
+ * **not** one of the OWNED_CACHES. The URLs carry the model's own identity and
+ * never change contents, so there is nothing to revalidate — and versioning it
+ * would throw several megabytes away on every deploy, making every visitor
+ * download the model again because an unrelated app changed.
+ */
+const MODEL_HOST = "storage.googleapis.com";
+const MODEL_PATH = "/tfjs-models/";
+const MODEL_CACHE = "oneapp-models";
+
+const isModelRequest = (url) => url.hostname === MODEL_HOST && url.pathname.startsWith(MODEL_PATH);
 
 /*
  * Share target. The manifest points the platform's share sheet at this path; the
@@ -550,6 +575,28 @@ async function handleMedia(request) {
   return response || Response.error();
 }
 
+/**
+ * Detect's model weights: cache-first, never trimmed, never versioned.
+ *
+ * Deliberately not routed through `putSafely`'s entry cap. A model is a set of
+ * files that only work together — a `model.json` and its weight shards — so an
+ * eviction policy that drops "the oldest few" would leave a manifest pointing
+ * at shards that are no longer there, which fails at load time with something
+ * far more confusing than a clean miss.
+ *
+ * A cross-origin fetch with no CORS gives an opaque response, which is fine to
+ * store and replay but whose size cannot be read; the model host does send CORS
+ * headers, so in practice these are ordinary responses.
+ */
+async function handleModel(request) {
+  const cache = await caches.open(MODEL_CACHE);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  const response = await fetch(request).catch(() => null);
+  if (isStorable(response)) void putSafely(MODEL_CACHE, request, response.clone());
+  return response || Response.error();
+}
+
 /* ----------------------------- share target --------------------------- */
 
 /**
@@ -672,6 +719,8 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) {
     if (MEDIA_HOSTS.includes(url.hostname) && request.destination === "image") {
       event.respondWith(handleMedia(request));
+    } else if (isModelRequest(url)) {
+      event.respondWith(handleModel(request));
     }
     return; // every other cross-origin request hits the network untouched
   }

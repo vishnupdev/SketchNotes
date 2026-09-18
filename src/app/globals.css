@@ -181,6 +181,7 @@
   --app-ocr: #9a3412;
   --app-specs: #7b2d4e;
   --app-latest: #a21caf;
+  --app-detect: #5c6b16;
 
   /* QR codes are read by a camera, not by a person, so these two are the one
      pair in the workspace that does *not* follow the theme: a scanner expects
@@ -190,6 +191,18 @@
      they never change is written down. */
   --qr-dark: #000000;
   --qr-light: #ffffff;
+
+  /* Detect's bounding boxes. The second pair in the workspace that does *not*
+     follow the theme, for the same kind of reason as the QR pair above: these
+     are drawn over a live camera frame, not over paper, so the surface behind
+     them is whatever the lens is pointed at and the theme says nothing useful
+     about it. Amber is the choice that stays legible over a dark room and a
+     bright window alike, and near-black on it clears AA at ~12:1 for the label
+     plate. `held` is the same amber at reduced alpha, for a box being carried
+     over a frame the detector lost it in. */
+  --detect-box: #facc15;
+  --detect-box-held: rgba(250, 204, 21, 0.5);
+  --detect-box-ink: #0d1319;
 
   /* Board section-type hues. Only ever used as a small glyph tile and a hairline
      rim (never as text or a fill behind text), so these are chosen for being
@@ -270,6 +283,7 @@
   --app-ocr: #fdb896;
   --app-specs: #eb9ab8;
   --app-latest: #f5b8ff;
+  --app-detect: #cfd977;
   --board-note: #fbbf24;
   --board-checklist: #4d94ff;
   --board-counter: #1fb89f;

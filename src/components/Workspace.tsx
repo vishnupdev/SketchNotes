@@ -74,6 +74,7 @@ const CalcApp = dynamic(APP_LOADERS.calc, { ssr: false });
 const OcrApp = dynamic(APP_LOADERS.ocr, { ssr: false });
 const SpecsApp = dynamic(APP_LOADERS.specs, { ssr: false });
 const LatestApp = dynamic(APP_LOADERS.latest, { ssr: false });
+const DetectApp = dynamic(APP_LOADERS.detect, { ssr: false });
 
 /**
  * Every app's deep-link path — the one place a route is declared, read in both
@@ -133,6 +134,7 @@ const APP_PATHS: Record<AppId, string> = {
   ocr: "/ocr",
   specs: "/specs",
   latest: "/latest",
+  detect: "/detect",
 };
 
 const PDF_BASE = APP_PATHS.pdf;
@@ -480,6 +482,14 @@ export function Workspace() {
           business holding for an app nobody is looking at. */}
       <AppFrame active={activeApp === "ocr"} name="OCR">
         <OcrApp />
+      </AppFrame>
+
+      {/* Detect. Unmounting is what stops the camera and frees the detector's
+          weights from GPU memory — a live stream and tens of megabytes of
+          model are the two things in this workspace that most obviously have
+          no business outliving the app you were looking at. */}
+      <AppFrame active={activeApp === "detect"} name="Detect">
+        <DetectApp />
       </AppFrame>
 
       {/* Exif. Unmounting drops the picture and its preview URL — a photo

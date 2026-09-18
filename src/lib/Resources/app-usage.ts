@@ -29,6 +29,8 @@ export const APP_NETWORK: Partial<Record<AppId, string>> = {
     "Recording is local. Transcription, when switched on, uses the browser's own speech service — in Chrome that means the audio is sent to Google. It is off by default.",
   markdown:
     "Nothing. Mermaid diagrams are drawn on the device; the diagram engine is downloaded once, the first time a document contains one.",
+  detect:
+    "The trained detector is downloaded from Google's model host the first time you run one — a few megabytes, once per device, after which the offline worker serves it and the app needs no connection at all. Camera frames and pictures are never uploaded: the model comes to them, and every frame is scored on this device and dropped.",
   clone: "The copy runs device to device. Over a cable or on “this network only” nothing outside the two devices is contacted at all; “anywhere” asks a public STUN server for this device's address, and it never sees your data.",
   specs:
     "Looking a product up asks this site’s own server, which fetches the article from Wikipedia and sends back only the parsed sheet — so Wikipedia sees the server, not you. Nothing about what you looked up is sent anywhere else, and a sheet you have already opened is answered from the cache without contacting anyone. Product photographs load from Wikimedia. The shop and review rows are ordinary links that contact nobody until you tap one, and they carry no referrer when you do.",
@@ -59,6 +61,8 @@ export const APP_STORAGE_NOTE: Record<AppId, string> = {
   cards: "Your decks, and every card's review schedule.",
   clip: "Only the capture settings. Recordings are held in memory and never written to storage.",
   exif: "Nothing — the picture is read in memory and dropped when you close it.",
+  detect:
+    "Nothing. The detector's trained weights are downloaded once and kept for offline use; camera frames are scored and dropped, and the list of what was seen is held in memory only, so it is gone when you close the tab.",
   ocr: "Your layout, output and picture-adjustment choices. Never the picture or the text it gave.",
   calc: "Your tape, and your base, width and angle choices. Nothing from the Bases or Percent boxes.",
   specs: "The products you have opened, the shortlist you are deciding from, your own star ratings and notes, which products you last compared, and the country and browse list you chose.",

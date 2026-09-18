@@ -158,14 +158,32 @@ function getWebGL(): WebGLInfo | null {
   });
 }
 
+/**
+ * The two ways an adapter has ever reported its identity, described here rather
+ * than taken from whichever WebGPU typings win in node_modules.
+ *
+ * `requestAdapterInfo()` was the original spelling and `info` replaced it;
+ * browsers in the wild still ship either, which is why the code below tries
+ * both. The *types* are the fragile part: `@webgpu/types` — pulled in
+ * transitively by Detect's TensorFlow dependency — predates `info`, while
+ * TypeScript's own lib.dom has since dropped `requestAdapterInfo`. Whichever
+ * one is in the tree, this file compiles, and nothing about what it does at
+ * runtime changes.
+ */
+interface AdapterIdentity {
+  info?: GPUAdapterInfo;
+  requestAdapterInfo?: () => Promise<GPUAdapterInfo>;
+}
+
 async function getWebGPU(): Promise<{ info: GPUAdapterInfo; features: number } | null> {
   const gpu = nav().gpu;
   if (!gpu) return null;
   try {
     const adapter = await gpu.requestAdapter();
     if (!adapter) return null;
-    let info = adapter.info;
-    if (!info && adapter.requestAdapterInfo) info = await adapter.requestAdapterInfo();
+    const identity = adapter as AdapterIdentity;
+    let info = identity.info;
+    if (!info && identity.requestAdapterInfo) info = await identity.requestAdapterInfo();
     return { info: info ?? {}, features: adapter.features ? adapter.features.size : 0 };
   } catch {
     return null;

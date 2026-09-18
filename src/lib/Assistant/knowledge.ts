@@ -60,6 +60,7 @@ export const APP_LABELS: Record<AppId, string> = {
   ocr: "OCR",
   specs: "Spec Analyser",
   latest: "Latest Tech",
+  detect: "Detect",
 };
 
 /**
@@ -502,6 +503,20 @@ export const APP_ALIASES: Record<AppId, string[]> = {
     "photo location",
     "where was this photo taken",
   ],
+  detect: [
+    "detect",
+    "object detection",
+    "detect objects",
+    "recognise objects",
+    "recognize objects",
+    "identify an object",
+    "what is this thing",
+    "name what the camera sees",
+    "image recognition",
+    "computer vision",
+    "bounding box",
+    "count people",
+  ],
   // "map" and "satellite" are safe to claim outright — no other app here draws
   // one. The weather phrasings are included because "is it raining" is how
   // people actually ask for the live overlay, not "show me radar tiles".
@@ -605,6 +620,7 @@ export const APP_PATHS: Record<AppId, string> = {
   ocr: "/ocr",
   specs: "/specs",
   latest: "/latest",
+  detect: "/detect",
 };
 
 /** One-line summary per app, used when listing the whole workspace. */
@@ -674,6 +690,8 @@ export const APP_SUMMARIES: Record<AppId, string> = {
     "a calculator shaped like a document — a calculation a line, each one named and reusable, plus number bases and the four percentage questions",
   ocr:
     "read the text out of a photo, a screenshot or a scan, on this device, with a confidence for every word so you know what it guessed at",
+  detect:
+    "point the camera at something and it names what it sees — eighty everyday categories, boxed and scored, entirely on this device",
   specs:
     "the full specification of any product — phone, laptop, camera, console, car or motorcycle — quoted from its source article, with what it replaced, a side-by-side comparison and a spec score that says how much of itself it could measure",
   latest:
@@ -1350,6 +1368,22 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "The JFIF header, the ICC colour profile and Adobe's colour-transform flag are deliberately kept: they are instructions for decoding the picture correctly, not facts about you, and dropping the profile visibly shifts the colours of a wide-gamut photo.\n" +
       "Nothing is uploaded and nothing is stored — the file is read in memory and dropped when you close it, which for a photo carrying your home address is the only defensible behaviour.",
     followUps: ["What can Image Studio do?", "Is my data private?", "What is the Satellite Map?"],
+  },
+  {
+    id: "app-detect",
+    title: "Detect — name what the camera sees",
+    app: "detect",
+    keywords: ["detect", "object detection", "detect objects", "recognise objects", "recognize objects", "identify an object", "what is this thing", "what is in this picture", "image recognition", "object recognition", "computer vision", "machine vision", "bounding box", "count people", "count objects", "camera ai", "ai camera"],
+    answer:
+      "Detect points a camera at something and names what it finds.\n" +
+      "• Live runs the camera and draws a labelled box round everything it recognises, with a confidence for each and a running frame rate. The camera stays off until you start it, and stops the moment you leave the tab\n" +
+      "• Picture does the same for a photo you already have — drop it, paste it or pick it. This half needs no camera at all, so it works on a desktop or after you have refused the permission\n" +
+      "• Seen gathers what has turned up, and lists the eighty categories the detector knows so you can search them\n" +
+      "The thing worth knowing before you start: it recognises exactly eighty everyday categories — people, vehicles, animals, furniture, kitchen things, food, devices — and nothing else. It cannot find your keys, read text, recognise a face, tell one dog breed from another or identify a brand, and no amount of better light or a closer angle will change that. The Seen tab lists all eighty so you can check before assuming it is broken.\n" +
+      "Two settings do most of the work. The detector choice trades speed for reach: Fast keeps up with live video, Accurate finds smaller and more crowded things and suits a still picture. The confidence slider is the fix for wrong labels — raise it when something is being named confidently and wrongly, lower it when things are being missed, though below about 40% a blank wall starts sprouting furniture.\n" +
+      "The detector is a few megabytes of trained weights, fetched the first time you run one and then kept on the device by the offline worker, so every later run works with no connection. Nothing is uploaded: the model comes to the picture, every frame is scored here and dropped, and the list of what was seen is held in memory only — it is gone when you close the tab.\n" +
+      "To photograph a page use Scan; to read its words use OCR; to read a code use QR Codes.",
+    followUps: ["What can OCR do?", "What can Scan do?", "Is my data private?"],
   },
 
   // ── Cross-cutting how-tos ────────────────────────────────────────────────

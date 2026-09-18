@@ -1367,3 +1367,20 @@ export const BookmarkIcon = ({ filled = false, ...p }: IconProps & { filled?: bo
     />
   </Svg>
 );
+
+/**
+ * Detect: four corner brackets round a recognised thing. The brackets are the
+ * app's own overlay drawn at 24px — the same mark it puts on the camera frame —
+ * and the rounded block inside them is the object that has been found. A plain
+ * reticle was the obvious alternative and is wrong: crosshairs say "aim at
+ * this", where the whole point here is "something is already in the box".
+ */
+export const DetectIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.4 8.2V4.9a1.5 1.5 0 0 1 1.5-1.5h3.3" />
+    <path d="M15.8 3.4h3.3a1.5 1.5 0 0 1 1.5 1.5v3.3" />
+    <path d="M20.6 15.8v3.3a1.5 1.5 0 0 1-1.5 1.5h-3.3" />
+    <path d="M8.2 20.6H4.9a1.5 1.5 0 0 1-1.5-1.5v-3.3" />
+    <rect x="8" y="8" width="8" height="8" rx="2" />
+  </Svg>
+);
