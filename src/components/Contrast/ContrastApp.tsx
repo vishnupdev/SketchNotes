@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { CONTRAST_TOOLS, useContrastStore, type ContrastTool } from "@/store/useContrastStore";
+import { hasSendTo, useSendToStore } from "@/store/useSendToStore";
 import { CheckPanel } from "@/components/Contrast/organisms/CheckPanel";
 import { RampPanel } from "@/components/Contrast/organisms/RampPanel";
 import { VisionPanel } from "@/components/Contrast/organisms/VisionPanel";
@@ -60,11 +61,37 @@ export function ContrastApp() {
   const tool = useContrastStore((s) => s.tool);
   const setTool = useContrastStore((s) => s.setTool);
   const hydrate = useContrastStore((s) => s.hydrate);
+  const ready = useContrastStore((s) => s.ready);
+  const setForeground = useContrastStore((s) => s.setForeground);
 
   // Adopt the saved colours once, after mount (avoids an SSR mismatch).
   useEffect(() => {
     void hydrate();
   }, [hydrate]);
+
+  /*
+   * A colour sent here from Color Lens (see `lib/sendto/types.ts`).
+   *
+   * It becomes the *foreground* and opens Check, because that is the question
+   * someone arriving from a colour reader is asking: Color Lens already grades
+   * a colour on white and on black, so the reason to come here is a background
+   * of their own — which is the one value the sender cannot know and the one
+   * left untouched.
+   *
+   * Waits for `ready`: `hydrate` resolves asynchronously and writes the saved
+   * pair over whatever is in state, so an earlier arrival would vanish.
+   */
+  const takeSend = useSendToStore((s) => s.take);
+  const sendWaiting = useSendToStore(hasSendTo("contrast"));
+  useEffect(() => {
+    if (!ready || !sendWaiting) return;
+    const item = takeSend("contrast");
+    if (!item) return;
+    // An unparseable colour is rejected by the store rather than coerced, so
+    // the panel keeps grading the pair it was already showing.
+    setForeground(item.value);
+    setTool("check");
+  }, [ready, sendWaiting, setForeground, setTool, takeSend]);
 
   return (
     <div className="flex min-h-full flex-col">

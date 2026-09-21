@@ -7,6 +7,7 @@ import { WordOverlay } from "@/components/Ocr/molecules/WordOverlay";
 import { LOW_CONFIDENCE, flagged, stats, verdict } from "@/lib/Ocr/blocks";
 import { SHAPES, exportName, render } from "@/lib/Ocr/export";
 import { cx } from "@/lib/utils";
+import { SendToButton } from "@/components/SketchNotes/molecules/SendToButton";
 import { CopyIcon, DownloadIcon, ScanTextIcon, TrashIcon } from "@/components/SketchNotes/atoms/icons";
 
 /**
@@ -260,6 +261,10 @@ export function ReadPanel() {
               <DownloadIcon size={15} />
               Save as {shapeInfo.extension.toUpperCase()}
             </button>
+            {/* The text is far more often wanted *in* something than saved as a
+                file of its own — this is the shortcut that skips the round trip
+                through the downloads folder (see `lib/sendto/types.ts`). */}
+            <SendToButton kind="text" value={text} from="ocr" label="Recognised text" />
           </div>
 
           {lowWords.length > 0 && (

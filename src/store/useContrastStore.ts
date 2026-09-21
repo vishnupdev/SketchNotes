@@ -41,6 +41,14 @@ interface ContrastState {
   vision: VisionType;
   /** The palette checked for confusable pairs. */
   palette: string[];
+  /**
+   * True once the saved colours have been read.
+   *
+   * Anything that *writes* a colour from outside — a colour sent in from
+   * Color Lens — has to wait for this, or `hydrate` lands a tick later and
+   * overwrites it with the saved pair.
+   */
+  ready: boolean;
 
   setTool: (tool: ContrastTool) => void;
   setForeground: (hex: string) => void;
@@ -95,6 +103,7 @@ export const useContrastStore = create<ContrastState>((set, get) => ({
   rampFormat: "css",
   vision: "deuteranopia",
   palette: DEFAULT_PALETTE,
+  ready: false,
 
   setTool: (tool) => {
     set({ tool });
@@ -174,7 +183,10 @@ export const useContrastStore = create<ContrastState>((set, get) => ({
 
   hydrate: async () => {
     const raw = await sGet(PREFS_KEY);
-    if (!raw) return;
+    if (!raw) {
+      set({ ready: true });
+      return;
+    }
     try {
       const p = JSON.parse(raw) as StoredPrefs;
       const palette = Array.isArray(p.palette)
@@ -197,9 +209,11 @@ export const useContrastStore = create<ContrastState>((set, get) => ({
           ? (p.vision as VisionType)
           : "deuteranopia",
         palette: palette.length > 0 ? palette : DEFAULT_PALETTE,
+        ready: true,
       });
     } catch {
       /* corrupt prefs are simply the defaults */
+      set({ ready: true });
     }
   },
 }));

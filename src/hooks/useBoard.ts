@@ -46,6 +46,17 @@ export function useBoard() {
  */
 export interface BoardActions {
   sections: BoardSection[];
+  /**
+   * True once the stored board has been read.
+   *
+   * Anything that dispatches *on its own* — an arrival, rather than a user
+   * pressing something — has to wait for this. `sections` is `[]` while the
+   * query is in flight, so an add dispatched before it resolves is applied to
+   * an empty board and `saveBoard` writes that empty board over the real one.
+   * A person cannot hit this, because there is nothing on screen to press yet;
+   * an effect can, and every time.
+   */
+  ready: boolean;
   /** Parse a line of English and carry it out. */
   runPrompt: (input: string) => void;
   /**
@@ -206,5 +217,16 @@ export function useBoardActions(): BoardActions {
     [read, commit],
   );
 
-  return { sections, runPrompt, dispatch, writeSection, writeItem, undo, canUndo };
+  return {
+    sections,
+    // `data` is undefined only while the first read is in flight; a board that
+    // has genuinely never been used resolves to an empty array, not undefined.
+    ready: data !== undefined,
+    runPrompt,
+    dispatch,
+    writeSection,
+    writeItem,
+    undo,
+    canUndo,
+  };
 }

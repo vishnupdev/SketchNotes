@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { useBoardActions } from "@/hooks/useBoard";
 import { splitLink } from "@/lib/Board/board-api";
+import type { BoardSection, SectionType } from "@/lib/Board/types";
 import { useIntakeStore } from "@/store/useIntakeStore";
 import { useFocusStore } from "@/store/useFocusStore";
+import { hasSendTo, useSendToStore } from "@/store/useSendToStore";
 import { useBoardStore } from "@/store/useBoardStore";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { AppsIcon, BoardIcon } from "@/components/SketchNotes/atoms/icons";
@@ -19,6 +21,21 @@ import { PromptComposer } from "@/components/Board/organisms/PromptComposer";
 
 /** Title of the links section a share lands in. */
 const SHARED_TITLE = "Shared";
+
+/** Title of the note section text sent from another app lands in. */
+const RECEIVED_TITLE = "Received";
+
+/** A row waiting for the section it belongs in — see the settling effect. */
+interface QueuedRow {
+  type: SectionType;
+  title: string;
+  text: string;
+  url: string;
+}
+
+/** The section with this type and title, if the board already has one. */
+const findSection = (sections: BoardSection[], { type, title }: Pick<QueuedRow, "type" | "title">) =>
+  sections.find((s) => s.type === type && s.title.toLowerCase() === title.toLowerCase());
 
 /**
  * Board — a page of sections the user composes by describing it.
@@ -37,8 +54,16 @@ export function BoardApp() {
   const helpOpen = useBoardStore((s) => s.helpOpen);
   const setDraft = useBoardStore((s) => s.setDraft);
   const actions = useBoardActions();
-  const { sections, runPrompt } = actions;
-  const [queuedShare, setQueuedShare] = useState<{ text: string; url: string } | null>(null);
+  const { sections, runPrompt, ready } = actions;
+  /**
+   * A row whose section does not exist yet.
+   *
+   * A fresh section has no id until the board has it, so the add is queued here
+   * and the row dropped in on the next pass. Shared by both arrival paths below
+   * — a share sheet and a send from another app differ only in which section
+   * they land in.
+   */
+  const [queued, setQueued] = useState<QueuedRow | null>(null);
 
   /*
    * Text or a link shared into OneApp from another app's share sheet.
@@ -47,32 +72,59 @@ export function BoardApp() {
    * file here (see `lib/intake/types.ts`). It goes into a "Shared" section,
    * created on first use, through the same `dispatch` the cards and the prompt
    * use — so it lands in the transcript and can be undone like any other change.
+   *
+   * Gated on `ready`: dispatching before the stored board has been read applies
+   * the add to an empty array and saves *that*, which loses the board.
    */
   const takeIntake = useIntakeStore((s) => s.take);
   const pendingText = useIntakeStore((s) => s.pending.some((i) => i.kind === "text"));
   const { dispatch } = actions;
   useEffect(() => {
-    if (!pendingText) return;
+    if (!ready || !pendingText) return;
     const item = takeIntake("text");
     if (!item) return;
 
     const raw = [item.title, item.text, item.url].filter(Boolean).join(" ").trim();
     if (!raw) return;
     const { label, url } = splitLink(raw);
+    const row: QueuedRow = { type: "links", title: SHARED_TITLE, text: label, url };
 
-    const existing = sections.find(
-      (s) => s.type === "links" && s.title.toLowerCase() === SHARED_TITLE.toLowerCase(),
-    );
+    const existing = findSection(sections, row);
     if (existing) {
-      dispatch({ kind: "addItem", id: existing.id, text: label, url });
+      dispatch({ kind: "addItem", id: existing.id, text: row.text, url: row.url });
       return;
     }
-    // A fresh section has no id until the board has it, so the row is added on
-    // the next pass — `sections` changes, this effect is not re-entered (the
-    // arrival is already taken), so the add is queued explicitly.
-    dispatch({ kind: "add", type: "links", title: SHARED_TITLE });
-    setQueuedShare({ text: label, url });
-  }, [dispatch, pendingText, sections, takeIntake]);
+    dispatch({ kind: "add", type: row.type, title: row.title });
+    setQueued(row);
+  }, [dispatch, pendingText, ready, sections, takeIntake]);
+
+  /*
+   * Text sent here from another app — a recognised page, a voice transcript
+   * (see `lib/sendto/types.ts`).
+   *
+   * It lands in a "Received" *note* section rather than the "Shared" links one:
+   * a sent paragraph is prose, and filing it as a link with no URL would
+   * render a row that looks broken. The same two-phase add as above, and the
+   * same `dispatch`, so it shows in the transcript and undoes like anything
+   * else the user did themselves — and the same wait for `ready`, since this
+   * arrives the instant the app mounts and would otherwise always be early.
+   */
+  const takeSend = useSendToStore((s) => s.take);
+  const sendWaiting = useSendToStore(hasSendTo("board"));
+  useEffect(() => {
+    if (!ready || !sendWaiting) return;
+    const item = takeSend("board");
+    if (!item) return;
+    const row: QueuedRow = { type: "note", title: RECEIVED_TITLE, text: item.value, url: "" };
+
+    const existing = findSection(sections, row);
+    if (existing) {
+      dispatch({ kind: "addItem", id: existing.id, text: row.text, url: row.url });
+      return;
+    }
+    dispatch({ kind: "add", type: row.type, title: row.title });
+    setQueued(row);
+  }, [dispatch, ready, sendWaiting, sections, takeSend]);
 
   /*
    * A section a palette search hit named. The board already knows how to scroll
@@ -88,16 +140,14 @@ export function BoardApp() {
     if (id) setFocusSection(id);
   }, [focusPending, setFocusSection, takeFocus]);
 
-  // Second half of the above: drop the shared row into the section once it exists.
+  // Second half of both arrivals above: drop the row in once its section exists.
   useEffect(() => {
-    if (!queuedShare) return;
-    const section = sections.find(
-      (s) => s.type === "links" && s.title.toLowerCase() === SHARED_TITLE.toLowerCase(),
-    );
+    if (!queued) return;
+    const section = findSection(sections, queued);
     if (!section) return;
-    dispatch({ kind: "addItem", id: section.id, text: queuedShare.text, url: queuedShare.url });
-    setQueuedShare(null);
-  }, [dispatch, queuedShare, sections]);
+    dispatch({ kind: "addItem", id: section.id, text: queued.text, url: queued.url });
+    setQueued(null);
+  }, [dispatch, queued, sections]);
 
   /**
    * A tapped example: run it, unless it's a stem ("rename ") that needs

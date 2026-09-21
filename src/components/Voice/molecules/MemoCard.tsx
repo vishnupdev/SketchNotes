@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useVoiceStore, type Memo } from "@/store/useVoiceStore";
 import { dataUrlToBlob, extensionFor, formatClock } from "@/lib/Voice/recorder";
 import { copyText } from "@/lib/export-text";
+import { SendToButton } from "@/components/SketchNotes/molecules/SendToButton";
 import {
   CheckIcon,
   CopyIcon,
@@ -142,6 +143,13 @@ export function MemoCard({ memo }: { memo: Memo }) {
             >
               {copied ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
             </button>
+            <SendToButton
+              kind="text"
+              value={memo.transcript}
+              from="voice"
+              label="Transcript"
+              variant="text"
+            />
           </div>
           {showTranscript && (
             <p className="mt-1 rounded-[8px] border border-border bg-paper px-2.5 py-2 text-[12.5px] leading-relaxed">

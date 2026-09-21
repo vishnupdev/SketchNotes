@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { MAX_DOC, useMarkdownStore, type MarkdownPane } from "@/store/useMarkdownStore";
+import { hasSendTo, useSendToStore } from "@/store/useSendToStore";
 import { useTheme } from "@/hooks/useTheme";
 import { documentStats, parseMarkdown, tableOfContents } from "@/lib/Markdown/parse";
 import { documentTitle, fileSlug, toStandaloneHtml } from "@/lib/Markdown/export";
@@ -54,14 +55,52 @@ export function MarkdownApp() {
   const showToc = useMarkdownStore((s) => s.toc);
   const toggleToc = useMarkdownStore((s) => s.toggleToc);
   const hydrate = useMarkdownStore((s) => s.hydrate);
+  const ready = useMarkdownStore((s) => s.ready);
   const { dark } = useTheme();
 
   const [copied, setCopied] = useState(false);
+  const docRef = useRef<HTMLTextAreaElement>(null);
+  const [received, setReceived] = useState(0);
 
   // Adopt the saved document once, after mount (avoids an SSR mismatch).
   useEffect(() => {
     void hydrate();
   }, [hydrate]);
+
+  /*
+   * Text sent here from another app — a recognised page, a voice transcript
+   * (see `lib/sendto/types.ts`).
+   *
+   * Appended under a heading naming where it came from, never substituted for
+   * what is already written: this is the one document the app has, and someone
+   * who sends a transcript into a half-finished README meant to *add* to it.
+   *
+   * The `ready` guard is load-bearing. `hydrate` resolves asynchronously and
+   * then writes the saved document over whatever is in state, so appending
+   * before it lands would have the arrival silently overwritten a tick later.
+   */
+  const takeSend = useSendToStore((s) => s.take);
+  const sendWaiting = useSendToStore(hasSendTo("markdown"));
+  useEffect(() => {
+    if (!ready || !sendWaiting) return;
+    const item = takeSend("markdown");
+    if (!item) return;
+    // Read the document at the moment of the append rather than closing over
+    // it: `doc` changes on every keystroke, and depending on it here would
+    // re-run this effect throughout a typing session to do nothing.
+    const current = useMarkdownStore.getState().doc.replace(/\s+$/, "");
+    setDoc(`${current}\n\n## ${item.label}\n\n${item.value}\n`);
+    setReceived((n) => n + 1);
+  }, [ready, sendWaiting, setDoc, takeSend]);
+
+  // Show the arrival rather than leaving it below the fold of a long document.
+  // Scrolled, not focused: stealing focus here would raise the on-screen
+  // keyboard on a phone for someone who has not decided to type yet (rule #3).
+  useEffect(() => {
+    if (received === 0) return;
+    const el = docRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [received]);
 
   // One parse per edit, shared by the preview, the contents and the counts —
   // parsing three times for three consumers would be the obvious mistake here.
@@ -217,6 +256,7 @@ export function MarkdownApp() {
                 Markdown
               </label>
               <textarea
+                ref={docRef}
                 id="markdown-doc"
                 value={doc}
                 onChange={(e) => setDoc(e.target.value)}

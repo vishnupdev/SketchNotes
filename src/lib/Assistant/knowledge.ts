@@ -763,6 +763,19 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     followUps: ["List all the apps", "How do I change the theme?"],
   },
   {
+    id: "send-to",
+    title: "Send a result to another app",
+    keywords: ["send to", "send it to", "hand over", "pass it to", "move it to", "between apps", "another app", "into markdown", "into the board", "ocr to markdown", "transcript to markdown", "colour to contrast", "color to contrast", "without saving a file", "round trip", "export to another app"],
+    answer:
+      "Some apps hand what they produced straight to another app here, so you don't have to save a file and open it again.\n" +
+      "• OCR and Voice Memos carry a \"Send to…\" button beside Copy and Save. The destinations are Markdown and the Board\n" +
+      "• Markdown appends what arrives under a heading naming where it came from — it never writes over what you have already written\n" +
+      "• The Board files it as a note in a section called \"Received\", added the same way your typed sentences are, so \"undo\" walks it back\n" +
+      "• Color Lens offers \"Send to Contrast\", which carries the colour over as the foreground and opens Check. Your background is left alone, because that is the one value the sender cannot know\n" +
+      "The workspace switches to the destination and hands the payload over once. Nothing is uploaded and nothing is stored: a send you never arrive at is gone when the tab closes.",
+    followUps: ["What can OCR do?", "What can Contrast do?", "What can the Board do?"],
+  },
+  {
     id: "theme",
     title: "Themes and dark mode",
     keywords: ["theme", "themes", "dark mode", "light mode", "colour", "color", "appearance", "settings", "night", "palette", "custom theme", "my own theme", "oled", "black theme"],

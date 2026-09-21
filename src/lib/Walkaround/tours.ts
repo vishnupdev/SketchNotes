@@ -244,6 +244,14 @@ export const TOURS: Record<AppId, Tour> = {
         suggestion:
           "“undo” walks back the last 25 changes, which makes trying an unfamiliar phrasing free.",
       },
+      {
+        at: "body:1",
+        title: "Things can arrive here",
+        direction:
+          "Text shared into OneApp, and text sent from another app, land in sections of their own.",
+        suggestion:
+          "A share becomes a row in “Shared”; a recognised page or a transcript becomes a note in “Received”. Both arrive through the same dispatch your sentences use, so “undo” walks them back too.",
+      },
     ],
   },
 
@@ -902,7 +910,7 @@ export const TOURS: Record<AppId, Tour> = {
         direction:
           "Contrast against white and black, graded pass or fail to WCAG AA and AAA, plus the nearest of the 148 named CSS colours.",
         suggestion:
-          "Check this before you commit a brand colour to body text. Most fail AA against white, and here is a better place to find out.",
+          "Check this before you commit a brand colour to body text — most fail AA against white. When your background is not white, Send to Contrast carries the colour over and grades it against the pair you actually ship.",
       },
       {
         at: "body:3",
@@ -1297,6 +1305,14 @@ export const TOURS: Record<AppId, Tour> = {
         suggestion:
           "If storage runs short it is the *audio* that is dropped and the transcript that is kept \u2014 the searchable half is the half worth saving.",
       },
+      {
+        at: "body:3",
+        title: "Where a transcript goes next",
+        direction:
+          "Every memo with a transcript carries Send to\u2026 beside its copy button.",
+        suggestion:
+          "It hands the words to Markdown or the Board with no file in between \u2014 which is usually what you wanted the transcript for.",
+      },
     ],
   },
 
@@ -1445,7 +1461,7 @@ export const TOURS: Record<AppId, Tour> = {
         direction:
           "Two colours in, and every WCAG level graded \u2014 AA and AAA, at normal and at large text sizes.",
         suggestion:
-          "Grade the pair you actually ship: body text on the card's own background, not on white.",
+          "Grade the pair you actually ship: body text on the card's own background, not on white. A colour sent over from Color Lens arrives as the foreground with the background untouched, because that one is yours to set.",
       },
       {
         at: "tab:1",
@@ -1740,7 +1756,7 @@ export const TOURS: Record<AppId, Tour> = {
         direction:
           "Paragraphs rejoins the lines the page merely wrapped; Lines keeps the layout exactly as it was.",
         suggestion:
-          "Paragraphs for prose you are pasting into a document — it also heals words hyphenated across a line break. Lines for a receipt or a table, where the layout is the information.",
+          "Paragraphs for prose you are pasting into a document — it also heals words hyphenated across a line break. Lines for a receipt or a table, where the layout is the information. Send to… skips the file entirely and puts the text into Markdown or the Board.",
       },
       {
         at: "tab:1",
@@ -1956,6 +1972,14 @@ export const TOURS: Record<AppId, Tour> = {
         direction: "Download it as .md or as a standalone .html file, or copy the whole thing out.",
         suggestion:
           "The .html export is self-contained, which makes it the one to send to somebody who does not want to read markdown.",
+      },
+      {
+        at: "body:0",
+        title: "Text can arrive from elsewhere",
+        direction:
+          "A recognised page from OCR, or a voice transcript, can be sent straight into this document.",
+        suggestion:
+          "It is appended under a heading naming where it came from, never written over what is already here \u2014 so sending into a half-finished draft is safe.",
       },
     ],
   },

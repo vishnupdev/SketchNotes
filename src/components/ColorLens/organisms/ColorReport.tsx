@@ -7,6 +7,7 @@ import { ColorHero } from "@/components/ColorLens/molecules/ColorHero";
 import { CodeGrid } from "@/components/ColorLens/molecules/CodeGrid";
 import { ContrastPanel } from "@/components/ColorLens/molecules/ContrastPanel";
 import { HarmonyList } from "@/components/ColorLens/molecules/HarmonyList";
+import { SendToButton } from "@/components/SketchNotes/molecules/SendToButton";
 
 interface ColorReportProps {
   hex: string;
@@ -78,6 +79,10 @@ export function ColorReport({ hex, onSelect }: ColorReportProps) {
 
       <CodeGrid detail={detail} />
       <ContrastPanel detail={detail} />
+      {/* The panel above grades this colour on white and black. The next
+          question — "and against *my* background?" — is Contrast's, so hand the
+          colour over rather than growing a second grader here (rule #5). */}
+      <SendToButton kind="color" value={hex} from="color" label="Picked colour" className="w-fit" />
       <HarmonyList hex={hex} onSelect={onSelect} />
     </div>
   );
