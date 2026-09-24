@@ -5,9 +5,10 @@ import { formatBytes, cx } from "@/lib/utils";
 import { sourceLabel } from "@/lib/WatchParty/media";
 import { driftLabel } from "@/lib/WatchParty/sync";
 import { ReactionBar } from "@/components/WatchParty/molecules/ReactionBar";
+import { OutputsCard } from "@/components/WatchParty/molecules/OutputsCard";
 import { Avatar } from "@/components/WatchParty/atoms/Avatar";
 import { FileButton } from "@/components/WatchParty/atoms/FileButton";
-import { MicIcon, MicOffIcon, SkipIcon, SubtitlesIcon } from "@/components/SketchNotes/atoms/icons";
+import { CheckIcon, MicIcon, MicOffIcon, SkipIcon, SubtitlesIcon } from "@/components/SketchNotes/atoms/icons";
 import { BTN, btn, CARD, LABEL, SECTION_TITLE } from "@/components/WatchParty/ui";
 
 const SUB_ACCEPT = ".srt,.vtt,text/vtt,application/x-subrip";
@@ -75,6 +76,8 @@ export function WatchPanel() {
         )}
       </div>
 
+      {!item && <GettingStarted isHost={isHost} guests={room.members.length - 1} />}
+
       <section aria-label="Reactions" className="flex flex-col gap-2">
         <span className={LABEL}>React</span>
         <ReactionBar onReact={react} />
@@ -114,6 +117,8 @@ export function WatchPanel() {
           Wear headphones when your mic is on, or the film will echo back into the room.
         </p>
       </section>
+
+      <OutputsCard />
 
       {item && item.kind !== "screen" && (
         <section className={CARD} aria-labelledby="party-subs">
@@ -253,5 +258,74 @@ export function WatchPanel() {
         subtitles.
       </p>
     </div>
+  );
+}
+
+const STEP_DONE = "grid size-7 flex-none place-items-center rounded-full bg-accent text-on-accent";
+const STEP_TODO =
+  "grid size-7 flex-none place-items-center rounded-full border-2 border-accent text-[12px] font-bold text-accent";
+
+/**
+ * What to do first, while nothing is playing — two steps for a host, and for a
+ * guest the reassurance that waiting is all they need to do.
+ */
+function GettingStarted({ isHost, guests }: { isHost: boolean; guests: number }) {
+  const setTab = useWatchPartyStore((s) => s.setTab);
+
+  if (!isHost) {
+    return (
+      <section className={CARD} aria-label="Getting started">
+        <p className="text-[13px] leading-relaxed">
+          You&apos;re in! It starts playing here by itself when the host picks something. Want to suggest
+          something? Add a link in <b>Queue</b>.
+        </p>
+        <button type="button" onClick={() => setTab("queue")} className={`${BTN} self-start`}>
+          Suggest something
+        </button>
+      </section>
+    );
+  }
+
+  const invited = guests > 0;
+  const steps = [
+    {
+      done: invited,
+      label: invited ? `${guests} ${guests === 1 ? "friend has" : "friends have"} joined` : "Invite your friends",
+      detail: invited ? "Invite more any time from People." : "Share an invite, then paste the reply they send back.",
+      action: invited ? "Invite more" : "Invite",
+      tab: "people" as const,
+    },
+    {
+      done: false,
+      label: "Pick something to watch",
+      detail: "A YouTube link, a video link, a file on this device, or your screen.",
+      action: "Choose",
+      tab: "queue" as const,
+    },
+  ];
+
+  return (
+    <section className={CARD} aria-labelledby="party-start">
+      <h3 id="party-start" className={SECTION_TITLE}>
+        Get the party going
+      </h3>
+      <ol className="flex flex-col gap-3">
+        {steps.map((s, i) => (
+          <li key={s.label} className="flex items-start gap-3">
+            <span className={s.done ? STEP_DONE : STEP_TODO}>{s.done ? <CheckIcon size={14} /> : i + 1}</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[13px] font-semibold">
+                {s.done && <span className="sr-only">Done: </span>}
+                {s.label}
+              </p>
+              <p className="text-[12px] leading-relaxed text-ink-soft">{s.detail}</p>
+            </div>
+            <button type="button" onClick={() => setTab(s.tab)} className={btn(false, true)}>
+              {s.action}
+            </button>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }

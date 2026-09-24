@@ -10,6 +10,7 @@ import { QueuePanel } from "@/components/WatchParty/organisms/QueuePanel";
 import { ChatPanel } from "@/components/WatchParty/organisms/ChatPanel";
 import { PeoplePanel } from "@/components/WatchParty/organisms/PeoplePanel";
 import { VoiceOut } from "@/components/WatchParty/molecules/VoiceOut";
+import { OutputsOut } from "@/components/WatchParty/molecules/OutputsOut";
 import { NavView } from "@/components/SketchNotes/atoms/NavView";
 import { AppBrand } from "@/components/SketchNotes/molecules/AppBrand";
 import { AppFooter } from "@/components/SketchNotes/molecules/AppFooter";
@@ -180,6 +181,7 @@ export function WatchPartyApp() {
               </NavView>
             </div>
             <VoiceOut />
+            <OutputsOut />
           </>
         ) : (
           <Lobby />

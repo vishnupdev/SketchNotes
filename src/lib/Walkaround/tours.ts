@@ -665,7 +665,7 @@ export const TOURS: Record<AppId, Tour> = {
       blocks: [
         { label: "The film · subtitles · reactions", grow: 2.4 },
         { label: "Play · seek · speed · volume · full screen", grow: 0.7 },
-        { label: "React · voice · subtitles · skip vote", grow: 1.3 },
+        { label: "React · voice · speakers · subtitles · skip vote", grow: 1.3 },
       ],
       tabs: ["Watch", "Queue", "Chat", "People"],
     },
@@ -674,9 +674,9 @@ export const TOURS: Record<AppId, Tour> = {
         at: "tab:3",
         title: "One invite per guest",
         direction:
-          "In People, create an invite and send its link or QR; the guest opens it, adds a name and hands you back a reply code to paste or scan.",
+          "A room opens with its first invite ready in People: tap Share to send it, and when the reply comes back, paste it — they join by themselves.",
         suggestion:
-          "An invite can only be answered once, so make one per person. Choose “Anywhere” for friends on other networks; “This network only” works with no internet at all.",
+          "An invite lets in one person, so tap Invite another person for each friend. Connection options switches to “this Wi-Fi only”, which works with no internet at all.",
       },
       {
         at: "tab:1",
@@ -708,7 +708,7 @@ export const TOURS: Record<AppId, Tour> = {
         direction:
           "Reactions float up over everyone's picture; Talk opens your mic, and a ring lights up round whoever is speaking.",
         suggestion:
-          "Wear headphones with the mic on, or the film echoes back into the room. Subtitles the host shares show on every screen; “Just for me” loads your own.",
+          "Wear headphones with the mic on, or the film echoes back into the room. Sharing one device? Speakers & headphones plays the sound on several paired Bluetooth outputs at once — Sync check and each one's Adjust delay line up headphones that lag differently. Subtitles the host shares show on every screen; “Just for me” loads your own.",
       },
       {
         at: "tab:2",

@@ -1490,3 +1490,13 @@ export const MusicNoteIcon = (p: IconProps) => (
     <circle cx="16.8" cy="15.5" r="2.2" />
   </Svg>
 );
+
+/** Three linked dots — hand something to another app (the share sheet). */
+export const ShareIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="17.5" cy="5.5" r="2.5" />
+    <circle cx="6.5" cy="12" r="2.5" />
+    <circle cx="17.5" cy="18.5" r="2.5" />
+    <path d="M8.7 10.7l6.6-3.9M8.7 13.3l6.6 3.9" />
+  </Svg>
+);

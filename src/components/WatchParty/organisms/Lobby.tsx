@@ -2,35 +2,49 @@
 
 import { useEffect, useId, useState } from "react";
 import { useWatchPartyStore } from "@/store/useWatchPartyStore";
-import { clearInviteFromLocation, inviteFromLocation } from "@/lib/rtc/code";
+import { clearInviteFromLocation, extractCode, inviteFromLocation } from "@/lib/rtc/code";
 import { rtcSupported } from "@/lib/rtc/peer";
 import { MAX_MEMBERS } from "@/lib/WatchParty/types";
 import { MAX_NAME, MAX_ROOM_NAME } from "@/lib/WatchParty/protocol";
+import { friendlyName } from "@/lib/WatchParty/names";
 import { CodeExchange } from "@/components/SketchNotes/molecules/CodeExchange";
 import { CodeScanner } from "@/components/WatchParty/molecules/CodeScanner";
+import { Steps } from "@/components/WatchParty/atoms/Steps";
 import {
   ChatIcon,
+  CheckIcon,
+  ClipboardIcon,
+  DiceIcon,
   FilmIcon,
+  LinkIcon,
   MicIcon,
-  MusicNoteIcon,
   SubtitlesIcon,
   UsersIcon,
+  WatchPartyIcon,
 } from "@/components/SketchNotes/atoms/icons";
-import { BTN, BTN_ACCENT, card, CARD, CODE_FIELD, FIELD, LABEL, SECTION_TITLE } from "@/components/WatchParty/ui";
-import { cx } from "@/lib/utils";
+import { BTN, BTN_ACCENT, CARD, CODE_FIELD, FIELD, ICON_BTN, LABEL } from "@/components/WatchParty/ui";
+
+type Mode = "start" | "join";
 
 const FEATURES = [
-  { icon: FilmIcon, text: "YouTube, media links, your own files or a shared screen" },
-  { icon: UsersIcon, text: `Up to ${MAX_MEMBERS} people, every player kept in step` },
-  { icon: ChatIcon, text: "Chat and reactions that float over the picture" },
-  { icon: MicIcon, text: "Voice chat while you watch" },
-  { icon: SubtitlesIcon, text: "Subtitles shared with the whole room" },
-  { icon: MusicNoteIcon, text: "A shared queue, votes to skip, speed for everyone" },
+  { icon: FilmIcon, text: "YouTube, links, your files or your screen" },
+  { icon: UsersIcon, text: `Up to ${MAX_MEMBERS} people, always in sync` },
+  { icon: ChatIcon, text: "Chat and floating reactions" },
+  { icon: MicIcon, text: "Voice chat" },
+  { icon: SubtitlesIcon, text: "Shared subtitles" },
 ];
 
+const CHOICE =
+  "flex min-w-0 flex-1 flex-col items-start gap-1 rounded-2xl border p-3.5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent";
+const CHOICE_ON = `${CHOICE} border-accent bg-accent-soft`;
+const CHOICE_OFF = `${CHOICE} border-border bg-panel hover:border-accent`;
+
 /**
- * Before a room: start one, or open an invite to join one. An invite link lands
- * here with its code already filled in — the guest only has to say who they are.
+ * Before a room: one choice — start one, or join one — then one button.
+ *
+ * A name is already filled in (see `friendlyName`), so nothing is disabled for
+ * a reason the screen doesn't show. An invite link lands here in Join with its
+ * code taken up already: the guest sees their name and a single Join button.
  */
 export function Lobby() {
   const phase = useWatchPartyStore((s) => s.phase);
@@ -42,9 +56,12 @@ export function Lobby() {
   const endedReason = useWatchPartyStore((s) => s.endedReason);
   const dismissEnded = useWatchPartyStore((s) => s.dismissEnded);
 
-  const [roomName, setRoomName] = useState("Movie night");
   const [code, setCode] = useState(() => inviteFromLocation() ?? "");
   const [invited] = useState(() => code !== "");
+  const [mode, setMode] = useState<Mode>(invited ? "join" : "start");
+  const [editCode, setEditCode] = useState(!invited);
+  const [roomName, setRoomName] = useState("Movie night");
+  const [canPaste, setCanPaste] = useState(false);
   const nameId = useId();
   const roomId = useId();
   const codeId = useId();
@@ -52,91 +69,21 @@ export function Lobby() {
   // The invite has been taken up; a reload must not replay it.
   useEffect(() => {
     clearInviteFromLocation();
+    setCanPaste(typeof navigator.clipboard?.readText === "function");
   }, []);
 
   if (phase === "joining") return <JoinWaiting />;
 
   const supported = rtcSupported();
-  const hasName = name.trim().length > 0;
+  const codeReady = !!extractCode(code);
 
-  const joinCard = (
-    <section className={card(invited)} aria-labelledby={`${codeId}-title`}>
-      <div>
-        <h2 id={`${codeId}-title`} className={SECTION_TITLE}>
-          {invited ? "You've been invited" : "Join a room"}
-        </h2>
-        <p className="mt-0.5 text-[12.5px] leading-relaxed text-ink-soft">
-          {invited
-            ? "The invite is filled in. Add your name and join — you'll get a reply code to send back to the host."
-            : "Open the invite link the host sent you, paste its code here, or scan their QR."}
-        </p>
-      </div>
-      <form
-        className="flex flex-col gap-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void join(code);
-        }}
-      >
-        <label htmlFor={codeId} className={LABEL}>
-          Invite code or link
-        </label>
-        <textarea
-          id={codeId}
-          rows={invited ? 2 : 3}
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="OAD1.… or https://…/watchparty#i=…"
-          className={CODE_FIELD}
-        />
-        <div className="flex flex-wrap items-start gap-2">
-          <button
-            type="submit"
-            disabled={!supported || !hasName || code.trim().length < 12}
-            className={BTN_ACCENT}
-          >
-            Join the room
-          </button>
-          {!invited && <CodeScanner label="Scan an invite" onCode={setCode} />}
-        </div>
-      </form>
-    </section>
-  );
-
-  const startCard = (
-    <section className={CARD} aria-labelledby={`${roomId}-title`}>
-      <div>
-        <h2 id={`${roomId}-title`} className={SECTION_TITLE}>
-          Start a room
-        </h2>
-        <p className="mt-0.5 text-[12.5px] leading-relaxed text-ink-soft">
-          This device hosts: it keeps the room&apos;s clock, the queue and the chat, and passes them to everyone
-          you invite.
-        </p>
-      </div>
-      <form
-        className="flex flex-col gap-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          startRoom(roomName);
-        }}
-      >
-        <label htmlFor={roomId} className={LABEL}>
-          Room name
-        </label>
-        <input
-          id={roomId}
-          value={roomName}
-          maxLength={MAX_ROOM_NAME}
-          onChange={(e) => setRoomName(e.target.value)}
-          className={FIELD}
-        />
-        <button type="submit" disabled={!supported || !hasName} className={cx(BTN_ACCENT, "self-start")}>
-          Start the room
-        </button>
-      </form>
-    </section>
-  );
+  const pasteInvite = async () => {
+    try {
+      setCode(await navigator.clipboard.readText());
+    } catch {
+      /* refused — the box takes a normal paste */
+    }
+  };
 
   return (
     <div className="flex flex-col gap-5 pb-8">
@@ -149,82 +96,179 @@ export function Lobby() {
         </div>
       )}
 
-      {!invited && (
-        <div>
-          <h2 className="text-[20px] font-bold leading-tight">Watch and listen together</h2>
-          <p className="mt-1 text-[13px] leading-relaxed text-ink-soft">
-            One person starts a room and invites the others. Every screen plays the same moment of the same film
-            or song — pause it and it pauses for everyone.
-          </p>
-          <ul role="list" className="mt-3 grid gap-2 min-[560px]:grid-cols-2">
+      <div>
+        <h2 className="text-[20px] font-bold leading-tight">
+          {invited ? "You're invited to watch together" : "Watch and listen together"}
+        </h2>
+        <p className="mt-1 text-[13px] leading-relaxed text-ink-soft">
+          {invited
+            ? "Check your name and join. Everyone sees the same moment — pause it and it pauses for everyone."
+            : "Start a room and invite friends. Everyone sees the same moment — pause it and it pauses for everyone."}
+        </p>
+        {!invited && (
+          <ul role="list" className="mt-3 flex flex-wrap gap-1.5">
             {FEATURES.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-start gap-2.5 text-[12.5px] leading-snug">
-                <Icon size={17} className="mt-px flex-none text-accent" />
+              <li
+                key={text}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-panel px-2.5 py-1 text-[11.5px]"
+              >
+                <Icon size={14} className="flex-none text-accent" />
                 {text}
               </li>
             ))}
           </ul>
+        )}
+      </div>
+
+      {!invited && (
+        <div role="radiogroup" aria-label="What would you like to do?" className="flex gap-2.5">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={mode === "start"}
+            onClick={() => setMode("start")}
+            className={mode === "start" ? CHOICE_ON : CHOICE_OFF}
+          >
+            <WatchPartyIcon size={22} className="text-accent" />
+            <span className="text-[14px] font-bold">Start a room</span>
+            <span className="text-[11.5px] leading-snug text-ink-soft">You pick what plays</span>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={mode === "join"}
+            onClick={() => setMode("join")}
+            className={mode === "join" ? CHOICE_ON : CHOICE_OFF}
+          >
+            <LinkIcon size={22} className="text-accent" />
+            <span className="text-[14px] font-bold">Join a room</span>
+            <span className="text-[11.5px] leading-snug text-ink-soft">Someone sent you an invite</span>
+          </button>
         </div>
       )}
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor={nameId} className={LABEL}>
-          Your name
-        </label>
-        <input
-          id={nameId}
-          value={name}
-          maxLength={MAX_NAME}
-          autoComplete="nickname"
-          onChange={(e) => setName(e.target.value)}
-          placeholder="How the room will see you"
-          className={FIELD}
-        />
-      </div>
+      <form
+        className={CARD}
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (mode === "start") startRoom(roomName);
+          else if (codeReady) void join(code);
+        }}
+      >
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor={nameId} className={LABEL}>
+            Your name
+          </label>
+          <div className="flex gap-2">
+            <input
+              id={nameId}
+              value={name}
+              maxLength={MAX_NAME}
+              autoComplete="nickname"
+              onChange={(e) => setName(e.target.value)}
+              placeholder="How others will see you"
+              className={FIELD}
+            />
+            <button
+              type="button"
+              onClick={() => setName(friendlyName())}
+              aria-label="Pick a random name"
+              title="Random name"
+              className={ICON_BTN}
+            >
+              <DiceIcon size={17} />
+            </button>
+          </div>
+        </div>
 
-      {error && (
-        <p role="alert" className="text-[12.5px] leading-relaxed text-danger">
-          {error}
-        </p>
-      )}
-      {!supported && (
-        <p role="alert" className="text-[12.5px] text-danger">
-          This browser can&apos;t open direct connections, so it can&apos;t join or host a room.
-        </p>
-      )}
+        {mode === "start" ? (
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor={roomId} className={LABEL}>
+              Room name <span className="normal-case tracking-normal">(optional)</span>
+            </label>
+            <input
+              id={roomId}
+              value={roomName}
+              maxLength={MAX_ROOM_NAME}
+              onChange={(e) => setRoomName(e.target.value)}
+              className={FIELD}
+            />
+          </div>
+        ) : editCode ? (
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor={codeId} className={LABEL}>
+              Invite link or code
+            </label>
+            <textarea
+              id={codeId}
+              rows={2}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Paste the invite you were sent…"
+              className={CODE_FIELD}
+            />
+            <div className="flex flex-wrap items-start gap-2">
+              {canPaste && (
+                <button type="button" onClick={() => void pasteInvite()} className={BTN}>
+                  <ClipboardIcon size={15} />
+                  Paste invite
+                </button>
+              )}
+              <CodeScanner label="Scan their QR" onCode={setCode} />
+            </div>
+            {code.trim() && !codeReady && (
+              <p className="text-[12px] text-ink-soft">
+                That doesn&apos;t look like a whole invite yet — copy all of it, or open the link itself.
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="flex items-center gap-2 rounded-xl bg-accent-soft px-3 py-2.5 text-[12.5px] font-semibold text-accent">
+            <CheckIcon size={15} />
+            Invite ready
+            <button
+              type="button"
+              onClick={() => setEditCode(true)}
+              className="ml-auto text-[12px] font-normal text-ink-soft underline underline-offset-2 hover:text-accent"
+            >
+              Use a different one
+            </button>
+          </p>
+        )}
 
-      {invited ? (
-        <>
-          {joinCard}
-          {startCard}
-        </>
-      ) : (
-        <>
-          {startCard}
-          {joinCard}
-        </>
-      )}
+        {error && (
+          <p role="alert" className="text-[12.5px] leading-relaxed text-danger">
+            {error}
+          </p>
+        )}
+        {!supported && (
+          <p role="alert" className="text-[12.5px] text-danger">
+            This browser can&apos;t make direct connections, so it can&apos;t host or join a room. Try a current
+            Chrome, Edge, Firefox or Safari.
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={!supported || (mode === "join" && !codeReady)}
+          className={`${BTN_ACCENT} min-h-12 w-full text-[14px]`}
+        >
+          {mode === "start" ? "Start the room" : "Join the room"}
+        </button>
+      </form>
 
       <details className="rounded-2xl border border-border bg-panel p-4 text-[12.5px] leading-relaxed text-ink-soft">
-        <summary className="cursor-pointer text-[13px] font-semibold text-text">How it works — and its limits</summary>
-        <ul className="mt-2 flex list-disc flex-col gap-1.5 pl-5">
-          <li>
-            There is no server. The host&apos;s device is the room, and each guest connects straight to it — so each
-            guest needs their own invite, and sends a reply code back.
-          </li>
-          <li>
-            YouTube and media links play on every device from the source, kept in step against the host&apos;s
-            clock. Small gaps are closed by playing a touch faster or slower; big ones by jumping.
-          </li>
-          <li>
-            A file on the host&apos;s device is streamed live to guests, using the host&apos;s upload once per
-            guest. A guest with the same file can play their own copy instead.
-          </li>
-          <li>
-            If the host closes the tab the room ends. A few pairs of networks (two strict mobile carriers) can&apos;t
-            connect directly — one shared Wi-Fi always works.
-          </li>
-        </ul>
+        <summary className="cursor-pointer text-[13px] font-semibold text-text">How does it work?</summary>
+        <ol className="mt-2 flex list-decimal flex-col gap-1.5 pl-5">
+          <li>The host starts a room and shares an invite with each friend.</li>
+          <li>The friend opens it, taps Join, and sends back the reply they get.</li>
+          <li>The host pastes the reply — and they&apos;re watching together.</li>
+        </ol>
+        <p className="mt-2">
+          There&apos;s no account and no server in the middle: devices connect straight to each other. The room
+          lasts while the host keeps this tab open. A few network pairs (usually two mobile carriers) can&apos;t
+          connect directly — being on the same Wi-Fi always works.
+        </p>
       </details>
     </div>
   );
@@ -234,21 +278,28 @@ export function Lobby() {
 function JoinWaiting() {
   const reply = useWatchPartyStore((s) => s.reply);
   const joinStatus = useWatchPartyStore((s) => s.joinStatus);
+  const name = useWatchPartyStore((s) => s.name);
   const cancelJoin = useWatchPartyStore((s) => s.cancelJoin);
 
   return (
     <div className="flex flex-col gap-4 pb-8">
+      <h2 className="text-[20px] font-bold leading-tight">Almost there</h2>
+      <Steps steps={["Open invite", "Send your reply", "Watch"]} current={reply ? 1 : 0} />
       {reply ? (
         <CodeExchange
           code={reply}
-          title="Send this reply to the host"
-          hint="Paste it into their “Step 2” box, or hold the QR up to their camera. You're in the room the moment they let you in."
+          title="Send this reply back to the host"
+          hint="Reply in the same chat the invite came from — tap Share, or paste it there (it's already copied if your browser allowed it). You'll join by yourself as soon as they add it."
+          message={`Here's my reply for Watch Party — paste it into my invite: ${reply}`}
+          autoCopy
         />
       ) : null}
-      <p role="status" className="text-[13px] font-semibold text-accent">
+      <p role="status" className="flex items-center gap-2 text-[13px] font-semibold text-accent">
+        <span aria-hidden className="size-2 animate-pulse rounded-full bg-accent motion-reduce:animate-none" />
         {joinStatus}
       </p>
-      <button type="button" onClick={cancelJoin} className={cx(BTN, "self-start")}>
+      <p className="text-[12px] text-ink-soft">Joining as {name}. Keep this page open.</p>
+      <button type="button" onClick={cancelJoin} className={`${BTN} self-start`}>
         Cancel
       </button>
     </div>

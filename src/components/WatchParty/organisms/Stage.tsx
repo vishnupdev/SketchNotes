@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { selectCanControl, useWatchPartyStore } from "@/store/useWatchPartyStore";
+import { selectCanControl, selectSilenceLocal, useWatchPartyStore } from "@/store/useWatchPartyStore";
 import { useWatchPartySync, usePlayhead } from "@/hooks/useWatchPartySync";
 import { elementHandle, youtubeHandle, type YTPlayer } from "@/lib/WatchParty/player";
 import { cueAt } from "@/lib/WatchParty/subtitles";
@@ -33,6 +33,70 @@ function viewFor(item: MediaItem | null, role: Role | null, ownUrl: string | nul
     case "screen":
       return role === "host" ? { type: "preview" } : { type: "stream" };
   }
+}
+
+/**
+ * The sound of what is playing here, as a stream the extra outputs can play —
+ * published to the store only while at least one is chosen, since capturing a
+ * player costs a decoder's worth of work for nobody.
+ *
+ * - A `<video>` element is captured; the capture ignores the element's own
+ *   volume and mute, so the system speaker can be silenced without silencing
+ *   the headphones. Only the audio tracks are kept.
+ * - A stream from the host, or the host's shared screen, is already a stream.
+ * - YouTube's embed plays inside its own frame and cannot be tapped at all.
+ */
+function useOutputTap(
+  type: View["type"],
+  el: HTMLVideoElement | null,
+  remote: MediaStream | null,
+  screen: MediaStream | null,
+  active: boolean,
+): MediaStream | null {
+  const setTap = useWatchPartyStore((s) => s.setTap);
+  const [captured, setCaptured] = useState<MediaStream | null>(null);
+
+  useEffect(() => {
+    if (!active || type !== "element" || !el) return;
+    // Firefox's prefixed capture takes the sound away from the element, which
+    // would silence this device's speaker, so only the standard one is used.
+    const capture = (el as HTMLVideoElement & { captureStream?: () => MediaStream }).captureStream;
+    if (typeof capture !== "function") return;
+    let source: MediaStream;
+    try {
+      source = capture.call(el);
+    } catch {
+      return; // media from another site that doesn't allow it
+    }
+    // The capture's tracks are swapped whenever the source settles; a fresh
+    // stream each time tells the mixer to pick up the new ones.
+    const sync = () => setCaptured(new MediaStream(source.getAudioTracks()));
+    source.addEventListener("addtrack", sync);
+    source.addEventListener("removetrack", sync);
+    sync();
+    return () => {
+      source.removeEventListener("addtrack", sync);
+      source.removeEventListener("removetrack", sync);
+      setCaptured(null);
+    };
+  }, [active, type, el]);
+
+  const tap = !active
+    ? null
+    : type === "element"
+      ? captured
+      : type === "stream"
+        ? remote
+        : type === "preview" && screen?.getAudioTracks().length
+          ? screen
+          : null;
+
+  useEffect(() => {
+    setTap(tap);
+    return () => setTap(null);
+  }, [tap, setTap]);
+
+  return tap;
 }
 
 /** Keys pressed while typing, or on a focused control, belong to that control. */
@@ -86,14 +150,19 @@ export function Stage() {
   useWatchPartySync(handle);
   const head = usePlayhead(handle);
 
+  const tap = useOutputTap(view.type, el, remoteMedia, screen, prefs.outputs.length > 0);
+  // Only sound that reaches the extra outputs may be taken off this one.
+  const silenceLocal = useWatchPartyStore(selectSilenceLocal) && !!tap;
+
   // Volume is this device's own business and never touches the room.
   useEffect(() => {
-    if (handle) handle.setVolume(prefs.volume, prefs.muted);
+    const muted = prefs.muted || silenceLocal;
+    if (handle) handle.setVolume(prefs.volume, muted);
     else if (el) {
       el.volume = prefs.volume;
-      el.muted = prefs.muted;
+      el.muted = muted;
     }
-  }, [handle, el, prefs.volume, prefs.muted]);
+  }, [handle, el, prefs.volume, prefs.muted, silenceLocal]);
 
   const idle = !item;
   const reportSync = useWatchPartyStore((s) => s.reportSync);
@@ -168,7 +237,12 @@ export function Stage() {
   return (
     <section
       aria-label="Player"
-      className="sticky top-0 z-20 -mx-5 border-b border-border bg-paper px-5 pb-1.5 pt-3 min-[1024px]:mx-0 min-[1024px]:border-b-0 min-[1024px]:px-0 min-[1024px]:pt-5"
+      // Pinned only while something plays: an empty stage stuck to the top of a
+      // phone would just push the invite and the queue below the fold.
+      className={cx(
+        "z-20 -mx-5 border-b border-border bg-paper px-5 pb-1.5 pt-3 min-[1024px]:mx-0 min-[1024px]:border-b-0 min-[1024px]:px-0 min-[1024px]:pt-5",
+        item ? "sticky top-0" : "relative",
+      )}
     >
       {/* Capped by the viewport's height as well as the column's width. Stacked
           over the tabs it stays under 40% of the screen, so what is below it is
@@ -180,7 +254,7 @@ export function Stage() {
         <div
           className={cx(
             "@container relative w-full overflow-hidden rounded-xl bg-party-stage",
-            fullscreen ? "min-h-0 flex-1" : "aspect-video",
+            fullscreen ? "min-h-0 flex-1" : item ? "aspect-video" : "aspect-[16/6] min-h-36",
           )}
         >
           {view.type === "idle" && <IdleStage role={role} waiting={!!item} />}

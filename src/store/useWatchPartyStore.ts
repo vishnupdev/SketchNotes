@@ -9,6 +9,21 @@ import { cleanName, type Control, type SharedSubs } from "@/lib/WatchParty/proto
 import { parseLink } from "@/lib/WatchParty/media";
 import { MAX_SUBTITLE_BYTES, parseSubtitles } from "@/lib/WatchParty/subtitles";
 import { micError } from "@/lib/WatchParty/voice";
+import {
+  cleanOutputs,
+  listOutputs,
+  clampDelay,
+  DEFAULT_TUNE,
+  MAX_NAME as MAX_OUTPUT_NAME,
+  MAX_OUTPUTS,
+  outputsError,
+  revealOutputs,
+  type ChosenOutput,
+  type OutputDevice,
+  type OutputTune,
+} from "@/lib/WatchParty/outputs";
+import { outputMixer } from "@/lib/WatchParty/output-mixer";
+import { friendlyName } from "@/lib/WatchParty/names";
 import type {
   ChatMessage,
   Cue,
@@ -35,6 +50,10 @@ export interface Prefs {
   subOffset: number;
   /** Last reach chosen for an invite. */
   reach: ReachMode;
+  /** Extra speakers and headphones the room also plays on. */
+  outputs: ChosenOutput[];
+  /** Keep playing on the system's own output while extra ones are on. */
+  localSpeaker: boolean;
 }
 
 const DEFAULT_PREFS: Prefs = {
@@ -44,6 +63,8 @@ const DEFAULT_PREFS: Prefs = {
   captions: true,
   subOffset: 0,
   reach: "internet",
+  outputs: [],
+  localSpeaker: true,
 };
 
 /** Something drifting up over the picture — a reaction, or a chat line. */
@@ -113,6 +134,13 @@ interface PartyState {
   ownCopy: OwnCopy | null;
   /** The browser blocked playback until someone taps. */
   needsTap: boolean;
+  /** The sound of what is playing here, for the extra outputs to play. */
+  tap: MediaStream | null;
+  /** This device's audio outputs, as last listed. */
+  devices: OutputDevice[];
+  /** Whether the outputs' names have been revealed yet. */
+  devicesListed: boolean;
+  devicesBusy: boolean;
 
   hydrate: () => Promise<void>;
   setTab: (tab: PartyTab) => void;
@@ -150,7 +178,18 @@ interface PartyState {
   clearSubs: () => void;
   setOwnCopy: (file: File | null) => void;
 
+  /* Extra speakers and headphones on this device. */
+  refreshDevices: () => Promise<void>;
+  findDevices: () => Promise<void>;
+  addOutput: (device: OutputDevice) => void;
+  removeOutput: (id: string) => void;
+  /** Change how one output plays; `name: ""` clears the listener's own name. */
+  tuneOutput: (id: string, patch: Partial<OutputTune> & { name?: string }) => void;
+  /** Play the sync clicks or the identify chime on some outputs. */
+  pingOutputs: (ids: string[], kind: "sync" | "identify") => void;
+
   /* Wired to the player by the stage. */
+  setTap: (stream: MediaStream | null) => void;
   reportSync: (drift: number | null, buffering: boolean, mode: MemberStatus["mode"]) => void;
   reanchor: (position: number) => void;
   patchNow: (patch: { duration?: number; title?: string; audio?: boolean }) => void;
@@ -193,6 +232,7 @@ const SESSION_RESET = {
   subs: null,
   ownCopy: null,
   needsTap: false,
+  tap: null,
 } satisfies Partial<PartyState>;
 
 function parsePrefs(raw: string | null): Prefs {
@@ -208,6 +248,8 @@ function parsePrefs(raw: string | null): Prefs {
       captions: p.captions !== false,
       subOffset: num(p.subOffset, -30, 30, 0),
       reach: p.reach === "local" ? "local" : "internet",
+      outputs: cleanOutputs(p.outputs),
+      localSpeaker: p.localSpeaker !== false,
     };
   } catch {
     return DEFAULT_PREFS;
@@ -334,6 +376,9 @@ export const useWatchPartyStore = create<PartyState>((set, get) => {
     endedReason: null,
     error: null,
     toast: null,
+    devices: [],
+    devicesListed: false,
+    devicesBusy: false,
     ...SESSION_RESET,
 
     hydrate: async () => {
@@ -346,7 +391,11 @@ export const useWatchPartyStore = create<PartyState>((set, get) => {
       } catch {
         /* a damaged list is just an empty one */
       }
-      set({ hydrated: true, name: name ? cleanName(name) : "", prefs: parsePrefs(prefs), recent: links });
+      // A first visit starts with a name already in place, kept so it stays the same next time.
+      const kept = name ? cleanName(name) : "";
+      const start = kept || friendlyName();
+      if (!kept) void sSet(NAME_KEY, start);
+      set({ hydrated: true, name: start, prefs: parsePrefs(prefs), recent: links });
     },
 
     setTab: (tab) => set(tab === "chat" ? { tab, unread: 0 } : { tab }),
@@ -366,22 +415,17 @@ export const useWatchPartyStore = create<PartyState>((set, get) => {
     /* ------------------------------ lifecycle ------------------------------ */
 
     startRoom: (roomName) => {
-      const name = cleanName(get().name);
-      if (!name) {
-        set({ error: "Add your name first — it is how the room will know you." });
-        return;
-      }
+      const name = cleanName(get().name) || friendlyName();
       host?.end();
       host = new HostRoom(name, roomName, hostEvents());
       set({ ...SESSION_RESET, phase: "room", role: "host", me: host.me.id, tab: "people", error: null });
+      // The first thing every host does next is invite someone — so it is
+      // already made, waiting to be shared, when the room opens.
+      void host.createInvite(get().prefs.reach);
     },
 
     join: async (invite) => {
-      const name = cleanName(get().name);
-      if (!name) {
-        set({ error: "Add your name first — it is how the room will know you." });
-        return;
-      }
+      const name = cleanName(get().name) || friendlyName();
       guest?.leave();
       set({ ...SESSION_RESET, phase: "joining", joinStatus: "Opening the invite…", error: null });
       try {
@@ -545,7 +589,67 @@ export const useWatchPartyStore = create<PartyState>((set, get) => {
       });
     },
 
+    /* ------------------------- speakers & headphones ------------------------ */
+
+    refreshDevices: async () => {
+      const { devices, named } = await listOutputs();
+      set({ devices, devicesListed: named });
+    },
+
+    findDevices: async () => {
+      if (get().devicesBusy) return;
+      set({ devicesBusy: true });
+      try {
+        const picked = await revealOutputs();
+        await get().refreshDevices();
+        // Firefox's picker hands back the one output chosen — add it straight away.
+        const device = picked ? get().devices.find((d) => d.id === picked) : undefined;
+        if (device) get().addOutput(device);
+      } catch (error) {
+        notify(outputsError(error));
+      } finally {
+        set({ devicesBusy: false });
+      }
+    },
+
+    addOutput: (device) => {
+      const { outputs } = get().prefs;
+      if (outputs.some((o) => o.id === device.id)) return;
+      if (outputs.length >= MAX_OUTPUTS) {
+        notify(`Up to ${MAX_OUTPUTS} extra outputs at once.`);
+        return;
+      }
+      get().setPrefs({ outputs: [...outputs, { ...DEFAULT_TUNE, id: device.id, label: device.label }] });
+      outputMixer().resume();
+    },
+
+    removeOutput: (id) => {
+      const outputs = get().prefs.outputs.filter((o) => o.id !== id);
+      // With nothing extra left, the system output must not stay silenced.
+      get().setPrefs(outputs.length ? { outputs } : { outputs, localSpeaker: true });
+    },
+
+    tuneOutput: (id, patch) => {
+      const outputs = get().prefs.outputs.map((o) => {
+        if (o.id !== id) return o;
+        const next = { ...o, ...patch };
+        next.volume = Math.min(1, Math.max(0, next.volume));
+        next.delayMs = clampDelay(next.delayMs);
+        if (patch.name !== undefined) {
+          const name = patch.name.slice(0, MAX_OUTPUT_NAME);
+          if (name.trim()) next.name = name;
+          else delete next.name;
+        }
+        return next;
+      });
+      get().setPrefs({ outputs });
+    },
+
+    pingOutputs: (ids, kind) => outputMixer().ping(ids, kind),
+
     /* ---------------------------- player wiring ---------------------------- */
+
+    setTap: (tap) => set({ tap }),
 
     reportSync: (drift, buffering, mode) => {
       set({ sync: { drift, buffering } });
@@ -570,3 +674,11 @@ export const useWatchPartyStore = create<PartyState>((set, get) => {
 /** Whether this device may press play, pause, seek and change speed. */
 export const selectCanControl = (s: PartyState): boolean =>
   s.role === "host" || (s.room?.settings.guestControl ?? false);
+
+/**
+ * Whether the system's own output should fall silent: the listener asked for
+ * that, and at least one chosen output is connected to take over. A choice
+ * whose headphones are switched off never leaves the room with no sound.
+ */
+export const selectSilenceLocal = (s: PartyState): boolean =>
+  !s.prefs.localSpeaker && s.prefs.outputs.some((o) => s.devices.some((d) => d.id === o.id));

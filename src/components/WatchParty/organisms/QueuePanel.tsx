@@ -6,6 +6,7 @@ import { QueueRow } from "@/components/WatchParty/molecules/QueueRow";
 import { FileButton } from "@/components/WatchParty/atoms/FileButton";
 import {
   ChevronDownIcon,
+  ClipboardIcon,
   ChevronUpIcon,
   CloseIcon,
   FilmIcon,
@@ -81,6 +82,7 @@ export function QueuePanel() {
             <label htmlFor={fieldId} className={LABEL}>
               YouTube link or media file link
             </label>
+            <div className="flex gap-2">
             <input
               id={fieldId}
               type="text"
@@ -96,6 +98,23 @@ export function QueuePanel() {
               aria-describedby={error ? `${fieldId}-error` : undefined}
               className={FIELD}
             />
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  setLink((await navigator.clipboard.readText()).trim());
+                  setError("");
+                } catch {
+                  /* refused — a normal paste into the field still works */
+                }
+              }}
+              aria-label="Paste a link"
+              title="Paste"
+              className={ICON_BTN}
+            >
+              <ClipboardIcon size={16} />
+            </button>
+            </div>
             {error && (
               <p id={`${fieldId}-error`} role="alert" className="text-[12px] leading-relaxed text-danger">
                 {error}

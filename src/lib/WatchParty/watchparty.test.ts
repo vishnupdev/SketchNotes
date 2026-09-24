@@ -4,7 +4,76 @@ import { ClockSync, correct, driftLabel, expectedPosition, nearestRate } from ".
 import { cueAt, parseSubtitles, parseTimestamp } from "./subtitles";
 import { encodeFrames, FRAME_CHARS, parseGuest, parseHost, Reassembler, type HostMsg } from "./protocol";
 import { HANGOVER_MS, SpeakingDetector } from "./voice";
+import { friendlyName } from "./names";
+import { clampDelay, cleanOutputs, DEFAULT_TUNE, MAX_DELAY_MS, MAX_OUTPUTS, outputName, toOutputs } from "./outputs";
 import type { RoomSnapshot } from "./types";
+
+describe("toOutputs", () => {
+  const dev = (deviceId: string, label: string, groupId = deviceId, kind: MediaDeviceKind = "audiooutput") => ({
+    deviceId,
+    groupId,
+    kind,
+    label,
+  });
+
+  it("drops Chrome's aliases and other kinds, and puts the system's output first", () => {
+    const outs = toOutputs([
+      dev("default", "Default - Speakers (Realtek)", "g-spk"),
+      dev("communications", "Communications - Speakers (Realtek)", "g-spk"),
+      dev("bt1", "WH-1000XM5 (Bluetooth)", "g-bt"),
+      dev("spk", "Speakers (Realtek)", "g-spk"),
+      dev("mic", "Microphone", "g-mic", "audioinput"),
+    ]);
+    expect(outs.map((o) => o.id)).toEqual(["spk", "bt1"]);
+    expect(outs[0]).toMatchObject({ isDefault: true, bluetooth: false });
+    expect(outs[1]).toMatchObject({ isDefault: false, bluetooth: true });
+  });
+
+  it("names an output the browser left unnamed", () => {
+    expect(toOutputs([dev("x", "  ")])[0].label).toBe("Audio output 1");
+  });
+});
+
+describe("cleanOutputs", () => {
+  it("keeps well-formed choices, clamps volume and drops duplicates and aliases", () => {
+    expect(
+      cleanOutputs([
+        { id: "a", label: "Buds", volume: 3 },
+        { id: "a", label: "Buds again", volume: 0.5 },
+        { id: "default", label: "Default", volume: 1 },
+        { id: "b", label: "Speaker" },
+        null,
+        "junk",
+      ]),
+    ).toEqual([
+      { ...DEFAULT_TUNE, id: "a", label: "Buds", volume: 1 },
+      { ...DEFAULT_TUNE, id: "b", label: "Speaker", volume: 1 },
+    ]);
+  });
+
+  it("keeps each output's tuning, and puts anything out of range back in", () => {
+    const [good, bad] = cleanOutputs([
+      { id: "a", label: "Buds", name: "  Mum's  ", volume: 0.5, muted: true, delayMs: 123.4, channel: "left", hear: "film", clearVoices: true, night: true },
+      { id: "b", label: "Speaker", name: "   ", delayMs: 99999, channel: "surround", hear: "everything", muted: "yes" },
+    ]);
+    expect(good).toEqual({
+      id: "a", label: "Buds", name: "Mum's", volume: 0.5, muted: true, delayMs: 123, channel: "left", hear: "film", clearVoices: true, night: true,
+    });
+    expect(bad).toEqual({ ...DEFAULT_TUNE, id: "b", label: "Speaker", delayMs: MAX_DELAY_MS });
+    expect(outputName(bad)).toBe("Speaker");
+    expect(outputName(good)).toBe("Mum's");
+  });
+
+  it("clamps a delay to whole milliseconds inside the range", () => {
+    expect([clampDelay(-5), clampDelay(12.6), clampDelay(Number.NaN), clampDelay(1e6)]).toEqual([0, 13, 0, MAX_DELAY_MS]);
+  });
+
+  it("caps the list and survives something that is not a list", () => {
+    const many = Array.from({ length: MAX_OUTPUTS + 3 }, (_, i) => ({ id: `d${i}`, label: "x", volume: 1 }));
+    expect(cleanOutputs(many)).toHaveLength(MAX_OUTPUTS);
+    expect(cleanOutputs({ id: "a" })).toEqual([]);
+  });
+});
 
 /**
  * Watch Party's pure half. The networking can only be exercised between real
@@ -246,5 +315,14 @@ describe("SpeakingDetector", () => {
     const d = new SpeakingDetector();
     d.update(new Map([["a", -20]]), 0);
     expect(d.update(new Map(), 10)).toEqual([]);
+  });
+});
+
+describe("friendlyName", () => {
+  it("makes a two-word name, stable for the same rolls", () => {
+    const rolls = [0.05, 0.95];
+    const name = friendlyName(() => rolls.shift() ?? 0);
+    expect(name).toBe("Happy Lynx");
+    expect(friendlyName()).toMatch(/^[A-Z][a-z]+ [A-Z][a-z]+$/);
   });
 });

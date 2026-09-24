@@ -52,16 +52,22 @@ export function PeoplePanel() {
               Invite people
             </h2>
             <p className="mt-0.5 text-[12.5px] leading-relaxed text-ink-soft">
-              Each person gets their own invite and sends a reply back — two codes, then they&apos;re in. Nothing
-              goes through a server; this device is the room.
+              Share an invite with each person. They send a reply back, you paste it, and they&apos;re in.
             </p>
           </div>
-          <ReachPicker
-            mode={prefs.reach}
-            onMode={(reach) => setPrefs({ reach })}
-            legend="Where are your guests?"
-            what="what you watch or say"
-          />
+          <details className="rounded-xl border border-border bg-paper px-3 py-2 text-[12.5px]">
+            <summary className="cursor-pointer font-semibold text-text">
+              Connection options · {prefs.reach === "local" ? "this Wi-Fi only" : "anywhere"}
+            </summary>
+            <div className="pt-2">
+              <ReachPicker
+                mode={prefs.reach}
+                onMode={(reach) => setPrefs({ reach })}
+                legend="Where are your guests? (applies to new invites)"
+                what="what you watch or say"
+              />
+            </div>
+          </details>
           <button
             type="button"
             onClick={() => void invite()}
@@ -79,8 +85,14 @@ export function PeoplePanel() {
               key={inv.id}
               invite={inv}
               number={i + 1}
+              roomName={room.name}
+              hostName={room.members.find((m) => m.host)?.name ?? "Your friend"}
               onReply={(code) => void acceptReply(inv.id, code)}
               onCancel={() => cancelInvite(inv.id)}
+              onRetry={() => {
+                cancelInvite(inv.id);
+                void invite();
+              }}
             />
           ))}
         </section>

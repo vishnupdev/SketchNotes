@@ -385,6 +385,8 @@ export class HostRoom {
       subs: this.subs,
     });
     this.notice(`${member.name} joined`);
+    // Said out loud too: the host is usually on another tab by now.
+    this.events.notice(`${member.name} joined the room 🎉`);
     this.broadcast();
     void this.negotiate(link);
   }

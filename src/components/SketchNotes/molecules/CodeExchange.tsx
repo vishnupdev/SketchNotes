@@ -3,12 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import { drawQr } from "@/lib/qr/encode";
 import { buildFrames } from "@/lib/qr/frames";
-import { cx } from "@/lib/utils";
-import { CheckIcon, CopyIcon, QrIcon } from "@/components/SketchNotes/atoms/icons";
+import { CheckIcon, CopyIcon, QrIcon, ShareIcon } from "@/components/SketchNotes/atoms/icons";
 import { FramePlayer } from "@/components/SketchNotes/molecules/FramePlayer";
 
 const BTN =
   "inline-flex items-center gap-2 rounded-full border border-border bg-panel px-3.5 py-2 text-[12.5px] font-semibold text-text transition-colors hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40";
+// Whole strings per state: layering `border-accent` over BTN loses to stylesheet order.
+const BTN_ON =
+  "inline-flex items-center gap-2 rounded-full border border-accent bg-accent-soft px-3.5 py-2 text-[12.5px] font-semibold text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent";
+const BTN_SHARE =
+  "inline-flex items-center gap-2 rounded-full border border-accent bg-accent px-3.5 py-2 text-[12.5px] font-semibold text-on-accent transition-[filter] hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper";
 
 /**
  * Handing a connection code to the other device.
@@ -35,12 +39,22 @@ export function CodeExchange({
   link,
   title,
   hint,
+  message,
+  autoCopy = false,
 }: {
   code: string;
   /** Full invite URL, when this code is an invitation rather than a reply. */
   link?: string;
   title: string;
   hint: string;
+  /**
+   * A friendly sentence carrying the code or link. When given, it is what gets
+   * shared and copied — the receiving side finds the code inside a sentence —
+   * and a Share button hands it straight to the phone's own share sheet.
+   */
+  message?: string;
+  /** Copy the message to the clipboard as soon as the code exists. */
+  autoCopy?: boolean;
 }) {
   const [showQr, setShowQr] = useState(false);
   const [copied, setCopied] = useState<"link" | "code" | null>(null);
@@ -48,6 +62,27 @@ export function CodeExchange({
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const shareText = link ?? code;
+  const outgoing = message ?? shareText;
+  const [canShare, setCanShare] = useState(false);
+  useEffect(() => setCanShare(typeof navigator.share === "function"), []);
+
+  // One fewer step: the code is already on the clipboard when it appears. The
+  // browser may refuse without a recent tap, and then the buttons are there.
+  useEffect(() => {
+    if (!autoCopy || !code) return;
+    navigator.clipboard
+      .writeText(outgoing)
+      .then(() => setCopied("link"))
+      .catch(() => {});
+  }, [autoCopy, code, outgoing]);
+
+  const share = async () => {
+    try {
+      await navigator.share({ title, text: outgoing });
+    } catch {
+      /* closed the share sheet, or sharing refused — Copy still works */
+    }
+  };
 
   // A connection code is a couple of kilobytes, so it rarely fits one QR — the
   // chunked frame channel handles that, and a short code just becomes one frame.
@@ -71,7 +106,7 @@ export function CodeExchange({
 
   const copy = async (what: "link" | "code") => {
     try {
-      await navigator.clipboard.writeText(what === "link" ? shareText : code);
+      await navigator.clipboard.writeText(what === "link" ? outgoing : code);
       setCopied(what);
       window.setTimeout(() => setCopied(null), 1600);
     } catch {
@@ -101,6 +136,12 @@ export function CodeExchange({
       </label>
 
       <div className="flex flex-wrap gap-2">
+        {message && canShare && (
+          <button type="button" onClick={() => void share()} className={BTN_SHARE}>
+            <ShareIcon size={15} />
+            Share…
+          </button>
+        )}
         <button type="button" onClick={() => void copy("link")} className={BTN}>
           {copied === "link" ? <CheckIcon size={15} /> : <CopyIcon size={15} />}
           {copied === "link" ? "Copied" : link ? "Copy link" : "Copy code"}
@@ -115,7 +156,7 @@ export function CodeExchange({
           type="button"
           onClick={() => setShowQr((v) => !v)}
           aria-expanded={showQr}
-          className={cx(BTN, showQr && "border-accent text-accent")}
+          className={showQr ? BTN_ON : BTN}
         >
           <QrIcon size={15} />
           {showQr ? "Hide code" : "Show as QR"}
