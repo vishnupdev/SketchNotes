@@ -291,38 +291,249 @@ export function unpackSdp(bytes: Uint8Array): { type: "offer" | "answer"; sdp: s
   const sctpPort = r.u16();
   const maxMessageSize = r.u32();
 
-  const candidates: string[] = [];
+  const candidates: Candidate[] = [];
   for (let i = 0; i < count; i++) {
     const kind = r.u8();
     const ctype = TYPES[kind >> 2];
     if (!ctype) throw new RangeError("candidate");
     const priority = r.u32();
     const port = r.u16();
-    const address = readAddress(r, kind & 0x3);
-    const related = ctype === "host" ? "" : " raddr 0.0.0.0 rport 0";
-    candidates.push(`a=candidate:${i + 1} 1 udp ${priority} ${address} ${port} typ ${ctype}${related}`);
+    candidates.push({ type: ctype, priority, port, address: readAddress(r, kind & 0x3) });
   }
   if (!r.finished) throw new RangeError("trailing");
 
+  return renderSdp({ type, setup, ufrag, pwd, fingerprint, sessionId, sessionVersion, mid, sctpPort, maxMessageSize, candidates });
+}
+
+/** The minimal SDP for a set of fields — the one grammar both packed forms unpack to. */
+function renderSdp(f: Omit<Fields, "fingerprint"> & { fingerprint: string }): { type: "offer" | "answer"; sdp: string } {
+  const candidates = f.candidates.map((c, i) => {
+    const related = c.type === "host" ? "" : " raddr 0.0.0.0 rport 0";
+    return `a=candidate:${i + 1} 1 udp ${c.priority} ${c.address} ${c.port} typ ${c.type}${related}`;
+  });
   const sdp = [
     "v=0",
-    `o=- ${sessionId} ${sessionVersion} IN IP4 127.0.0.1`,
+    `o=- ${f.sessionId} ${f.sessionVersion} IN IP4 127.0.0.1`,
     "s=-",
     "t=0 0",
-    `a=group:BUNDLE ${mid}`,
+    `a=group:BUNDLE ${f.mid}`,
     "a=msid-semantic: WMS",
     "m=application 9 UDP/DTLS/SCTP webrtc-datachannel",
     "c=IN IP4 0.0.0.0",
     ...candidates,
-    `a=ice-ufrag:${ufrag}`,
-    `a=ice-pwd:${pwd}`,
-    `a=fingerprint:sha-256 ${fingerprint}`,
-    `a=setup:${setup}`,
-    `a=mid:${mid}`,
-    `a=sctp-port:${sctpPort}`,
-    `a=max-message-size:${maxMessageSize}`,
+    `a=ice-ufrag:${f.ufrag}`,
+    `a=ice-pwd:${f.pwd}`,
+    `a=fingerprint:sha-256 ${f.fingerprint}`,
+    `a=setup:${f.setup}`,
+    `a=mid:${f.mid}`,
+    `a=sctp-port:${f.sctpPort}`,
+    `a=max-message-size:${f.maxMessageSize}`,
     "a=end-of-candidates",
     "",
   ].join("\r\n");
-  return { type, sdp };
+  return { type: f.type, sdp };
+}
+
+/* ------------------------------ tight form ------------------------------ */
+
+/*
+ * Version 2 — the same fields, spent more carefully. What it drops, and why
+ * each is safe:
+ *
+ *  - **Candidate priorities** (4 bytes each). ICE only needs them to rank this
+ *    side's candidates against each other, so they are rebuilt from type and
+ *    order (RFC 8445 §5.1.2.1) — the order the browser listed them in, best first.
+ *  - **8 bits per ICE character.** The ufrag and password are drawn from the
+ *    64-character ice-char set, so each character is 6 bits.
+ *  - **The usual values** — media id "0", SCTP port 5000, 256 KB messages, what
+ *    Chrome, Edge and Safari always write — become one flag bit.
+ *  - **A repeated address.** STUN reports the same public IP once per local
+ *    socket; the second and later copies cost nothing.
+ *  - **Session version** is almost always a single digit, so it is a varint.
+ *
+ * A 16-bit CRC rides at the end, inside the bytes, in place of the eight hex
+ * digits the text codes carry. The first byte keeps the layout's version, so
+ * a later form can still tell these apart.
+ */
+
+const TIGHT = 2;
+const ICE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const ICE_RE = /^[A-Za-z0-9+/]+$/;
+const STD = { mid: "0", sctpPort: 5000, maxMessageSize: 262144 } as const;
+/** Candidate address forms for the tight layout — the four above, plus a repeat. */
+const REPEAT = 4;
+/** RFC 8445 type preferences. */
+const TYPE_PREF: Record<CandidateType, number> = { host: 126, prflx: 110, srflx: 100, relay: 0 };
+const MAX_TIGHT_CANDIDATES = 15;
+
+const crc16 = (bytes: Uint8Array): number => {
+  // CRC-16/CCITT-FALSE: enough to tell a mistyped or truncated code apart.
+  let crc = 0xffff;
+  for (const b of bytes) {
+    crc ^= b << 8;
+    for (let i = 0; i < 8; i++) crc = crc & 0x8000 ? ((crc << 1) ^ 0x1021) & 0xffff : (crc << 1) & 0xffff;
+  }
+  return crc;
+};
+
+/** Pack ICE characters at six bits each. */
+function packIce(w: Writer, text: string): void {
+  let acc = 0;
+  let bits = 0;
+  for (const ch of text) {
+    acc = (acc << 6) | ICE_CHARS.indexOf(ch);
+    bits += 6;
+    while (bits >= 8) {
+      bits -= 8;
+      w.u8(acc >> bits);
+      acc &= (1 << bits) - 1;
+    }
+  }
+  if (bits > 0) w.u8(acc << (8 - bits));
+}
+
+function unpackIce(r: Reader, length: number): string {
+  const bytes = r.raw(Math.ceil((length * 6) / 8));
+  let acc = 0;
+  let bits = 0;
+  let out = "";
+  for (const b of bytes) {
+    acc = (acc << 8) | b;
+    bits += 8;
+    while (bits >= 6 && out.length < length) {
+      bits -= 6;
+      out += ICE_CHARS[(acc >> bits) & 0x3f];
+      acc &= (1 << bits) - 1;
+    }
+  }
+  return out;
+}
+
+function writeVarint(w: Writer, n: number): void {
+  while (n >= 0x80) {
+    w.u8((n & 0x7f) | 0x80);
+    n = Math.floor(n / 128);
+  }
+  w.u8(n);
+}
+
+function readVarint(r: Reader): number {
+  let n = 0;
+  for (let shift = 0; shift < 35; shift += 7) {
+    const b = r.u8();
+    n += (b & 0x7f) * 2 ** shift;
+    if (!(b & 0x80)) return n;
+  }
+  throw new RangeError("varint");
+}
+
+/** The priority a candidate gets back, from its type and its place in the list. */
+const rebuiltPriority = (type: CandidateType, index: number): number =>
+  TYPE_PREF[type] * 2 ** 24 + (65535 - index) * 2 ** 8 + 255;
+
+/** The tight form. Null when it can't carry the description exactly. */
+export function packTight(description: { type?: string; sdp?: string }): Uint8Array | null {
+  const f = readFields(description.type ?? "", description.sdp ?? "");
+  if (!f || f.candidates.length > MAX_TIGHT_CANDIDATES) return null;
+  if (!ICE_RE.test(f.ufrag) || !ICE_RE.test(f.pwd) || f.ufrag.length > 255 || f.pwd.length > 255) return null;
+  const std = f.mid === STD.mid && f.sctpPort === STD.sctpPort && f.maxMessageSize === STD.maxMessageSize;
+
+  const w = new Writer();
+  w.u8(TIGHT);
+  // type (1) · setup (2) · usual values (1) · candidate count (4)
+  w.u8((f.type === "answer" ? 0x80 : 0) | (SETUPS.indexOf(f.setup) << 5) | (std ? 0x10 : 0) | f.candidates.length);
+  w.u8(f.ufrag.length);
+  w.u8(f.pwd.length);
+  packIce(w, f.ufrag + f.pwd);
+  w.raw(f.fingerprint);
+  w.u64(f.sessionId);
+  writeVarint(w, f.sessionVersion);
+  if (!std) {
+    w.str(f.mid);
+    w.u16(f.sctpPort);
+    w.u32(f.maxMessageSize);
+  }
+  // Best first, so the order alone can stand in for the priorities.
+  const ranked = [...f.candidates].sort((a, b) => b.priority - a.priority);
+  const seen: string[] = [];
+  for (const c of ranked) {
+    const repeat = seen.indexOf(c.address);
+    if (repeat >= 0) {
+      // type (2) · form (3), then which earlier address it repeats
+      w.u8((TYPES.indexOf(c.type) << 6) | (REPEAT << 3));
+      w.u8(repeat);
+      w.u16(c.port);
+      continue;
+    }
+    const at = new Writer();
+    const form = writeAddress(at, c.address);
+    w.u8((TYPES.indexOf(c.type) << 6) | (form << 3));
+    w.u16(c.port);
+    w.raw(at.done());
+    seen.push(c.address);
+  }
+  const body = w.done();
+  const crc = crc16(body);
+  return Uint8Array.from([...body, crc >> 8, crc & 0xff]);
+}
+
+/** Rebuild a description from `packTight`'s bytes. Throws if they're damaged. */
+export function unpackTight(bytes: Uint8Array): { type: "offer" | "answer"; sdp: string } {
+  if (bytes.length < 3) throw new RangeError("short");
+  const body = bytes.slice(0, -2);
+  if (crc16(body) !== ((bytes[bytes.length - 2] << 8) | bytes[bytes.length - 1])) throw new RangeError("crc");
+
+  const r = new Reader(body);
+  if (r.u8() !== TIGHT) throw new RangeError("version");
+  const head = r.u8();
+  const type = head & 0x80 ? "answer" : "offer";
+  const setup = SETUPS[(head >> 5) & 0x3];
+  if (!setup) throw new RangeError("setup");
+  const std = !!(head & 0x10);
+  const count = head & 0x0f;
+  const ufragLength = r.u8();
+  const pwdLength = r.u8();
+  const ice = unpackIce(r, ufragLength + pwdLength);
+  const fingerprint = Array.from(r.raw(32), (b) => b.toString(16).padStart(2, "0").toUpperCase()).join(":");
+  const sessionId = r.u64();
+  const sessionVersion = readVarint(r);
+  const mid = std ? STD.mid : r.str();
+  const sctpPort = std ? STD.sctpPort : r.u16();
+  const maxMessageSize = std ? STD.maxMessageSize : r.u32();
+
+  const seen: string[] = [];
+  const candidates: Candidate[] = [];
+  for (let i = 0; i < count; i++) {
+    const kind = r.u8();
+    const ctype = TYPES[kind >> 6];
+    const form = (kind >> 3) & 0x7;
+    let address: string;
+    let port: number;
+    if (form === REPEAT) {
+      address = seen[r.u8()];
+      if (address === undefined) throw new RangeError("repeat");
+      port = r.u16();
+    } else {
+      if (form > ADDR.text) throw new RangeError("form");
+      port = r.u16();
+      address = readAddress(r, form);
+      seen.push(address);
+    }
+    candidates.push({ type: ctype, priority: rebuiltPriority(ctype, i), address, port });
+  }
+  if (!r.finished) throw new RangeError("trailing");
+
+  return renderSdp({
+    type,
+    setup,
+    ufrag: ice.slice(0, ufragLength),
+    pwd: ice.slice(ufragLength),
+    fingerprint,
+    sessionId,
+    sessionVersion,
+    mid,
+    sctpPort,
+    maxMessageSize,
+    candidates,
+  });
 }

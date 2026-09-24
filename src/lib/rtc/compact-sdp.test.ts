@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { packSdp, unpackSdp } from "./compact-sdp";
+import { checksum32, toBase64Url } from "@/lib/pack";
+import { packSdp, packTight, unpackSdp, unpackTight } from "./compact-sdp";
 import { decodeCode, encodeCode, encodeShortCode, extractCode } from "./code";
 
 /**
@@ -114,18 +115,96 @@ describe("packSdp / unpackSdp", () => {
   });
 });
 
+describe("packTight / unpackTight", () => {
+  const candidateLines = (sdp: string) => lines(sdp).filter((l) => l.startsWith("a=candidate:"));
+
+  it("carries the same fields as the short form, in fewer bytes", () => {
+    const tight = packTight({ type: "offer", sdp: chromeOffer })!;
+    const short = packSdp({ type: "offer", sdp: chromeOffer })!;
+    expect(tight.length).toBeLessThan(short.length - 20);
+    const out = lines(unpackTight(tight).sdp);
+    for (const line of [
+      "o=- 4611731400430051336 2 IN IP4 127.0.0.1",
+      "a=ice-ufrag:aB3x",
+      "a=ice-pwd:Zq8VbM2n7Lk4Ty1Wd6Rf0Hs9",
+      `a=fingerprint:sha-256 ${FP}`,
+      "a=setup:actpass",
+      "a=mid:0",
+      "a=sctp-port:5000",
+      "a=max-message-size:262144",
+    ]) {
+      expect(out).toContain(line);
+    }
+  });
+
+  it("keeps every candidate, best first, with priorities rebuilt in that order", () => {
+    const cands = candidateLines(unpackTight(packTight({ type: "offer", sdp: chromeOffer })!).sdp);
+    expect(cands.map((l) => l.split(" ").slice(4, 8).join(" "))).toEqual([
+      "2001:db8:0:0:0:0:0:1f 61000 typ host",
+      "7c2f5d1a-94be-4c51-9f0e-0b3a6c2d8e41.local 54400 typ host",
+      "203.0.113.77 54400 typ srflx",
+    ]);
+    const priorities = cands.map((l) => Number(l.split(" ")[3]));
+    expect([...priorities].sort((a, b) => b - a)).toEqual(priorities);
+    expect(new Set(priorities).size).toBe(priorities.length);
+  });
+
+  it("sends a repeated public address once", () => {
+    const twice = chromeOffer.replace(
+      "a=ice-ufrag",
+      "a=candidate:9 1 udp 1677729534 203.0.113.77 61001 typ srflx raddr 0.0.0.0 rport 0\r\na=ice-ufrag",
+    );
+    const once = packTight({ type: "offer", sdp: chromeOffer })!;
+    const repeated = packTight({ type: "offer", sdp: twice })!;
+    expect(repeated.length - once.length).toBe(4); // kind, which address, port
+    expect(candidateLines(unpackTight(repeated).sdp).filter((l) => l.includes("203.0.113.77"))).toHaveLength(2);
+  });
+
+  it("carries Firefox's unusual values instead of assuming the usual ones", () => {
+    const out = lines(unpackTight(packTight({ type: "answer", sdp: firefoxAnswer })!).sdp);
+    expect(out).toContain("a=ice-ufrag:9c1e4f2a");
+    expect(out).toContain("a=ice-pwd:4b0a7a9e2f1d4c6b8e3a5f7d9c1b3e5a");
+    expect(out).toContain("a=max-message-size:1073741823");
+    expect(out).toContain("a=setup:active");
+  });
+
+  it("catches a flipped bit with its checksum", () => {
+    const tight = packTight({ type: "offer", sdp: chromeOffer })!;
+    const bad = tight.slice();
+    bad[20] ^= 0x04;
+    expect(() => unpackTight(bad)).toThrow("crc");
+  });
+
+  it("declines more candidates than it can count, leaving them to the short form", () => {
+    const many = chromeOffer.replace(
+      "a=ice-ufrag",
+      Array.from({ length: 14 }, (_, i) => `a=candidate:x${i} 1 udp 2100000000 10.0.0.${i + 1} ${40000 + i} typ host`).join("\r\n") +
+        "\r\na=ice-ufrag",
+    );
+    expect(packTight({ type: "offer", sdp: many })).toBeNull();
+    expect(packSdp({ type: "offer", sdp: many })).not.toBeNull();
+  });
+});
+
 describe("encodeShortCode", () => {
   const offer = JSON.stringify({ type: "offer", sdp: chromeOffer });
 
-  it("round-trips through decodeCode and is far shorter than the ordinary code", async () => {
+  it("round-trips through decodeCode and is a small fraction of the ordinary code", async () => {
     const short = await encodeShortCode(offer);
     const long = await encodeCode(offer);
-    expect(short.startsWith("OAD2.")).toBe(true);
-    expect(short.length).toBeLessThan(220);
-    expect(short.length * 2).toBeLessThan(long.length);
+    expect(short.startsWith("OAD3.")).toBe(true);
+    expect(short.length).toBeLessThan(170);
+    expect(short.length * 3).toBeLessThan(long.length);
     const back = JSON.parse(await decodeCode(short)) as { type: string; sdp: string };
     expect(back.type).toBe("offer");
     expect(back.sdp).toContain("a=ice-pwd:Zq8VbM2n7Lk4Ty1Wd6Rf0Hs9");
+  });
+
+  it("still reads a code in the earlier short form", async () => {
+    const body = toBase64Url(packSdp({ type: "offer", sdp: chromeOffer })!);
+    const old = `OAD2.${checksum32(body)}.${body}.`;
+    const back = JSON.parse(await decodeCode(old)) as { sdp: string };
+    expect(back.sdp).toContain("a=ice-ufrag:aB3x");
   });
 
   it("falls back to the ordinary code for a description it can't pack", async () => {
@@ -137,9 +216,10 @@ describe("encodeShortCode", () => {
 
   it("is found inside a link, and says so when it has been damaged", async () => {
     const short = await encodeShortCode(offer);
+    expect(extractCode(`https://example.com/watchparty#${short}`)).toBe(short);
     expect(extractCode(`https://example.com/watchparty#i=${short}`)).toBe(short);
-    const [p, h, body] = short.slice(0, -1).split(".");
-    const flipped = `${p}.${h}.${body.slice(0, 10)}${body[10] === "A" ? "B" : "A"}${body.slice(11)}.`;
+    const [p, body] = short.slice(0, -1).split(".");
+    const flipped = `${p}.${body.slice(0, 30)}${body[30] === "A" ? "B" : "A"}${body.slice(31)}.`;
     await expect(decodeCode(flipped)).rejects.toThrow(/damaged/);
     await expect(decodeCode(short.slice(0, 40))).rejects.toThrow(/incomplete/);
   });

@@ -1,4 +1,4 @@
-import { decodeCode, encodeShortCode, inviteLink } from "@/lib/rtc/code";
+import { decodeCode, encodeShortCode, shortInviteLink } from "@/lib/rtc/code";
 import { createAnswer, createOffer, whenOpen, type Peer, type ReachMode } from "@/lib/rtc/peer";
 import { uid } from "@/lib/utils";
 import { isAudioFile, isMediaFile, parseLink, titleFromName } from "./media";
@@ -295,7 +295,7 @@ export class HostRoom {
       };
       this.patchInvite(id, {
         code,
-        link: inviteLink(window.location.origin, "/watchparty", code),
+        link: shortInviteLink(window.location.origin, "/watchparty", code),
         status: "waiting",
       });
     } catch {

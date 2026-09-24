@@ -1,5 +1,5 @@
 import { checksum32, deflateText, fromBase64Url, inflateText, toBase64Url } from "@/lib/pack";
-import { packSdp, unpackSdp } from "./compact-sdp";
+import { packSdp, packTight, unpackSdp, unpackTight } from "./compact-sdp";
 
 /**
  * Connection details as something a person can actually carry across.
@@ -33,9 +33,16 @@ import { packSdp, unpackSdp } from "./compact-sdp";
 const PREFIX = "OAD1";
 /** The short form: a data-channel description packed field by field (`./compact-sdp.ts`). */
 const SHORT_PREFIX = "OAD2";
+/** The tight form: packed harder, with its checksum inside the bytes. */
+const TIGHT_PREFIX = "OAD3";
 
-/** Prefix, checksum, payload, end marker. Both forms are always readable. */
-const CODE_RE = /OAD[12]\.[0-9a-f]{8}\.[A-Za-z0-9_-]+\./;
+/**
+ * Prefix, checksum, payload, end marker — or, for the tight form, prefix,
+ * payload and end marker, the checksum riding inside the payload. Every form
+ * stays readable, so a link made by an older copy of the app still opens.
+ */
+const CODE_RE = /OAD[12]\.[0-9a-f]{8}\.[A-Za-z0-9_-]+\.|OAD3\.[A-Za-z0-9_-]+\./;
+const PREFIXES = [PREFIX, SHORT_PREFIX, TIGHT_PREFIX];
 
 /** Turn a description into one pasteable token. */
 export async function encodeCode(description: string): Promise<string> {
@@ -45,18 +52,22 @@ export async function encodeCode(description: string): Promise<string> {
 }
 
 /**
- * The shortest token for a description — about a quarter of `encodeCode`'s
+ * The shortest token for a description — under a quarter of `encodeCode`'s
  * length for a data-channel offer or answer, which is what makes an invite
  * link short enough to send comfortably and its QR code easy to scan.
- * Anything the short form can't carry exactly gets the ordinary code instead.
+ * Each form is tried from tightest to plainest, and the first that can carry
+ * the description exactly is used.
  */
 export async function encodeShortCode(description: string): Promise<string> {
-  let packed: Uint8Array | null = null;
+  let parsed: { type?: string; sdp?: string } | null = null;
   try {
-    packed = packSdp(JSON.parse(description) as { type?: string; sdp?: string });
+    parsed = JSON.parse(description) as { type?: string; sdp?: string };
   } catch {
-    packed = null;
+    parsed = null;
   }
+  const tight = parsed && packTight(parsed);
+  if (tight) return `${TIGHT_PREFIX}.${toBase64Url(tight)}.`;
+  const packed = parsed && packSdp(parsed);
   if (!packed) return encodeCode(description);
   const body = toBase64Url(packed);
   return `${SHORT_PREFIX}.${checksum32(body)}.${body}.`;
@@ -85,10 +96,29 @@ export async function decodeCode(raw: string): Promise<string> {
     // is one of ours and it got cut off", which is a far more useful thing to
     // tell someone.
     throw new CodeError(
-      raw.includes(PREFIX) || raw.includes(SHORT_PREFIX)
+      PREFIXES.some((p) => raw.includes(p))
         ? "That code is incomplete — copy the whole thing and try again."
         : "That doesn't look like a connection code.",
     );
+  }
+
+  if (token.startsWith(`${TIGHT_PREFIX}.`)) {
+    let bytes: Uint8Array;
+    try {
+      bytes = fromBase64Url(token.slice(TIGHT_PREFIX.length + 1, -1));
+    } catch {
+      throw new CodeError("That code is damaged — copy it again and retry.");
+    }
+    try {
+      return JSON.stringify(unpackTight(bytes));
+    } catch (error) {
+      // The checksum is inside the bytes, so a failed one is "damaged", not "unreadable".
+      throw new CodeError(
+        (error as Error).message === "crc" || (error as Error).message === "short"
+          ? "That code is damaged — copy it again and retry."
+          : "That code couldn't be unpacked.",
+      );
+    }
   }
 
   const [prefix, hash, body] = token.slice(0, -1).split(".");
@@ -116,17 +146,30 @@ export async function decodeCode(raw: string): Promise<string> {
 export const inviteLink = (origin: string, path: string, code: string): string =>
   `${origin}${path}#i=${code}`;
 
-/** Read an invite out of a URL fragment, if this load carries one. */
-export function inviteFromLocation(): string | null {
+/**
+ * The same, without the `i=` — the token's own prefix already says what the
+ * fragment holds. Every app still reads both.
+ */
+export const shortInviteLink = (origin: string, path: string, code: string): string =>
+  `${origin}${path}#${code}`;
+
+/** The fragment's invite text — after `#i=`, or a bare `#OAD…` — valid or not. */
+function inviteFragment(): string | null {
   if (typeof window === "undefined") return null;
   const hash = window.location.hash;
-  if (!hash.startsWith("#i=")) return null;
-  return extractCode(hash.slice(3));
+  if (hash.startsWith("#i=")) return hash.slice(3);
+  if (PREFIXES.some((p) => hash.startsWith(`#${p}.`))) return hash.slice(1);
+  return null;
+}
+
+/** Read an invite out of a URL fragment, if this load carries one. */
+export function inviteFromLocation(): string | null {
+  const fragment = inviteFragment();
+  return fragment === null ? null : extractCode(fragment);
 }
 
 /** Drop the invite from the address bar once it has been taken up. */
 export function clearInviteFromLocation(): void {
-  if (typeof window === "undefined") return;
-  if (!window.location.hash.startsWith("#i=")) return;
+  if (inviteFragment() === null) return;
   window.history.replaceState(null, "", window.location.pathname + window.location.search);
 }
