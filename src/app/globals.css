@@ -184,6 +184,22 @@
   --app-detect: #5c6b16;
   --app-metronome: #8c2f39;
   --app-breathe: #2f6f9f;
+  --app-watchparty: #4338ca;
+  /* Watch Party's member colours, one per seat (0 is the host). Used as text
+     for names in the chat and as the rim of each avatar, so every light value
+     clears 4.5:1 on white and every dark one on the dark paper below. */
+  --party-0: #b45309;
+  --party-1: #1d4ed8;
+  --party-2: #047857;
+  --party-3: #7e22ce;
+  --party-4: #b91c1c;
+  --party-5: #0e7490;
+  --party-6: #be185d;
+  --party-7: #4d7c0f;
+  /* The screen a film plays on is dark in every palette — a light letterbox
+     around a movie is glare, not a theme — and subtitles on it are white. */
+  --party-stage: #0b0d10;
+  --party-stage-ink: #ffffff;
 
   /* QR codes are read by a camera, not by a person, so these two are the one
      pair in the workspace that does *not* follow the theme: a scanner expects
@@ -288,6 +304,17 @@
   --app-detect: #cfd977;
   --app-metronome: #f4a3ab;
   --app-breathe: #8cc8f0;
+  --app-watchparty: #a5b4fc;
+  --party-0: #fcd34d;
+  --party-1: #93c5fd;
+  --party-2: #6ee7b7;
+  --party-3: #d8b4fe;
+  --party-4: #fca5a5;
+  --party-5: #67e8f9;
+  --party-6: #f9a8d4;
+  --party-7: #bef264;
+  --party-stage: #050608;
+  --party-stage-ink: #ffffff;
   --board-note: #fbbf24;
   --board-checklist: #4d94ff;
   --board-counter: #1fb89f;
@@ -771,6 +798,8 @@
 
 /* ---------------- expose tokens to Tailwind utilities ---------------- */
 @theme inline {
+  --color-party-stage: var(--party-stage);
+  --color-party-stage-ink: var(--party-stage-ink);
   --color-paper: var(--paper);
   --color-grid: var(--grid);
   --color-ink: var(--ink);
@@ -1778,6 +1807,84 @@ svg {
   .breathe-check path {
     animation: none;
     stroke-dashoffset: 0;
+  }
+}
+
+/* ------------------------------ Watch Party ------------------------------ */
+
+/* A reaction rises from the bottom of the picture, swaying, and fades out
+   before it reaches the top — so a burst of them never covers the film. */
+.party-float {
+  animation: party-float 3.4s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+/* Someone else's chat line, held long enough to read, then gone. */
+.party-bubble {
+  animation: party-bubble 5.2s ease forwards;
+}
+/* The music visual's fallback when there is no audio signal to measure. */
+.party-eq > span {
+  animation: party-eq 0.9s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+@keyframes party-float {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(-6px, -1.2em) scale(1.15);
+  }
+  45% {
+    transform: translate(8px, -3.2em) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-4px, -6.5em) scale(0.95);
+  }
+}
+@keyframes party-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  6%,
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@keyframes party-eq {
+  from {
+    transform: scaleY(0.2);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes party-fade {
+  0%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Reactions and chat lines still appear — they carry who said what — but
+     stay where they land and simply fade. */
+  .party-float,
+  .party-bubble {
+    animation: party-fade 3.4s linear forwards;
+  }
+  .party-eq > span {
+    animation: none;
+    transform: scaleY(0.6);
   }
 }
 

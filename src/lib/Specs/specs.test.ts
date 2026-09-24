@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { cleanValue, findInfobox, linkedTitles, parseInfobox, rawField, resolveTemplate } from "./wikitext";
 import { detectCategory, groupFields, labelFor } from "./categories";
 import { extractMeasures, lowerIsBetter, measureLabel } from "./measure";
-import { bandFor, confidenceOf, scoreProduct, UNSCORED_REASON } from "./score";
+import { bandFor, confidenceOf, publishedBands, scoreProduct, UNSCORED_REASON } from "./score";
 import { DEFAULT_REGION, REGIONS, REVIEW_SITES, regionById, storeQuery, storesFor } from "./stores";
 import { exportComparison, exportFilename, exportSheet } from "./export";
 import { reviveRecord } from "./client";
@@ -742,5 +742,56 @@ describe("diffMeasures", () => {
     );
     expect(summariseDiff(changes)).toBe("1 of 2 comparable specifications changed.");
     expect(summariseDiff([])).toContain("Neither sheet");
+  });
+});
+
+/* ----------------------------- published bands ---------------------------- */
+
+describe("publishedBands", () => {
+  it("describes exactly the axes the scorer actually uses", () => {
+    // The two must not drift: a method page that lists an axis the scorer does
+    // not apply is worse than no method page, because it is checkable and wrong.
+    for (const category of ["phone", "car", "camera", "component"] as ProductCategory[]) {
+      const bands = publishedBands(category);
+      const axes = scoreProduct([], category).axes;
+      expect(bands.map((b) => b.id), category).toEqual(axes.map((a) => a.id));
+    }
+  });
+
+  it("gives shares that add up to the whole score", () => {
+    for (const category of ["phone", "computer", "motorcycle"] as ProductCategory[]) {
+      const total = publishedBands(category).reduce((sum, b) => sum + b.share, 0);
+      expect(total, category).toBeCloseTo(1, 6);
+    }
+  });
+
+  it("words each endpoint with its unit", () => {
+    const battery = publishedBands("phone").find((b) => b.id === "battery");
+    expect(battery?.worst).toBe("3,000 mAh");
+    expect(battery?.best).toBe("6,000 mAh");
+  });
+
+  it("writes a year as a year, not as a quantity", () => {
+    const year = publishedBands("phone").find((b) => b.id === "year");
+    expect(year?.worst).toBe("2015");
+    expect(year?.best).toBe("2025");
+  });
+
+  it("marks the axes where smaller is the better figure", () => {
+    expect(publishedBands("phone").find((b) => b.id === "mass")?.lowerBetter).toBe(true);
+    expect(publishedBands("phone").find((b) => b.id === "battery")?.lowerBetter).toBe(false);
+  });
+
+  it("returns nothing for a category this app refuses to score", () => {
+    // Paired with UNSCORED_REASON, which is what the panel shows instead.
+    for (const category of ["appliance", "aircraft", "other"] as ProductCategory[]) {
+      expect(publishedBands(category), category).toEqual([]);
+      expect(UNSCORED_REASON[category]).toBeTruthy();
+    }
+  });
+
+  it("carries the proxy caveats through to the reader", () => {
+    const camera = publishedBands("camera").find((b) => b.id === "sensor");
+    expect(camera?.caveat).toMatch(/resolution/i);
   });
 });

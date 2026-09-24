@@ -27,6 +27,7 @@ export const APP_LABELS: Record<AppId, string> = {
   speed: "Network Speed",
   news: "News",
   streams: "Streams",
+  watchparty: "Watch Party",
   world: "World Clock",
   malayalam: "Malayalam Writer",
   translate: "Translate",
@@ -155,6 +156,7 @@ export const APP_ALIASES: Record<AppId, string[]> = {
   translate: ["translate", "translator", "translation"],
   morse: ["morse code", "morse", "sos", "dots and dashes", "telegraph", "cw"],
   metronome: ["metronome", "click track", "tap tempo", "bpm", "tempo trainer", "speed trainer"],
+  watchparty: ["watch party", "watch together", "listen together", "movie night", "watchparty", "co-watch", "group watch"],
   breathe: ["breathe", "breathing", "breathing exercise", "box breathing", "breathing app", "4-7-8"],
   sound: [
     "sound meter",
@@ -591,6 +593,7 @@ export const APP_PATHS: Record<AppId, string> = {
   speed: "/speedtest",
   news: "/news",
   streams: "/streams",
+  watchparty: "/watchparty",
   world: "/worldclock",
   malayalam: "/malayalam",
   translate: "/translate",
@@ -648,6 +651,8 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   news: "headlines by category — tech, software engineering, sports, national, state, local, world",
   streams:
     "music stations and live channels from YouTube, played in a workspace tab",
+  watchparty:
+    "a room where several people watch a film or listen to music together, every player kept at the same moment — with chat, reactions, voice, subtitles and a shared queue",
   world: "live time in cities worldwide, with each country's facts, specialities and news",
   malayalam: "type Malayalam by Manglish, on-screen keyboard or handwriting",
   translate: "translate text online, or fully offline on-device",
@@ -1090,6 +1095,21 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "• Library — what you saved and a short trail of what you played, both kept on this device\n" +
       "Each station is a saved search rather than a pinned video, so it keeps working as streams start and end. The player shrinks to a bar while you browse and keeps playing, and stops when you leave the app. Playback is YouTube's own embed on its own domain, so views count for the creator; nothing is downloaded or re-hosted. It needs a connection.",
     followUps: ["Which apps need internet?", "How do I check the news?", "List all the apps"],
+  },
+  {
+    id: "app-watchparty",
+    title: "Watch Party — watch and listen together, in sync",
+    app: "watchparty",
+    keywords: ["watch party", "watchparty", "watch together", "listen together", "movie night", "watch a movie with friends", "watch with friends", "listen with friends", "group watch", "co-watch", "teleparty", "sync video", "synced playback", "synchronised playback", "shared screen", "share screen", "stream a movie", "stream a file", "room", "invite", "invite link", "reply code", "voice chat", "talk while watching", "reactions", "subtitles", "srt", "vtt", "queue", "vote to skip", "host"],
+    answer:
+      "Watch Party is a room where up to 8 people watch a film or listen to music together — every player held at the same moment, so pausing pauses it for everyone.\n" +
+      "• Getting in — one person starts a room and becomes the host; their browser is the room, with no server behind it. The host makes one invite per guest in People (a link, a QR or a code), the guest opens it, adds their name and gets a reply code, and the host pastes or scans that reply to let them in. “This network only” contacts nothing outside the Wi-Fi; “Anywhere” also asks a public STUN server for the device's address\n" +
+      "• What plays — a YouTube link or a direct link to a video or audio file plays on every device from the source, kept in step against the host's clock (small gaps are closed by playing slightly faster or slower, big ones by a jump). The host can also add files from their own device, streamed live to guests, or share a browser tab or screen. A guest who has the same file can choose Play my own copy for full quality\n" +
+      "• Queue — add now, next or to the end; the host reorders, removes and replays; guests can add links if the host allows it, and a majority vote skips what is playing\n" +
+      "• Watch — reactions that float over the picture, voice chat (wear headphones), and subtitles: an .srt or .vtt the host shares appears on every screen, or load one just for yourself, with a timing nudge\n" +
+      "• People — who is here, whether each person is in sync and their ping; the host can remove people and decide whether guests may control playback or add to the queue\n" +
+      "Keys: Space plays and pauses for everyone, ← → jump 10 seconds, M mutes this device, F is full screen, C toggles subtitles. Switching to another app keeps the room running (only the mic closes); closing the host's tab ends it, and a guest who leaves needs a new invite. YouTube items need the internet; a room on one Wi-Fi playing files works with none.",
+    followUps: ["What can File Drop do?", "What can Streams do?", "Which apps need internet?"],
   },
   {
     id: "app-world",

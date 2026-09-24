@@ -72,6 +72,7 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   detect: () => import("@/components/Detect/DetectApp").then((m) => m.DetectApp),
   metronome: () => import("@/components/Metronome/MetronomeApp").then((m) => m.MetronomeApp),
   breathe: () => import("@/components/Breathe/BreatheApp").then((m) => m.BreatheApp),
+  watchparty: () => import("@/components/WatchParty/WatchPartyApp").then((m) => m.WatchPartyApp),
 };
 
 /**
@@ -123,6 +124,9 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "speed",
   "news",
   "streams",
+  // Watch Party's chunk is all a room needs to open; only YouTube items and
+  // guests on another network need the internet.
+  "watchparty",
   "world",
   // Unlike the feeds above it and Spec Analyser below, Latest Tech's catalogue
   // is *inside* its chunk: warming it caches every product sheet too, so the
@@ -197,4 +201,5 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   detect: "Detect",
   metronome: "Metronome",
   breathe: "Breathe",
+  watchparty: "Watch Party",
 };

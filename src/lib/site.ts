@@ -80,6 +80,12 @@ export const APPS: AppEntry[] = [
       "play music and live channels from YouTube — genre and language stations, live radio and news, search and a saved library",
   },
   {
+    path: "/watchparty",
+    name: "Watch Party",
+    blurb:
+      "watch movies and listen to music together online — invite up to seven friends by link or QR, and every screen plays the same moment of a YouTube video, a media link, the host's own file or a shared screen, with chat, floating reactions, voice chat, shared subtitles, a shared queue and vote to skip; no sign-up and no server in between",
+  },
+  {
     path: "/worldclock",
     name: "World Clock",
     blurb:
@@ -259,7 +265,7 @@ export const APPS: AppEntry[] = [
     path: "/specs",
     name: "Spec Analyser",
     blurb:
-      "browse every phone, laptop, camera, console, car and motorcycle by maker or by year, then read the full specification of any of them — phones, laptops, cameras, consoles, graphics cards, cars, motorcycles and aircraft: every spec grouped and quoted from the source article it was read from, a picture gallery, the shops that sell it in a dozen countries, the models it replaced and sits beside, a measure-by-measure comparison of up to five at once with a differences-only filter and a score grid, an automatic diff against whatever it replaced, a shortlist that survives, a spec score that says how much of itself was actually measured, a filter that searches the sheet by value as well as by label, and Markdown, CSV or JSON export that carries its own citation",
+      "browse every phone, laptop, camera, console, car and motorcycle by maker or by year, then read the full specification of any of them — phones, laptops, cameras, consoles, graphics cards, cars, motorcycles and aircraft: every spec grouped and quoted from the source article it was read from, a picture gallery, the shops that sell it in a dozen countries, the models it replaced and sits beside, a measure-by-measure comparison of up to five at once with a differences-only filter and a score grid, an automatic diff against whatever it replaced, a shortlist you can rank by any measure and export, a spec score that says how much of itself was actually measured, a filter that searches the sheet by value as well as by label, and Markdown, CSV or JSON export that carries its own citation",
   },
   {
     path: "/latest",
@@ -361,6 +367,15 @@ export const SITE_KEYWORDS = [
   "lofi radio online",
   "online music player",
   "watch youtube in one app",
+  "watch party online",
+  "watch movies together online",
+  "watch together with friends",
+  "listen to music together online",
+  "sync youtube with friends",
+  "online movie night",
+  "watch party no sign up",
+  "stream a movie to friends",
+  "watch party with voice chat",
   "world clock",
   "world time",
   "time zone converter",
@@ -546,6 +561,8 @@ export const SITE_KEYWORDS = [
   "what changed between two phone models",
   "is it worth upgrading",
   "shortlist products to compare",
+  "sort phones by battery",
+  "how is this score calculated",
   "browse all phones",
   "list of all laptops",
   "all mobile phone models",

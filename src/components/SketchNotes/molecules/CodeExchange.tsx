@@ -26,6 +26,9 @@ const BTN =
  * Long codes are shown in a read-only textarea rather than as text: it can be
  * selected with one gesture, and it is what a headless check (or a user without
  * clipboard permission) can read.
+ *
+ * Shared by the apps that pair browsers over `lib/rtc` — File Drop hands one
+ * invite to one receiver; Watch Party hands one to each guest it lets in.
  */
 export function CodeExchange({
   code,

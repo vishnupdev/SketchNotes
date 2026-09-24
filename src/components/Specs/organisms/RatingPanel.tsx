@@ -8,6 +8,7 @@ import { REVIEW_SITES, regionById, storeQuery, storesFor } from "@/lib/Specs/sto
 import { ScoreDial } from "@/components/Specs/atoms/ScoreDial";
 import { StarPicker } from "@/components/Specs/atoms/StarPicker";
 import { AxisBar } from "@/components/Specs/molecules/AxisBar";
+import { HowScored } from "@/components/Specs/organisms/HowScored";
 import { PanelNote } from "@/components/Specs/molecules/PanelNote";
 import { StoreRow } from "@/components/Specs/molecules/StoreRow";
 import { PrimaryButton } from "@/components/SketchNotes/atoms/PrimaryButton";
@@ -126,6 +127,8 @@ export function RatingPanel() {
           </div>
         )}
       </section>
+
+      <HowScored category={product.category} categoryLabel={product.categoryLabel} />
 
       <section className="flex flex-col gap-2">
         <h3 className="font-mono text-[10px] uppercase tracking-[.14em] text-ink-soft">

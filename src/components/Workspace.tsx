@@ -77,6 +77,7 @@ const LatestApp = dynamic(APP_LOADERS.latest, { ssr: false });
 const DetectApp = dynamic(APP_LOADERS.detect, { ssr: false });
 const MetronomeApp = dynamic(APP_LOADERS.metronome, { ssr: false });
 const BreatheApp = dynamic(APP_LOADERS.breathe, { ssr: false });
+const WatchPartyApp = dynamic(APP_LOADERS.watchparty, { ssr: false });
 
 /**
  * Every app's deep-link path — the one place a route is declared, read in both
@@ -139,6 +140,7 @@ const APP_PATHS: Record<AppId, string> = {
   detect: "/detect",
   metronome: "/metronome",
   breathe: "/breathe",
+  watchparty: "/watchparty",
 };
 
 const PDF_BASE = APP_PATHS.pdf;
@@ -487,6 +489,14 @@ export function Workspace() {
           and lets go of the screen wake lock. */}
       <AppFrame active={activeApp === "breathe"} name="Breathe">
         <BreatheApp />
+      </AppFrame>
+
+      {/* Watch Party. Unlike the apps around it, unmounting does *not* end the
+          room: its connections live beside the store, so the host can check
+          another app and come back to a room still running. Only the
+          microphone is closed on the way out. */}
+      <AppFrame active={activeApp === "watchparty"} name="Watch Party">
+        <WatchPartyApp />
       </AppFrame>
 
       <AppFrame active={activeApp === "calc"} name="Calc">

@@ -1,24 +1,25 @@
 "use client";
 
+import { useId } from "react";
 import type { ReachMode } from "@/lib/rtc/peer";
 import { cx } from "@/lib/utils";
 
 const OPTIONS: Array<{
   id: ReachMode;
   label: string;
-  detail: string;
+  detail: (what: string) => string;
 }> = [
   {
     id: "local",
     label: "This network only",
-    detail:
+    detail: () =>
       "Both devices on the same Wi-Fi or hotspot. Works with no internet at all, and nothing outside the network is contacted.",
   },
   {
     id: "internet",
     label: "Anywhere",
-    detail:
-      "Different networks, different countries. Needs internet, and asks a public STUN server what address this device looks like from outside — it never sees the files.",
+    detail: (what) =>
+      `Different networks, different countries. Needs internet, and asks a public STUN server what address this device looks like from outside — it never sees ${what}.`,
   },
 ];
 
@@ -31,18 +32,28 @@ const OPTIONS: Array<{
  * server for this device's public address. The wording says exactly what each one
  * does — and the honest limit of the second is stated where it matters, on the
  * failure message, not buried here.
+ *
+ * Shared by every app that pairs two browsers over `lib/rtc` (File Drop, Watch
+ * Party). Each names what travels over the link — `what` — so the promise in the
+ * "anywhere" line is about that app's data, not someone else's.
  */
 export function ReachPicker({
   mode,
   onMode,
+  legend = "Where is the other device?",
+  what = "the files",
 }: {
   mode: ReachMode;
   onMode: (mode: ReachMode) => void;
+  legend?: string;
+  what?: string;
 }) {
+  // Unique per instance, so two pickers on one page never share a radio group.
+  const name = useId();
   return (
     <fieldset className="flex flex-col gap-2">
       <legend className="font-mono text-[10px] uppercase tracking-[.14em] text-ink-soft">
-        Where is the other device?
+        {legend}
       </legend>
       {OPTIONS.map((option) => (
         <label
@@ -56,7 +67,7 @@ export function ReachPicker({
         >
           <input
             type="radio"
-            name="reach"
+            name={name}
             value={option.id}
             checked={mode === option.id}
             onChange={() => onMode(option.id)}
@@ -65,7 +76,7 @@ export function ReachPicker({
           <span className="min-w-0">
             <span className="block text-[13px] font-semibold">{option.label}</span>
             <span className="mt-0.5 block text-[12px] leading-relaxed text-ink-soft">
-              {option.detail}
+              {option.detail(what)}
             </span>
           </span>
         </label>

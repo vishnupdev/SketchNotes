@@ -1409,3 +1409,84 @@ export const BreatheIcon = (p: IconProps) => (
     <path d="M3.4 6.4a10.2 10.2 0 0 0 0 11.2M20.6 6.4a10.2 10.2 0 0 1 0 11.2" />
   </Svg>
 );
+
+/**
+ * A screen with a play mark and two people in front of it — watching
+ * something together, which is the whole of the Watch Party app.
+ */
+export const WatchPartyIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="3.2" width="18" height="11.6" rx="2" />
+    <path d="M10.4 6.6v4.8l4-2.4Z" fill="currentColor" stroke="none" />
+    <circle cx="8" cy="17.6" r="1.4" />
+    <circle cx="16" cy="17.6" r="1.4" />
+    <path d="M5.2 21.4a2.8 2.8 0 0 1 5.6 0M13.2 21.4a2.8 2.8 0 0 1 5.6 0" />
+  </Svg>
+);
+
+/** A speech bubble — a conversation. */
+export const ChatIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4.5 6.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H11l-4 3.5v-3.5h-.5a2 2 0 0 1-2-2z" />
+    <path d="M8.5 9.3h7M8.5 12.2h4.5" />
+  </Svg>
+);
+
+/** Lines of a list with a play mark on the first — what plays next. */
+export const QueueIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 6.5l4 2.5-4 2.5z" fill="currentColor" stroke="none" />
+    <path d="M11 9h9M4 15h16M4 19.5h16" />
+  </Svg>
+);
+
+/** A captions box — subtitles. */
+export const SubtitlesIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="5" width="18" height="14" rx="2.2" />
+    <path d="M6.5 13.5h4M13 13.5h4.5M6.5 16h7.5M15.8 16h1.7" />
+  </Svg>
+);
+
+/** A speaker struck through — sound off. */
+export const MuteIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4.5 9.5h3l4-3v11l-4-3h-3z" />
+    <path d="M15.5 9.5l5 5M20.5 9.5l-5 5" />
+  </Svg>
+);
+
+/** Four corners pushing outward — fill the screen. */
+export const FullscreenIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15" />
+  </Svg>
+);
+
+/** A small frame floating in the corner of a larger one — picture in picture. */
+export const PipIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="4.5" width="18" height="15" rx="2" />
+    <rect x="12" y="12" width="6.5" height="5" rx="1" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+/** Two chevrons pointing back — jump back. */
+export const SeekBackIcon = (p: IconProps) => (
+  <Svg {...p}><path d="M11.5 6.5 6 12l5.5 5.5M18 6.5 12.5 12l5.5 5.5" /></Svg>
+);
+
+/** Two chevrons pointing forward — jump ahead. */
+export const SeekForwardIcon = (p: IconProps) => (
+  <Svg {...p}><path d="M12.5 6.5 18 12l-5.5 5.5M6 6.5l5.5 5.5L6 17.5" /></Svg>
+);
+
+/** A pair of beamed quavers — music. */
+export const MusicNoteIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M9 17.5V5.8l10-2v11.7" />
+    <path d="M9 9.2l10-2" />
+    <circle cx="6.8" cy="17.6" r="2.2" />
+    <circle cx="16.8" cy="15.5" r="2.2" />
+  </Svg>
+);

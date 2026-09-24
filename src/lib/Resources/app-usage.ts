@@ -17,6 +17,8 @@ export const APP_NETWORK: Partial<Record<AppId, string>> = {
   news: "Fetches headlines through this site's own server route.",
   streams:
     "Searches YouTube through this site's own server route, then hands playback to YouTube's embed — the video itself is streamed from YouTube to your browser.",
+  watchparty:
+    "Connects straight to the other people in the room (WebRTC) — chat, the playback clock, voices and any file you stream go device to device. \"Anywhere\" invites also ask a public STUN server for this device's address; YouTube items play from YouTube.",
   world: "Fetches a country's headlines; clocks and facts are bundled offline.",
   translate: "Online mode posts your text to this site's translate route. On-device mode sends nothing.",
   malayalam: "Handwriting recognition posts the strokes you draw. Typing and the keyboard stay local.",
@@ -80,6 +82,7 @@ export const APP_STORAGE_NOTE: Record<AppId, string> = {
   speed: "Your past speed-test results.",
   news: "Nothing beyond the cached responses the offline worker keeps.",
   streams: "The videos you saved, and a short trail of what you played.",
+  watchparty: "Your display name, volume and subtitle choices, and the last few links you added — never a room, its chat or what was played.",
   world: "Pinned cities and clock preferences.",
   malayalam: "The document you are writing and its formatting.",
   translate: "Your language choices.",

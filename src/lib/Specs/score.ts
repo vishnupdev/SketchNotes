@@ -26,7 +26,7 @@
  *    and a higher TDP is not a faster chip.
  */
 
-import { lowerIsBetter, measureLabel } from "./measure";
+import { lowerIsBetter, measureLabel, measureUnit } from "./measure";
 import type { Measure, MeasureId, ProductCategory, ProductScore, ScoreAxis } from "./types";
 
 interface AxisDef {
@@ -143,6 +143,59 @@ export const UNSCORED_REASON: Partial<Record<ProductCategory, string>> = {
   other:
     "This app only scores categories it has published bands for. It could not tell what kind of product this is from the article, so it is showing you the specifications and leaving the judgement to you.",
 };
+
+/**
+ * The published bands for one kind of product, for showing a reader.
+ *
+ * The whole defence of this score is "the bands are written down and you can
+ * check them", which until now was true only of the *source file*. Exposing
+ * them lets the app show its working to the person reading the number, rather
+ * than asking them to take the methodology on trust — which is the difference
+ * between a transparent score and one that merely claims to be.
+ */
+export interface PublishedAxis {
+  id: MeasureId;
+  label: string;
+  /** Value scoring 0, worded with its unit. */
+  worst: string;
+  /** Value scoring 100, worded with its unit. */
+  best: string;
+  /** Share of the category's total weight, 0–1. */
+  share: number;
+  /** Why this axis is only a proxy, where it is one. */
+  caveat?: string;
+  /** Whether a smaller figure is the better one. */
+  lowerBetter: boolean;
+}
+
+/**
+ * How a category is scored, as data a component can render.
+ *
+ * Returns an empty list for the categories this app refuses to score; pair it
+ * with {@link UNSCORED_REASON}, which says why.
+ */
+export function publishedBands(category: ProductCategory): PublishedAxis[] {
+  const defs = AXES[category] ?? [];
+  const total = defs.reduce((sum, def) => sum + def.weight, 0);
+
+  return defs.map((def) => {
+    const unit = measureUnit(def.id);
+    // A year is a number that must not be grouped — "2,025" reads as a
+    // quantity. Same rule as the verdict lines below.
+    const figure = (n: number): string =>
+      `${def.id === "year" ? String(n) : n.toLocaleString("en")}${unit ? ` ${unit}` : ""}`;
+
+    return {
+      id: def.id,
+      label: measureLabel(def.id),
+      worst: figure(def.worst),
+      best: figure(def.best),
+      share: total > 0 ? def.weight / total : 0,
+      caveat: def.caveat,
+      lowerBetter: lowerIsBetter(def.id),
+    };
+  });
+}
 
 /** Plain-language band for a 0–100 figure. */
 export function bandFor(score: number): string {

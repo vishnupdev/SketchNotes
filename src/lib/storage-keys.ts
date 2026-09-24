@@ -83,6 +83,7 @@ const OWNERS: OwnerRule[] = [
   { app: "detect", match: prefix("sknotes:detect:") },
   { app: "metronome", match: prefix("sknotes:metronome:") },
   { app: "breathe", match: prefix("sknotes:breathe:") },
+  { app: "watchparty", match: prefix("sknotes:watchparty:") },
   // Exif stores nothing either — the picture is read in memory and dropped on
   // close, which for a photo carrying a home address is the only defensible
   // behaviour — so it has no rule here.

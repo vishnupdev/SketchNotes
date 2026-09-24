@@ -48,7 +48,7 @@
 // streaming downloads; v12 adds the /clone route; v21 adds the /latest route
 // and Latest Tech's listings endpoint; v22 adds the /detect route and the
 // model cache below.
-const VERSION = "oneapp-v24";
+const VERSION = "oneapp-v25";
 const SHELL_CACHE = `oneapp-shell-${VERSION}`;
 const STATIC_CACHE = `oneapp-static-${VERSION}`;
 const DATA_CACHE = `oneapp-data-${VERSION}`;
@@ -148,6 +148,7 @@ const SHELL_URLS = [
   "/detect",
   "/metronome",
   "/breathe",
+  "/watchparty",
 ];
 
 /** Non-HTML files the workspace can't start (or edit PDFs) without. */

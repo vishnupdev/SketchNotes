@@ -59,7 +59,8 @@ export type AppId =
   | "latest"
   | "detect"
   | "metronome"
-  | "breathe";
+  | "breathe"
+  | "watchparty";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
 const ALL_APPS: AppId[] = [
@@ -103,6 +104,9 @@ const ALL_APPS: AppId[] = [
   "speed",
   "news",
   "streams",
+  // Watch Party follows Streams: one plays something to you, the other plays
+  // it to a room of people at once.
+  "watchparty",
   "world",
   "malayalam",
   "translate",

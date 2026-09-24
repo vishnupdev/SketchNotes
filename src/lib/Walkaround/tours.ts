@@ -658,6 +658,68 @@ export const TOURS: Record<AppId, Tour> = {
     ],
   },
 
+  watchparty: {
+    tagline: "watch and listen together, in sync",
+    intro: "Letting people into a room, what it can play, and the controls everyone shares.",
+    layout: {
+      blocks: [
+        { label: "The film · subtitles · reactions", grow: 2.4 },
+        { label: "Play · seek · speed · volume · full screen", grow: 0.7 },
+        { label: "React · voice · subtitles · skip vote", grow: 1.3 },
+      ],
+      tabs: ["Watch", "Queue", "Chat", "People"],
+    },
+    steps: [
+      {
+        at: "tab:3",
+        title: "One invite per guest",
+        direction:
+          "In People, create an invite and send its link or QR; the guest opens it, adds a name and hands you back a reply code to paste or scan.",
+        suggestion:
+          "An invite can only be answered once, so make one per person. Choose “Anywhere” for friends on other networks; “This network only” works with no internet at all.",
+      },
+      {
+        at: "tab:1",
+        title: "Four kinds of source",
+        direction:
+          "Queue takes a YouTube link or a direct media link, and — for the host — files from this device or a shared tab or screen.",
+        suggestion:
+          "Links play from the source on every device and cost the host nothing. A host's file is streamed once per guest, so a guest with the same file should press Play my own copy on the Watch tab for full quality.",
+      },
+      {
+        at: "body:0",
+        title: "Everyone at one moment",
+        direction:
+          "Every player steers toward the host's clock: small gaps close by playing slightly faster or slower, big ones by a jump.",
+        suggestion:
+          "If the host's player stalls to buffer, the room waits for it rather than racing ahead — so the host should be the one on the best connection.",
+      },
+      {
+        at: "body:1",
+        title: "Shared controls",
+        direction:
+          "Play, pause, seek and speed act on everyone's screen; volume and mute are only yours.",
+        suggestion:
+          "Space, ← →, M, F and C do the same from the keyboard. The host can take the controls back in People → Room rules.",
+      },
+      {
+        at: "body:2",
+        title: "Talk over the film",
+        direction:
+          "Reactions float up over everyone's picture; Talk opens your mic, and a ring lights up round whoever is speaking.",
+        suggestion:
+          "Wear headphones with the mic on, or the film echoes back into the room. Subtitles the host shares show on every screen; “Just for me” loads your own.",
+      },
+      {
+        at: "tab:2",
+        title: "Chat that reaches full screen",
+        direction: "Chat holds the room's messages, plus who joined, left, paused or queued what.",
+        suggestion:
+          "Other people's messages also surface for a few seconds over the picture, so nobody watching full screen misses them.",
+      },
+    ],
+  },
+
   world: {
     tagline: "live times, countries & their news",
     intro: "The time somewhere else, and the country behind the clock.",
@@ -2259,19 +2321,19 @@ export const TOURS: Record<AppId, Tour> = {
   specs: {
     tagline: "what a product is actually made of",
     intro:
-      "Browse or search any product, read every specification, see what changed since the last one, price it, compare it and score it.",
+      "Browse or search any product, read every specification, see what changed since the last one, price it, rank it and score it.",
     layout: {
       blocks: [
         { label: "Search a name", grow: 0.7 },
         { label: "Browse by kind & maker", grow: 0.9 },
-        { label: "Shortlist & recents", span: 1 },
+        { label: "Shortlist & ranking", grow: 0.9 },
         { label: "Find in this sheet", span: 1 },
-        { label: "Pictures & the spec sheet", grow: 1.6 },
+        { label: "Pictures & the spec sheet", grow: 1.5 },
         { label: "What changed since", span: 1 },
         { label: "Where to buy", span: 1 },
         { label: "Similar & side by side", grow: 1 },
-        { label: "Scores, reviews & your rating", span: 1 },
-        { label: "Export & print", span: 1 },
+        { label: "Score & how it is scored", span: 1 },
+        { label: "Reviews, your rating, export", span: 1 },
       ],
       tabs: ["Find", "Sheet", "Prices", "Similar", "Rating"],
     },
@@ -2290,15 +2352,15 @@ export const TOURS: Record<AppId, Tour> = {
         direction:
           "Under the box, pick a kind and then a maker or a year — every iPhone, every Galaxy, every ThinkPad, every Toyota.",
         suggestion:
-          "These are the encyclopedia's own maintained categories rather than search results, so a maker's list is as complete as the encyclopedia is, and the line under each list tells you which of the two you are reading. One to know: “Samsung” is the Galaxy line, and “Samsung (pre-Galaxy)” is a second real category whose newest phone is from 2010.",
+          "These are the encyclopedia's own maintained categories rather than search results, so a maker's list is as complete as the encyclopedia is. One to know: “Samsung” is the Galaxy line, and “Samsung (pre-Galaxy)” is a second real category whose newest phone is from 2010.",
       },
       {
         at: "body:2",
-        title: "Keep the ones you mean",
+        title: "Shortlist, then rank it",
         direction:
-          "Add a product to the shortlist from its own sheet, and it waits here until you take it off — unlike the recents below it.",
+          "Keep the products you are deciding between, then sort them by any measure their sheets state — battery, memory, weight, power.",
         suggestion:
-          "“Compare these” is the payoff: it opens the first and puts the rest beside it in the table in one tap, instead of you finding each one again and ticking it.",
+          "Ranking is instant here and impossible on a whole catalogue, for the same reason: a measure only exists once a sheet has been read, and these few are already loaded. A product whose sheet is silent sinks to the bottom rather than vanishing from your own list.",
       },
       {
         at: "body:3",
@@ -2322,7 +2384,7 @@ export const TOURS: Record<AppId, Tour> = {
         direction:
           "Similar opens with the diff against whatever this replaced: what moved, by how much, and what stayed the same.",
         suggestion:
-          "Read the word beside each percentage rather than the sign. A heavier phone is a bigger number and a worse outcome, so “up” and “better” are tracked separately — and the app deliberately offers no verdict on whether the change is worth paying for.",
+          "Read the word beside each percentage rather than the sign. A phone that gained 6% of its weight reads “worse +6%”, because how far the number moved and whether that is an improvement are two different things.",
       },
       {
         at: "body:6",
@@ -2330,7 +2392,7 @@ export const TOURS: Record<AppId, Tour> = {
         direction:
           "Prices lists the shops that sell it in your country — pick from a dozen — and quotes the launch price off the spec sheet.",
         suggestion:
-          "Read the panel's first paragraph once. It carries no live prices on purpose: no shop publishes them without a key, and a scraped number that is stale or for the wrong variant is worse than no number on a purchase this size.",
+          "It carries no live prices on purpose: no shop publishes them without a key, and a scraped number that is stale or for the wrong variant is worse than no number on a purchase this size.",
       },
       {
         at: "body:7",
@@ -2342,22 +2404,23 @@ export const TOURS: Record<AppId, Tour> = {
       },
       {
         at: "body:8",
-        title: "Three ratings, kept apart",
+        title: "Check the app's working",
         direction:
-          "The spec score against published bands, links to what buyers wrote at each shop, and your own stars — never averaged together.",
+          "Under the dial, “How a phone is scored” opens every band the score used: both endpoints, each axis's share, and which way counts as better.",
         suggestion:
-          "The line above the dial is the one that matters: it says how many of the measures the sheet actually answered. Two out of five is a sketch, however confident the number looks.",
+          "Worth opening once. A score you cannot inspect is asking for trust; these bands are the whole method, so you can disagree with the number on the evidence rather than on instinct.",
       },
       {
         at: "body:9",
-        title: "Take it, or print it",
+        title: "Reviews, your say, and out",
         direction:
-          "Both the sheet and the comparison copy or save as Markdown, CSV or JSON, and print as a clean document.",
+          "Links to what buyers wrote, a place for your own stars, and export of any sheet, comparison or shortlist as Markdown, CSV or JSON.",
         suggestion:
-          "Every export carries the source address and the minute the sheet was read, so a table pasted into a document stays checkable. Printing drops the tab bar and the dark theme rather than putting the screen on paper.",
+          "The three ratings are never averaged together. Every export carries the source address and the minute it was read, so a table pasted into a document stays checkable.",
       },
     ],
   },
+
 
 
 

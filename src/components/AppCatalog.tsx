@@ -30,6 +30,7 @@ import {
   TagIcon,
   VoiceMemoIcon,
   WalletIcon,
+  WatchPartyIcon,
 } from "@/components/SketchNotes/atoms/icons";
 
 /**
@@ -584,6 +585,13 @@ export const APPS: AppEntry[] = [
     tagline: "Music & live from YouTube",
     icon: StreamsGlyph,
     hue: "--app-streams",
+  },
+  {
+    id: "watchparty",
+    name: "Watch Party",
+    tagline: "Watch & listen together",
+    icon: <WatchPartyIcon size={24} />,
+    hue: "--app-watchparty",
   },
   {
     id: "world",

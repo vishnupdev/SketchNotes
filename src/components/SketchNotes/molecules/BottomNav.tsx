@@ -12,6 +12,8 @@ export interface BottomNavItem<T extends string> {
   hint?: string;
   /** Id of the panel this tab controls, for `aria-controls`. */
   controls?: string;
+  /** Unseen items behind this tab (e.g. new chat messages). Hidden while the tab is open. */
+  badge?: number;
 }
 
 interface BottomNavProps<T extends string> {
@@ -66,8 +68,10 @@ export function BottomNav<T extends string>({
         bottom: "calc(var(--footer-h) + 0.625rem)",
       }}
     >
-      {items.map(({ id, label: itemLabel, icon, hint, controls }) => {
+      {items.map(({ id, label: itemLabel, icon, hint, controls, badge }) => {
         const active = id === value;
+        // A count only means something on a tab you are not looking at.
+        const count = !active && badge ? badge : 0;
         return (
           <button
             key={id}
@@ -75,13 +79,14 @@ export function BottomNav<T extends string>({
             role="tab"
             aria-selected={active}
             aria-controls={controls}
+            aria-label={count ? `${itemLabel}, ${count} new` : undefined}
             title={hint ?? itemLabel}
             onClick={() => onChange(id)}
             className="group flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-[20px] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <span
               className={cx(
-                "grid size-11 flex-none place-items-center rounded-full",
+                "relative grid size-11 flex-none place-items-center rounded-full",
                 active
                   ? "-translate-y-5 bg-accent text-on-accent shadow-(--nav-glow) ring-4 ring-paper"
                   : "text-ink-soft group-hover:text-accent",
@@ -93,6 +98,14 @@ export function BottomNav<T extends string>({
               <span data-nav-tab={active ? "on" : undefined} className="grid place-items-center">
                 {icon}
               </span>
+              {count > 0 && (
+                <span
+                  aria-hidden
+                  className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[9.5px] font-bold leading-none text-on-accent ring-2 ring-paper"
+                >
+                  {count > 99 ? "99+" : count}
+                </span>
+              )}
             </span>
             <span
               className={cx(

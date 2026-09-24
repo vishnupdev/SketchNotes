@@ -3,6 +3,7 @@
 import { MAX_COMPARE, useSpecsStore } from "@/store/useSpecsStore";
 import { ProductRow } from "@/components/Specs/molecules/ProductRow";
 import { PinOffIcon } from "@/components/SketchNotes/atoms/icons";
+import { ShortlistRanking } from "@/components/Specs/organisms/ShortlistRanking";
 
 /**
  * The products you are actually deciding between.
@@ -92,6 +93,8 @@ export function ShortlistPanel() {
           />
         ))}
       </ul>
+
+      <ShortlistRanking />
 
       <p className="text-[11px] leading-snug text-ink-soft">
         Kept in this browser until you remove them — unlike the recents below, nothing drops off

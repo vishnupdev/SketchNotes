@@ -7,9 +7,9 @@ import { BLOB_SINK_LIMIT } from "@/lib/FileDrop/sink";
 import { acceptFrame, newCollector } from "@/lib/qr/frames";
 import { startScanner, type Scanner } from "@/lib/qr/scanner";
 import type { ReachMode } from "@/lib/rtc/peer";
-import { CodeExchange } from "@/components/FileDrop/molecules/CodeExchange";
+import { CodeExchange } from "@/components/SketchNotes/molecules/CodeExchange";
 import { TransferView } from "@/components/FileDrop/molecules/TransferView";
-import { ReachPicker } from "@/components/FileDrop/molecules/ReachPicker";
+import { ReachPicker } from "@/components/SketchNotes/molecules/ReachPicker";
 import { cx, formatBytes } from "@/lib/utils";
 import { CameraIcon, StopIcon } from "@/components/SketchNotes/atoms/icons";
 
