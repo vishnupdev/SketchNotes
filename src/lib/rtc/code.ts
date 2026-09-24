@@ -1,4 +1,5 @@
 import { checksum32, deflateText, fromBase64Url, inflateText, toBase64Url } from "@/lib/pack";
+import { packSdp, unpackSdp } from "./compact-sdp";
 
 /**
  * Connection details as something a person can actually carry across.
@@ -30,15 +31,35 @@ import { checksum32, deflateText, fromBase64Url, inflateText, toBase64Url } from
  */
 
 const PREFIX = "OAD1";
+/** The short form: a data-channel description packed field by field (`./compact-sdp.ts`). */
+const SHORT_PREFIX = "OAD2";
 
-/** Prefix, checksum, payload, end marker. */
-const CODE_RE = /OAD1\.[0-9a-f]{8}\.[A-Za-z0-9_-]+\./;
+/** Prefix, checksum, payload, end marker. Both forms are always readable. */
+const CODE_RE = /OAD[12]\.[0-9a-f]{8}\.[A-Za-z0-9_-]+\./;
 
 /** Turn a description into one pasteable token. */
 export async function encodeCode(description: string): Promise<string> {
   const { data, enc } = await deflateText(description);
   const body = enc + toBase64Url(data);
   return `${PREFIX}.${checksum32(body)}.${body}.`;
+}
+
+/**
+ * The shortest token for a description — about a quarter of `encodeCode`'s
+ * length for a data-channel offer or answer, which is what makes an invite
+ * link short enough to send comfortably and its QR code easy to scan.
+ * Anything the short form can't carry exactly gets the ordinary code instead.
+ */
+export async function encodeShortCode(description: string): Promise<string> {
+  let packed: Uint8Array | null = null;
+  try {
+    packed = packSdp(JSON.parse(description) as { type?: string; sdp?: string });
+  } catch {
+    packed = null;
+  }
+  if (!packed) return encodeCode(description);
+  const body = toBase64Url(packed);
+  return `${SHORT_PREFIX}.${checksum32(body)}.${body}.`;
 }
 
 export class CodeError extends Error {}
@@ -64,15 +85,22 @@ export async function decodeCode(raw: string): Promise<string> {
     // is one of ours and it got cut off", which is a far more useful thing to
     // tell someone.
     throw new CodeError(
-      raw.includes(PREFIX)
+      raw.includes(PREFIX) || raw.includes(SHORT_PREFIX)
         ? "That code is incomplete — copy the whole thing and try again."
         : "That doesn't look like a connection code.",
     );
   }
 
-  const [, hash, body] = token.slice(0, -1).split(".");
+  const [prefix, hash, body] = token.slice(0, -1).split(".");
   if (checksum32(body) !== hash) {
     throw new CodeError("That code is damaged — copy it again and retry.");
+  }
+  if (prefix === SHORT_PREFIX) {
+    try {
+      return JSON.stringify(unpackSdp(fromBase64Url(body)));
+    } catch {
+      throw new CodeError("That code couldn't be unpacked.");
+    }
   }
   const enc = body.slice(0, 1);
   if (enc !== "z" && enc !== "b") throw new CodeError("That code is in a format this can't read.");

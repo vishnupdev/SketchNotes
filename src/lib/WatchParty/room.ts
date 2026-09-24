@@ -1,4 +1,4 @@
-import { decodeCode, encodeCode, inviteLink } from "@/lib/rtc/code";
+import { decodeCode, encodeShortCode, inviteLink } from "@/lib/rtc/code";
 import { createAnswer, createOffer, whenOpen, type Peer, type ReachMode } from "@/lib/rtc/peer";
 import { uid } from "@/lib/utils";
 import { isAudioFile, isMediaFile, parseLink, titleFromName } from "./media";
@@ -286,7 +286,7 @@ export class HostRoom {
         peer.close();
         return;
       }
-      const code = await encodeCode(peer.description);
+      const code = await encodeShortCode(peer.description);
       invite.peer = peer;
       invite.wire = new Wire(channel);
       invite.wire.onMessage = (raw) => {
@@ -990,7 +990,7 @@ export class GuestRoom {
       onUnreachable: () => room.ended(room.me ? "Lost the connection to the host." : unreachable(mode)),
     });
     room.peer = peer;
-    room.replyCode = await encodeCode(peer.description);
+    room.replyCode = await encodeShortCode(peer.description);
     void channel.then(async (ch) => {
       try {
         await whenOpen(ch);

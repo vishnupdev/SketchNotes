@@ -246,12 +246,16 @@ export function Workspace() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reflect app/section changes into the URL (skip the first pass so a deep
-  // link isn't overwritten before init adopts it).
+  // Reflect app/section changes into the URL — but only once init has adopted
+  // the URL's own app, so a deep link isn't overwritten first. Checked against
+  // the URL rather than counted as "skip one pass": dev mode runs every effect
+  // twice, and a counted skip let the second run push "/" over the deep link,
+  // taking its #fragment (an invite) with it.
   useEffect(() => {
     if (!appSynced.current) {
+      if (activeApp !== parsePath(window.location.pathname).app) return;
       appSynced.current = true;
-      return;
+      return; // the URL is where init found it
     }
     setUrl(pathForApp(activeApp, pdfTool));
   }, [activeApp, pdfTool, setUrl]);
