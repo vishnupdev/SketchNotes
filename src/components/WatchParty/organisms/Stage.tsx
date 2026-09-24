@@ -237,11 +237,12 @@ export function Stage() {
   return (
     <section
       aria-label="Player"
-      // Pinned only while something plays: an empty stage stuck to the top of a
-      // phone would just push the invite and the queue below the fold.
+      // Pinned only while something plays, just under the app's pinned header:
+      // an empty stage stuck to the top of a phone would just push the invite
+      // and the queue below the fold.
       className={cx(
         "z-20 -mx-5 border-b border-border bg-paper px-5 pb-1.5 pt-3 min-[1024px]:mx-0 min-[1024px]:border-b-0 min-[1024px]:px-0 min-[1024px]:pt-5",
-        item ? "sticky top-0" : "relative",
+        item ? "sticky top-(--party-header-h,0px)" : "relative",
       )}
     >
       {/* Capped by the viewport's height as well as the column's width. Stacked

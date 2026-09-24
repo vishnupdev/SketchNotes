@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
 import { PARTY_TABS, useWatchPartyStore, type PartyTab } from "@/store/useWatchPartyStore";
 import { Lobby } from "@/components/WatchParty/organisms/Lobby";
@@ -108,19 +108,36 @@ export function WatchPartyApp() {
     };
   }, []);
 
+  // The header can wrap onto two lines on a narrow screen, so its height is
+  // measured rather than assumed; the pinned player sits right under it.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const header = headerRef.current;
+    const root = rootRef.current;
+    if (!header || !root) return;
+    const update = () => root.style.setProperty("--party-header-h", `${header.offsetHeight}px`);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
+
   const inRoom = phase === "room";
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div ref={rootRef} className="flex min-h-full flex-col">
+      {/* Pinned in every phase. In a room the player pins itself just below it,
+          at the header's measured height (--party-header-h). */}
       <header
-        className={cx(
-          "border-b border-border bg-paper px-[22px] pb-[18px] pt-[22px]",
-          !inRoom && "sticky top-0 z-20",
-        )}
+        ref={headerRef}
+        className="sticky top-0 z-30 border-b border-border bg-paper px-4 py-3 min-[640px]:px-5.5 min-[640px]:pb-4.5 min-[640px]:pt-5.5"
       >
+        {/* One line at every width — pinned, a second line would cost a phone
+            the room it needs for the player and the tabs. */}
         <div
           className={cx(
-            "mx-auto flex flex-wrap items-end justify-between gap-4",
+            "mx-auto flex items-center justify-between gap-3 min-[640px]:items-end min-[640px]:gap-4",
             inRoom ? "max-w-[1200px]" : "max-w-[680px]",
           )}
         >
@@ -134,7 +151,8 @@ export function WatchPartyApp() {
                   <span aria-hidden>·</span>
                   <span className="flex-none">
                     {count} {count === 1 ? "person" : "people"}
-                    {role === "host" ? " · you're hosting" : ""}
+                    {/* Dropped on the narrowest phones, so the room's name keeps its room. */}
+                    {role === "host" && <span className="max-[399px]:hidden"> · you&apos;re hosting</span>}
                   </span>
                 </span>
               ) : (
@@ -146,10 +164,11 @@ export function WatchPartyApp() {
             type="button"
             onClick={openLauncher}
             title="Switch app"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-panel px-3.5 py-2 font-mono text-[11px] uppercase tracking-[.1em] hover:border-accent hover:text-accent"
+            className="inline-flex min-h-10 min-w-10 flex-none items-center justify-center gap-2 rounded-full border border-border bg-panel px-2.5 py-2 font-mono text-[11px] uppercase tracking-[.1em] hover:border-accent hover:text-accent min-[480px]:px-3.5"
           >
             <AppsIcon size={15} />
-            Apps
+            {/* Icon-only on a phone; still the button's name for a screen reader. */}
+            <span className="max-[479px]:sr-only">Apps</span>
           </button>
         </div>
       </header>
