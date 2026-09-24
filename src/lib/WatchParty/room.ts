@@ -1,4 +1,5 @@
 import { decodeCode, encodeShortCode, shortInviteLink } from "@/lib/rtc/code";
+import { listenForReply, postReply, relayKeyFor, type RelayListener } from "./relay";
 import { createAnswer, createOffer, whenOpen, type Peer, type ReachMode } from "@/lib/rtc/peer";
 import { uid } from "@/lib/utils";
 import { isAudioFile, isMediaFile, parseLink, titleFromName } from "./media";
@@ -111,7 +112,12 @@ export interface InviteView {
   code: string;
   link: string;
   mode: ReachMode;
-  status: "creating" | "waiting" | "connecting" | "failed";
+  /** `asking`: their reply came in through the relay and waits for the host's yes. */
+  status: "creating" | "waiting" | "asking" | "connecting" | "failed";
+  /** Replies to this invite arrive by themselves (see `relay.ts`). */
+  auto: boolean;
+  /** Who is asking to join, and the reply that lets them in. */
+  asking?: { name: string; code: string };
   error?: string;
 }
 
@@ -144,6 +150,8 @@ interface PendingInvite {
   peer: Peer | null;
   wire: Wire | null;
   timer: number | null;
+  /** Listening on the relay for this invite's reply. */
+  listener: RelayListener | null;
 }
 
 export class HostRoom {
@@ -252,7 +260,14 @@ export class HostRoom {
     if (!invite) return;
     if (invite.timer != null) window.clearTimeout(invite.timer);
     invite.timer = null;
-    this.patchInvite(id, { status: "failed", error });
+    this.stopListening(invite);
+    this.patchInvite(id, { status: "failed", error, asking: undefined });
+  }
+
+  /** The relay's job for an invite ends the moment a reply is in hand. */
+  private stopListening(invite: PendingInvite): void {
+    invite.listener?.close();
+    invite.listener = null;
   }
 
   get seatsLeft(): number {
@@ -267,10 +282,11 @@ export class HostRoom {
     }
     const id = uid();
     const invite: PendingInvite = {
-      view: { id, code: "", link: "", mode, status: "creating" },
+      view: { id, code: "", link: "", mode, status: "creating", auto: false },
       peer: null,
       wire: null,
       timer: null,
+      listener: null,
     };
     this.invites.set(id, invite);
     this.emitInvites();
@@ -293,14 +309,36 @@ export class HostRoom {
         const message = parseGuest(raw);
         if (message?.t === "hello") this.admit(id, message.name);
       };
+      // "Anywhere" invites also listen on the relay, so the reply comes back by
+      // itself; "This network only" keeps its promise and contacts nothing.
+      const relay = mode === "internet" ? await relayKeyFor(peer.description) : null;
+      if (relay && this.invites.has(id)) {
+        invite.listener = listenForReply(relay, (reply) => {
+          const current = this.invites.get(id);
+          if (!current || current.view.status !== "waiting") return;
+          this.stopListening(current);
+          this.patchInvite(id, {
+            status: "asking",
+            asking: { name: cleanName(reply.name) || "Someone", code: reply.code },
+            error: undefined,
+          });
+        });
+      }
       this.patchInvite(id, {
         code,
         link: shortInviteLink(window.location.origin, "/watchparty", code),
         status: "waiting",
+        auto: !!relay,
       });
     } catch {
       this.failInvite(id, "This browser couldn't make an invite.");
     }
+  }
+
+  /** Let in whoever asked through the relay. */
+  async letIn(id: string): Promise<void> {
+    const asking = this.invites.get(id)?.view.asking;
+    if (asking) await this.acceptReply(id, asking.code);
   }
 
   /** The guest's reply, pasted or scanned back in. */
@@ -322,6 +360,7 @@ export class HostRoom {
       });
       return;
     }
+    this.stopListening(invite);
     this.patchInvite(id, { status: "connecting", error: undefined });
     invite.timer = window.setTimeout(
       () =>
@@ -337,6 +376,7 @@ export class HostRoom {
     const invite = this.invites.get(id);
     if (!invite) return;
     if (invite.timer != null) window.clearTimeout(invite.timer);
+    this.stopListening(invite);
     invite.peer?.close();
     this.invites.delete(id);
     this.emitInvites();
@@ -346,6 +386,7 @@ export class HostRoom {
     const invite = this.invites.get(inviteId);
     if (!invite?.peer || !invite.wire) return;
     if (invite.timer != null) window.clearTimeout(invite.timer);
+    this.stopListening(invite);
     this.invites.delete(inviteId);
     this.emitInvites();
 
@@ -928,6 +969,7 @@ export class HostRoom {
     this.guests.clear();
     for (const invite of this.invites.values()) {
       if (invite.timer != null) window.clearTimeout(invite.timer);
+      this.stopListening(invite);
       invite.peer?.close();
     }
     this.invites.clear();
@@ -958,6 +1000,8 @@ export interface GuestEvents {
 
 export class GuestRoom {
   replyCode = "";
+  /** Whether the reply reached the host's relay; false means "send it by hand". */
+  relayed: Promise<boolean> = Promise.resolve(false);
   me: string | null = null;
   private peer: Peer | null = null;
   private wire: Wire | null = null;
@@ -991,6 +1035,14 @@ export class GuestRoom {
     });
     room.peer = peer;
     room.replyCode = await encodeShortCode(peer.description);
+    // An "Anywhere" invite takes its reply back through the relay; if no relay
+    // can be reached, the guest is shown the reply to send by hand instead.
+    room.relayed =
+      mode === "internet"
+        ? relayKeyFor(offer)
+            .then((relay) => (relay ? postReply(relay, { name, code: room.replyCode }) : false))
+            .catch(() => false)
+        : Promise.resolve(false);
     void channel.then(async (ch) => {
       try {
         await whenOpen(ch);

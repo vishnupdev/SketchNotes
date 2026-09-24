@@ -674,9 +674,9 @@ export const TOURS: Record<AppId, Tour> = {
         at: "tab:3",
         title: "One invite per guest",
         direction:
-          "A room opens with its first invite ready in People: tap Share to send it, and when the reply comes back, paste it — they join by themselves.",
+          "A room opens with its first invite ready in People: tap Share to send it. When they tap Join, the card asks you to let them in — one tap, nothing to copy back.",
         suggestion:
-          "An invite lets in one person, so tap Invite another person for each friend. Connection options switches to “this Wi-Fi only”, which works with no internet at all.",
+          "An invite lets in one person, so tap Invite another person for each friend. Connection options switches to “this Wi-Fi only”, which works with no internet at all — there the guest sends a reply back for you to paste.",
       },
       {
         at: "tab:1",

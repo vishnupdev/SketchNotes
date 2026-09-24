@@ -260,40 +260,70 @@ export function Lobby() {
       <details className="rounded-2xl border border-border bg-panel p-4 text-[12.5px] leading-relaxed text-ink-soft">
         <summary className="cursor-pointer text-[13px] font-semibold text-text">How does it work?</summary>
         <ol className="mt-2 flex list-decimal flex-col gap-1.5 pl-5">
-          <li>The host starts a room and shares an invite with each friend.</li>
-          <li>The friend opens it, taps Join, and sends back the reply they get.</li>
-          <li>The host pastes the reply — and they&apos;re watching together.</li>
+          <li>The host starts a room and shares an invite link with each friend.</li>
+          <li>The friend opens it and taps Join.</li>
+          <li>The host taps Let them in — and they&apos;re watching together.</li>
         </ol>
         <p className="mt-2">
-          There&apos;s no account and no server in the middle: devices connect straight to each other. The room
-          lasts while the host keeps this tab open. A few network pairs (usually two mobile carriers) can&apos;t
-          connect directly — being on the same Wi-Fi always works.
+          There&apos;s no account, and the film, voices and chat go straight from device to device. To knock
+          without a second message, the friend&apos;s reply passes once through a public relay, locked with a key
+          that only exists in the invite link — the relay can&apos;t read it. &ldquo;This network only&rdquo;
+          skips the relay: there the friend sends their reply back by hand. The room lasts while the host keeps
+          this tab open. A few network pairs (usually two mobile carriers) can&apos;t connect directly — being on
+          the same Wi-Fi always works.
         </p>
       </details>
     </div>
   );
 }
 
-/** A guest who has opened an invite, waiting for the host to paste the reply. */
+/**
+ * A guest who has opened an invite and tapped Join. With the relay there is
+ * nothing to do but wait for the host's yes — the reply is still here, folded
+ * away, in case it never arrives. Without one (this network only, or no relay
+ * reachable), the reply is the whole next step and is shown in full.
+ */
 function JoinWaiting() {
   const reply = useWatchPartyStore((s) => s.reply);
+  const relay = useWatchPartyStore((s) => s.relay);
   const joinStatus = useWatchPartyStore((s) => s.joinStatus);
   const name = useWatchPartyStore((s) => s.name);
   const cancelJoin = useWatchPartyStore((s) => s.cancelJoin);
+  const auto = relay !== "off";
+
+  const exchange = reply ? (
+    <CodeExchange
+      code={reply}
+      title="Send this reply back to the host"
+      hint={
+        auto
+          ? "Only if the host says nothing arrived: send this in the chat the invite came from, and they paste it."
+          : "Reply in the same chat the invite came from — tap Share, or paste it there (it's already copied if your browser allowed it). You'll join by yourself as soon as they add it."
+      }
+      message={`Here's my reply for Watch Party — paste it into my invite: ${reply}`}
+      autoCopy={!auto}
+    />
+  ) : null;
 
   return (
     <div className="flex flex-col gap-4 pb-8">
       <h2 className="text-[20px] font-bold leading-tight">Almost there</h2>
-      <Steps steps={["Open invite", "Send your reply", "Watch"]} current={reply ? 1 : 0} />
-      {reply ? (
-        <CodeExchange
-          code={reply}
-          title="Send this reply back to the host"
-          hint="Reply in the same chat the invite came from — tap Share, or paste it there (it's already copied if your browser allowed it). You'll join by yourself as soon as they add it."
-          message={`Here's my reply for Watch Party — paste it into my invite: ${reply}`}
-          autoCopy
-        />
-      ) : null}
+      <Steps
+        steps={auto ? ["Open invite", "Host lets you in", "Watch"] : ["Open invite", "Send your reply", "Watch"]}
+        current={reply ? 1 : 0}
+      />
+      {auto ? (
+        exchange && (
+          <details className="rounded-2xl border border-border bg-panel p-3.5">
+            <summary className="cursor-pointer text-[12.5px] font-semibold text-ink-soft">
+              Host not seeing you? Send your reply by hand
+            </summary>
+            <div className="mt-3">{exchange}</div>
+          </details>
+        )
+      ) : (
+        exchange
+      )}
       <p role="status" className="flex items-center gap-2 text-[13px] font-semibold text-accent">
         <span aria-hidden className="size-2 animate-pulse rounded-full bg-accent motion-reduce:animate-none" />
         {joinStatus}

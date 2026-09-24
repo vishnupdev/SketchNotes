@@ -83,7 +83,7 @@ export const APPS: AppEntry[] = [
     path: "/watchparty",
     name: "Watch Party",
     blurb:
-      "watch movies and listen to music together online — invite up to seven friends by link or QR, and every screen plays the same moment of a YouTube video, a media link, the host's own file or a shared screen, with chat, floating reactions, voice chat, shared subtitles, a shared queue and vote to skip; no sign-up and no server in between",
+      "watch movies and listen to music together online — invite up to seven friends by link or QR, and every screen plays the same moment of a YouTube video, a media link, the host's own file or a shared screen, with chat, floating reactions, voice chat, shared subtitles, a shared queue and vote to skip; no sign-up, and what you watch goes straight between devices",
   },
   {
     path: "/worldclock",

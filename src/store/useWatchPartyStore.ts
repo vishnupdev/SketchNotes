@@ -112,6 +112,12 @@ interface PartyState {
   invites: InviteView[];
   /** The guest's reply code while waiting to be let in. */
   reply: string | null;
+  /**
+   * Guest: how the reply is getting back. `sending`/`sent` — through the relay,
+   * nothing to do; `off` — no relay (this network only, or none reachable), so
+   * the reply is shown to send by hand.
+   */
+  relay: "sending" | "sent" | "off";
   joinStatus: string;
   endedReason: string | null;
   error: string | null;
@@ -155,6 +161,8 @@ interface PartyState {
 
   invite: () => Promise<void>;
   acceptReply: (id: string, code: string) => Promise<void>;
+  /** Let in whoever asked to join through the relay. */
+  letIn: (id: string) => Promise<void>;
   cancelInvite: (id: string) => void;
 
   control: (control: Control) => void;
@@ -219,6 +227,7 @@ const SESSION_RESET = {
   floaters: [],
   invites: [],
   reply: null,
+  relay: "off",
   joinStatus: "",
   offset: 0,
   rtt: null,
@@ -336,7 +345,13 @@ export const useWatchPartyStore = create<PartyState>((set, get) => {
     react: onReact,
     subs: onSubs,
     speaking: (ids) => set({ speaking: ids }),
-    invites: (invites) => set({ invites }),
+    invites: (invites) => {
+      // Someone asking to join is worth hearing about from any tab.
+      const before = new Set(get().invites.filter((i) => i.status === "asking").map((i) => i.id));
+      const asked = invites.find((i) => i.status === "asking" && !before.has(i.id));
+      set({ invites });
+      if (asked?.asking && get().tab !== "people") notify(`${asked.asking.name} wants to join — open People to let them in.`);
+    },
     voices: (voices) => set({ voices }),
     screen: (screen) => set({ screen }),
     notice: notify,
@@ -431,7 +446,14 @@ export const useWatchPartyStore = create<PartyState>((set, get) => {
       try {
         const room = await GuestRoom.open(invite, name, guestEvents());
         guest = room;
-        set({ reply: room.replyCode, joinStatus: "Waiting for the host to let you in…" });
+        set({ reply: room.replyCode, relay: "sending", joinStatus: "Asking the host to let you in…" });
+        const relayed = await room.relayed;
+        if (guest !== room || get().phase !== "joining") return;
+        set(
+          relayed
+            ? { relay: "sent", joinStatus: "Waiting for the host to let you in…" }
+            : { relay: "off", joinStatus: "Waiting for your reply to reach the host…" },
+        );
       } catch (error) {
         guest = null;
         set({ phase: "lobby", error: (error as Error).message || "That invite couldn't be opened." });
@@ -460,6 +482,10 @@ export const useWatchPartyStore = create<PartyState>((set, get) => {
     acceptReply: async (id, code) => {
       host?.resumeAudio();
       await host?.acceptReply(id, code);
+    },
+    letIn: async (id) => {
+      host?.resumeAudio();
+      await host?.letIn(id);
     },
     cancelInvite: (id) => host?.cancelInvite(id),
 

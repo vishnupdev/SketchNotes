@@ -27,6 +27,7 @@ export function PeoplePanel() {
   const micBusy = useWatchPartyStore((s) => s.micBusy);
   const invite = useWatchPartyStore((s) => s.invite);
   const acceptReply = useWatchPartyStore((s) => s.acceptReply);
+  const letIn = useWatchPartyStore((s) => s.letIn);
   const cancelInvite = useWatchPartyStore((s) => s.cancelInvite);
   const setPrefs = useWatchPartyStore((s) => s.setPrefs);
   const setSettings = useWatchPartyStore((s) => s.setSettings);
@@ -52,7 +53,9 @@ export function PeoplePanel() {
               Invite people
             </h2>
             <p className="mt-0.5 text-[12.5px] leading-relaxed text-ink-soft">
-              Share an invite with each person. They send a reply back, you paste it, and they&apos;re in.
+              {prefs.reach === "local"
+                ? "Share an invite with each person. They send a reply back, you paste it, and they're in."
+                : "Share an invite with each person. When they tap Join, you'll be asked to let them in — nothing to copy back."}
             </p>
           </div>
           <details className="rounded-xl border border-border bg-paper px-3 py-2 text-[12.5px]">
@@ -66,6 +69,11 @@ export function PeoplePanel() {
                 legend="Where are your guests? (applies to new invites)"
                 what="what you watch or say"
               />
+              <p className="mt-2 text-[12px] leading-relaxed text-ink-soft">
+                {prefs.reach === "local"
+                  ? "This Wi-Fi only contacts nothing outside it, so each guest sends their reply back by hand."
+                  : "Anywhere also lets a guest's reply come back by itself: it passes once through a public relay, locked with a key that exists only in the invite link, so the relay can't read it."}
+              </p>
             </div>
           </details>
           <button
@@ -88,6 +96,7 @@ export function PeoplePanel() {
               roomName={room.name}
               hostName={room.members.find((m) => m.host)?.name ?? "Your friend"}
               onReply={(code) => void acceptReply(inv.id, code)}
+              onLetIn={() => void letIn(inv.id)}
               onCancel={() => cancelInvite(inv.id)}
               onRetry={() => {
                 cancelInvite(inv.id);
