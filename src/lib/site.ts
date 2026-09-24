@@ -107,6 +107,18 @@ export const APPS: AppEntry[] = [
       "measure sound frequency, musical pitch and loudness from your microphone, with a live spectrum analyzer",
   },
   {
+    path: "/breathe",
+    name: "Breathe",
+    blurb:
+      "a guided breathing exercise led by an animated orb that swells as you breathe in and shrinks as you breathe out — box breathing, 4-7-8, coherent breathing, a long exhale, the double sigh or your own pattern, with rising and falling tones, phone vibration, timed sessions that end on an exhale, and a daily streak, all offline",
+  },
+  {
+    path: "/metronome",
+    name: "Metronome",
+    blurb:
+      "an online metronome that keeps sample-accurate time — 20 to 300 BPM with tap tempo, 2/4 to 12/8 with per-beat accents, eighth, triplet and sixteenth subdivisions, a speed trainer that ramps the tempo up bar by bar, silent bars to test your own time, and saved song tempos, all offline",
+  },
+  {
     path: "/color",
     name: "Color Lens",
     blurb:
@@ -318,6 +330,16 @@ export const SITE_KEYWORDS = [
   "frequency measurement online",
   "hz meter",
   "online tuner",
+  "online metronome",
+  "tap tempo",
+  "bpm counter",
+  "metronome with accents",
+  "speed trainer metronome",
+  "breathing exercise online",
+  "box breathing timer",
+  "4-7-8 breathing",
+  "guided breathing app",
+  "breathing bubble",
   "pitch detector",
   "spectrum analyzer online",
   "decibel meter",

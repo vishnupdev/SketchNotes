@@ -182,6 +182,8 @@
   --app-specs: #7b2d4e;
   --app-latest: #a21caf;
   --app-detect: #5c6b16;
+  --app-metronome: #8c2f39;
+  --app-breathe: #2f6f9f;
 
   /* QR codes are read by a camera, not by a person, so these two are the one
      pair in the workspace that does *not* follow the theme: a scanner expects
@@ -284,6 +286,8 @@
   --app-specs: #eb9ab8;
   --app-latest: #f5b8ff;
   --app-detect: #cfd977;
+  --app-metronome: #f4a3ab;
+  --app-breathe: #8cc8f0;
   --board-note: #fbbf24;
   --board-checklist: #4d94ff;
   --board-counter: #1fb89f;
@@ -1565,6 +1569,215 @@ svg {
 @keyframes app-intro-fade {
   from {
     opacity: 0;
+  }
+}
+
+/*
+ * Breathe — the orb.
+ *
+ * One number drives the whole stage: `--level`, how full the lungs are (0
+ * empty, 1 full, a little over 1 on a sigh's top-up). During a session the
+ * orb's animation loop writes it once per frame, with `--p` (progress through
+ * the phase) and `--spin`; every layer below is a pure function of those, so
+ * there is no second animation to fall out of step with the breath. At rest it
+ * is registered as a real number, which is what lets the idle pulse be a plain
+ * CSS keyframe rather than JavaScript.
+ *
+ * Only transform and opacity move, and the stage is a size container so the
+ * particles are placed in `cqw` rather than measured in pixels by script.
+ * Colour is mixed from tokens — the orb goes from the app's own hue when empty
+ * to the accent when full — so it breathes in every one of the palettes.
+ */
+@property --level {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.35;
+}
+.breathe-stage {
+  --p: 0;
+  --spin: 0;
+  --orb: color-mix(in oklab, var(--accent) calc(min(var(--level), 1) * 100%), var(--app-breathe));
+  position: relative;
+  aspect-ratio: 1;
+  container-type: inline-size;
+  isolation: isolate;
+}
+.breathe-stage[data-state="idle"] {
+  animation: breathe-idle 7s ease-in-out infinite;
+}
+.breathe-stage[data-state="done"] {
+  animation: breathe-settle 1.4s ease-out both;
+}
+.breathe-aura {
+  position: absolute;
+  inset: 4%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in oklab, var(--orb) 60%, transparent), transparent 68%);
+  filter: blur(14px);
+  opacity: calc(0.3 + var(--level) * 0.55);
+  transform: scale(calc(0.72 + var(--level) * 0.4));
+}
+.breathe-ring {
+  position: absolute;
+  inset: 7%;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in oklab, var(--orb) 65%, transparent);
+  opacity: calc((0.55 - var(--i) * 0.15) * (0.35 + var(--level) * 0.65));
+  transform: scale(calc(0.44 + var(--level) * 0.44 + var(--i) * 0.07 * (0.4 + var(--level))));
+}
+.breathe-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.7cqw;
+  height: 1.7cqw;
+  margin: -0.85cqw;
+  border-radius: 50%;
+  background: var(--orb);
+  opacity: calc(0.2 + var(--level) * 0.6);
+  transform: rotate(calc(var(--a) * 1deg + var(--spin) * var(--dir) * 1deg))
+    translateY(calc((21cqw + var(--level) * 19cqw + var(--j) * 3.5cqw) * -1))
+    scale(calc(0.55 + var(--level) * 0.6));
+}
+.breathe-orb {
+  position: absolute;
+  inset: 7%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 28%,
+    color-mix(in oklab, var(--orb) 50%, var(--paper)) 0%,
+    var(--orb) 48%,
+    color-mix(in oklab, var(--orb) 72%, var(--text)) 100%
+  );
+  box-shadow:
+    inset 0 -1.5cqw 5cqw color-mix(in oklab, var(--text) 18%, transparent),
+    0 2cqw 7cqw -2cqw color-mix(in oklab, var(--orb) 55%, transparent);
+  transform: scale(calc(0.44 + var(--level) * 0.44));
+  will-change: transform;
+}
+.breathe-sweep {
+  stroke: var(--orb);
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--p));
+}
+.breathe-label {
+  animation: breathe-label 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.breathe-bloom {
+  position: absolute;
+  inset: 7%;
+  border-radius: 50%;
+  border: 2px solid var(--orb);
+  opacity: 0;
+  animation: breathe-bloom 2.6s cubic-bezier(0.1, 0.7, 0.3, 1) both;
+  animation-delay: calc(var(--i) * 0.45s);
+}
+.breathe-check path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: breathe-draw 0.7s 0.35s cubic-bezier(0.6, 0, 0.2, 1) forwards;
+}
+.breathe-bar {
+  transform-origin: bottom;
+  animation: breathe-grow 0.8s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 40ms);
+}
+.breathe-rise {
+  animation: breathe-label 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+/* The pattern card's rider: a dot travelling the pattern's own level curve,
+   once a cycle, at the pattern's real speed. */
+.breathe-rider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  offset-rotate: 0deg;
+  animation: breathe-ride var(--cycle) linear infinite;
+}
+@keyframes breathe-idle {
+  0%,
+  100% {
+    --level: 0.3;
+  }
+  50% {
+    --level: 0.62;
+  }
+}
+@keyframes breathe-settle {
+  from {
+    --level: 0.9;
+  }
+  to {
+    --level: 0.5;
+  }
+}
+@keyframes breathe-label {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.96);
+    filter: blur(3px);
+  }
+}
+@keyframes breathe-bloom {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+@keyframes breathe-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes breathe-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes breathe-ride {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Nothing grows, orbits or blooms. What remains carries all the meaning:
+     the words, the countdown, the ring that fills through each phase, and the
+     orb's colour turning from its own hue to the accent as the lungs fill. */
+  .breathe-stage,
+  .breathe-label,
+  .breathe-bar,
+  .breathe-rise,
+  .breathe-rider {
+    animation: none !important;
+  }
+  .breathe-ring,
+  .breathe-dot,
+  .breathe-bloom,
+  .breathe-aura,
+  .breathe-rider {
+    display: none;
+  }
+  .breathe-orb {
+    transform: scale(0.7);
+  }
+  .breathe-check path {
+    animation: none;
+    stroke-dashoffset: 0;
   }
 }
 

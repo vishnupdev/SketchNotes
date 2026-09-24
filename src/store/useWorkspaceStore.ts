@@ -57,7 +57,9 @@ export type AppId =
   | "ocr"
   | "specs"
   | "latest"
-  | "detect";
+  | "detect"
+  | "metronome"
+  | "breathe";
 
 /** Canonical app list — also the default launcher order for a fresh visitor. */
 const ALL_APPS: AppId[] = [
@@ -71,6 +73,9 @@ const ALL_APPS: AppId[] = [
   "todos",
   "reminders",
   "timer",
+  // Breathe sits by Timer: both are paced by a clock, and one is a timer you
+  // follow with your lungs instead of watching.
+  "breathe",
   "wallet",
   "vault",
   "scan",
@@ -103,6 +108,9 @@ const ALL_APPS: AppId[] = [
   "translate",
   "morse",
   "sound",
+  // Metronome follows the Sound Meter: one listens to pitch, the other keeps
+  // time — the two things a musician opens the workspace for.
+  "metronome",
   "color",
   "qr",
   "qrfiles",

@@ -75,6 +75,8 @@ const OcrApp = dynamic(APP_LOADERS.ocr, { ssr: false });
 const SpecsApp = dynamic(APP_LOADERS.specs, { ssr: false });
 const LatestApp = dynamic(APP_LOADERS.latest, { ssr: false });
 const DetectApp = dynamic(APP_LOADERS.detect, { ssr: false });
+const MetronomeApp = dynamic(APP_LOADERS.metronome, { ssr: false });
+const BreatheApp = dynamic(APP_LOADERS.breathe, { ssr: false });
 
 /**
  * Every app's deep-link path — the one place a route is declared, read in both
@@ -135,6 +137,8 @@ const APP_PATHS: Record<AppId, string> = {
   specs: "/specs",
   latest: "/latest",
   detect: "/detect",
+  metronome: "/metronome",
+  breathe: "/breathe",
 };
 
 const PDF_BASE = APP_PATHS.pdf;
@@ -471,6 +475,18 @@ export function Workspace() {
 
       <AppFrame active={activeApp === "cards"} name="Cards">
         <CardsApp />
+      </AppFrame>
+
+      {/* Metronome. Unmounting stops the click and closes its audio device, so
+          it never follows anyone into another app. */}
+      <AppFrame active={activeApp === "metronome"} name="Metronome">
+        <MetronomeApp />
+      </AppFrame>
+
+      {/* Breathe. Unmounting logs a session in progress, silences its tones
+          and lets go of the screen wake lock. */}
+      <AppFrame active={activeApp === "breathe"} name="Breathe">
+        <BreatheApp />
       </AppFrame>
 
       <AppFrame active={activeApp === "calc"} name="Calc">

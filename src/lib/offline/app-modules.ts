@@ -70,6 +70,8 @@ export const APP_LOADERS: Record<LazyAppId, AppLoader> = {
   specs: () => import("@/components/Specs/SpecsApp").then((m) => m.SpecsApp),
   latest: () => import("@/components/Latest/LatestApp").then((m) => m.LatestApp),
   detect: () => import("@/components/Detect/DetectApp").then((m) => m.DetectApp),
+  metronome: () => import("@/components/Metronome/MetronomeApp").then((m) => m.MetronomeApp),
+  breathe: () => import("@/components/Breathe/BreatheApp").then((m) => m.BreatheApp),
 };
 
 /**
@@ -86,6 +88,8 @@ export const WARMUP_ORDER: LazyAppId[] = [
   "walk",
   "morse",
   "sound",
+  "metronome",
+  "breathe",
   "color",
   "qr",
   "qrfiles",
@@ -191,4 +195,6 @@ export const APP_LABELS: Record<LazyAppId, string> = {
   specs: "Spec Analyser",
   latest: "Latest Tech",
   detect: "Detect",
+  metronome: "Metronome",
+  breathe: "Breathe",
 };

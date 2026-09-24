@@ -112,6 +112,25 @@ export class SketchEngine {
   private dpr = 1;
   private crect = { left: 0, top: 0 };
 
+  /*
+   * Off-screen copy of the finished scene, used for the length of one gesture.
+   *
+   * Drawing redraws on every pointer frame, and what it redrew was every element
+   * on the page — so the cost of one stroke grew with everything already drawn:
+   * a 60-move gesture issued 61 path draws on an empty canvas and 2,501 with
+   * forty strokes on screen. Nothing in `els` can change while a pen is down, so
+   * the finished work is painted once here and blitted after that, leaving one
+   * path draw per frame no matter how full the page is.
+   *
+   * The canvas is kept between gestures rather than reallocated per stroke: it
+   * is a third full-size surface (the grid layer is the second), which is worth
+   * more than the garbage a per-stroke allocation would make of it.
+   */
+  private layerCv: HTMLCanvasElement | null = null;
+  private layerCtx: CanvasRenderingContext2D | null = null;
+  /** Whether `layerCv` matches the current elements, view and theme. */
+  private layerOn = false;
+
   // Pointer interaction state
   private pointers = new Map<number, Point>();
   private mode: PointerMode = null;
@@ -471,7 +490,16 @@ export class SketchEngine {
     drawGrid(this.bctx, this.view, this.W, this.H, this.dpr, this.dark);
   }
 
+  /**
+   * Repaint everything, from the elements themselves.
+   *
+   * This is the only redraw the rest of the engine calls, and it drops the
+   * gesture layer on the way through. That is what makes the layer safe: it is
+   * built from live state and thrown away by every path that could have changed
+   * that state, so the worst a missed invalidation can do is cost a rebuild.
+   */
   private drawAll(): void {
+    this.layerOn = false;
     const { ctx, dpr, view } = this;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, this.W, this.H);
@@ -482,6 +510,71 @@ export class SketchEngine {
       if (el === this.editingEl) continue;
       drawEl(ctx, el, this.dark);
     }
+    if (this.cur) drawEl(ctx, this.cur, this.dark);
+    if (this.sel && this.els.includes(this.sel)) this.drawSelBox();
+  }
+
+  /**
+   * Paint the finished scene into the off-screen layer.
+   *
+   * Reads the same state `drawAll` does, at the same device scale, so the blit
+   * lands pixel-for-pixel where the direct draw would have.
+   */
+  private buildLayer(): boolean {
+    const w = this.cv.width;
+    const h = this.cv.height;
+    if (w === 0 || h === 0) return false;
+
+    if (!this.layerCv) {
+      this.layerCv = document.createElement("canvas");
+      this.layerCtx = this.layerCv.getContext("2d");
+    }
+    const lctx = this.layerCtx;
+    if (!lctx) return false;
+    if (this.layerCv.width !== w || this.layerCv.height !== h) {
+      this.layerCv.width = w;
+      this.layerCv.height = h;
+    }
+
+    const { dpr, view } = this;
+    lctx.setTransform(1, 0, 0, 1, 0, 0);
+    lctx.clearRect(0, 0, w, h);
+    lctx.setTransform(view.s * dpr, 0, 0, view.s * dpr, view.x * dpr, view.y * dpr);
+    lctx.lineCap = "round";
+    lctx.lineJoin = "round";
+    for (const el of this.els) {
+      if (el === this.editingEl) continue;
+      drawEl(lctx, el, this.dark);
+    }
+    this.layerOn = true;
+    return true;
+  }
+
+  /**
+   * Repaint while a stroke is being drawn: the layer, then the stroke.
+   *
+   * Only the drawing gesture uses this, and only because the element it is
+   * changing — `cur` — belongs on top of everything until the pen lifts. That
+   * makes the result identical to `drawAll`, not merely close to it.
+   *
+   * Falls back to the full redraw if the layer cannot be had.
+   */
+  private drawGesture(): void {
+    if (!this.layerOn) this.buildLayer();
+    const layer = this.layerCv;
+    if (!this.layerOn || !layer) {
+      this.drawAll();
+      return;
+    }
+
+    const { ctx, dpr, view } = this;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.cv.width, this.cv.height);
+    ctx.drawImage(layer, 0, 0);
+
+    ctx.setTransform(view.s * dpr, 0, 0, view.s * dpr, view.x * dpr, view.y * dpr);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
     if (this.cur) drawEl(ctx, this.cur, this.dark);
     if (this.sel && this.els.includes(this.sel)) this.drawSelBox();
   }
@@ -646,11 +739,14 @@ export class SketchEngine {
           else this.cur.x2 = this.cur.x1;
         }
       }
-      this.drawAll();
+      this.drawGesture();
     } else if (this.mode === "move" && this.sel && this.moveLast) {
       const p = this.toWorld(loc);
       offsetEl(this.sel, p.x - this.moveLast.x, p.y - this.moveLast.y);
       this.moveLast = p;
+      // Deliberately the full redraw: a dragged element has elements above it,
+      // and the layer could only put it back by drawing it last — which lifts it
+      // over them for as long as the drag lasts, then drops it back on release.
       this.drawAll();
     } else if (this.mode === "pan" && this.panStart) {
       this.view.x = this.panStart.vx + (loc.x - this.panStart.x);

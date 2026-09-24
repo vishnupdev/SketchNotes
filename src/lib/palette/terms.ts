@@ -58,6 +58,8 @@ export const APP_SEARCH_TERMS: Record<AppId, string[]> = {
   translate: ["translation", "translator", "language", "offline translate"],
   morse: ["morse", "sos", "telegraph", "dots and dashes", "cw"],
   sound: ["frequency", "hz", "decibel", "tuner", "pitch", "spectrum", "microphone"],
+  metronome: ["metronome", "tempo", "bpm", "beats per minute", "click track", "tap tempo", "time signature", "beat", "rhythm", "speed trainer", "subdivision", "silent bars", "set list"],
+  breathe: ["breathe", "breathing", "breathing exercise", "box breathing", "4-7-8", "478", "calm down", "relax", "relaxation", "meditate", "meditation", "mindfulness", "anxiety", "stress", "sleep", "inhale", "exhale", "coherent breathing", "resonance breathing", "physiological sigh"],
   color: ["colour", "hex", "rgb", "palette", "eyedropper", "contrast", "swatch"],
   qr: ["qr", "qr code", "barcode", "scan", "scanner", "wifi code", "vcard", "contact card"],
   qrfiles: [

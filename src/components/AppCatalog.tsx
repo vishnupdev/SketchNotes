@@ -8,6 +8,7 @@ import type { AppId } from "@/store/useWorkspaceStore";
  */
 import {
   ApiIcon,
+  BreatheIcon,
   CalcIcon,
   CardsIcon,
   ChronoIcon,
@@ -16,6 +17,7 @@ import {
   FileQrIcon,
   KeyIcon,
   MarkdownIcon,
+  MetronomeIcon,
   NewReleaseIcon,
   RecordIcon,
   ScanTextIcon,
@@ -624,6 +626,20 @@ export const APPS: AppEntry[] = [
     tagline: "Pitch, note & loudness",
     icon: SoundGlyph,
     hue: "--app-sound",
+  },
+  {
+    id: "metronome",
+    name: "Metronome",
+    tagline: "Tempo, accents & practice",
+    icon: <MetronomeIcon size={24} />,
+    hue: "--app-metronome",
+  },
+  {
+    id: "breathe",
+    name: "Breathe",
+    tagline: "Guided breathing orb",
+    icon: <BreatheIcon size={24} />,
+    hue: "--app-breathe",
   },
   {
     id: "color",

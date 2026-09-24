@@ -1384,3 +1384,28 @@ export const DetectIcon = (p: IconProps) => (
     <rect x="8" y="8" width="8" height="8" rx="2" />
   </Svg>
 );
+
+/**
+ * A pyramid metronome with its pendulum swung off-centre — the one object
+ * everybody recognises as "keeping time", where a clock would say "telling it".
+ */
+export const MetronomeIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M9 3.4h6l3.9 17.2H5.1Z" />
+    <path d="M6.4 15.2h11.2" />
+    <path d="M12 15.2 16.6 6.4" />
+    <circle cx="15.3" cy="8.9" r="1.2" fill="currentColor" stroke="none" />
+  </Svg>
+);
+
+/**
+ * An orb with the breath around it — two arcs opening outward from a filled
+ * centre, the shape the Breathe app's whole screen is.
+ */
+export const BreatheIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="3.4" fill="currentColor" stroke="none" />
+    <path d="M6.3 8.6a6.6 6.6 0 0 0 0 6.8M17.7 8.6a6.6 6.6 0 0 1 0 6.8" />
+    <path d="M3.4 6.4a10.2 10.2 0 0 0 0 11.2M20.6 6.4a10.2 10.2 0 0 1 0 11.2" />
+  </Svg>
+);

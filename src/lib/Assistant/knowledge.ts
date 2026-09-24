@@ -32,6 +32,8 @@ export const APP_LABELS: Record<AppId, string> = {
   translate: "Translate",
   morse: "Morse Code",
   sound: "Sound Meter",
+  metronome: "Metronome",
+  breathe: "Breathe",
   color: "Color Lens",
   qr: "QR Codes",
   qrfiles: "QR Files",
@@ -152,6 +154,8 @@ export const APP_ALIASES: Record<AppId, string[]> = {
   malayalam: ["malayalam writer", "malayalam", "manglish", "മലയാളം"],
   translate: ["translate", "translator", "translation"],
   morse: ["morse code", "morse", "sos", "dots and dashes", "telegraph", "cw"],
+  metronome: ["metronome", "click track", "tap tempo", "bpm", "tempo trainer", "speed trainer"],
+  breathe: ["breathe", "breathing", "breathing exercise", "box breathing", "breathing app", "4-7-8"],
   sound: [
     "sound meter",
     "sound frequency",
@@ -592,6 +596,8 @@ export const APP_PATHS: Record<AppId, string> = {
   translate: "/translate",
   morse: "/morse",
   sound: "/soundmeter",
+  metronome: "/metronome",
+  breathe: "/breathe",
   color: "/color",
   qr: "/qr",
   qrfiles: "/qrfiles",
@@ -647,6 +653,10 @@ export const APP_SUMMARIES: Record<AppId, string> = {
   translate: "translate text online, or fully offline on-device",
   morse: "learn, practise and send Morse code — chart, drills, translator and a key",
   sound: "measure sound frequency, musical pitch and loudness from the microphone",
+  metronome:
+    "a click that keeps sample-accurate time — tap tempo, any common time signature with per-beat accents and subdivisions, a speed ramp, silent bars and saved songs",
+  breathe:
+    "paced breathing led by an animated orb — box, long exhale, coherent, 4-7-8, double sigh or your own pattern, with rising and falling tones, vibration and a streak",
   color: "read any colour out of a photo — every code, its name, contrast and palette",
   qr: "scan a QR code with the camera or from a picture, and make codes for links, Wi-Fi, contacts and more",
   qrfiles:
@@ -1147,6 +1157,32 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       "• Spectrum and waveform — a live 20 Hz–20 kHz log spectrum (point at a spike to read its frequency) or a time-domain scope\n" +
       "Nothing is recorded, saved or uploaded: audio is analysed frame by frame in the browser and thrown away, and the microphone is released the moment you stop or switch apps. It works fully offline — but it does need microphone permission, and accuracy is limited by your mic.",
     followUps: ["Is my data private?", "What does System Info show?", "List all the apps"],
+  },
+  {
+    id: "app-metronome",
+    title: "Metronome — keep time, then keep it without the click",
+    app: "metronome",
+    keywords: ["metronome", "tempo", "bpm", "beats per minute", "click track", "click", "tap tempo", "time signature", "6/8", "7/8", "accent", "accents", "downbeat", "subdivision", "triplets", "sixteenths", "speed trainer", "tempo ramp", "speed up gradually", "practice tempo", "silent bars", "gap click", "keep time", "rhythm", "set list", "setlist", "song tempo"],
+    answer:
+      "Metronome is a click that keeps real time, plus the two practice modes a mechanical one cannot manage.\n" +
+      "• Beat sets the tempo from 20 to 300 BPM — slider, ±1 and ±5 buttons, or Tap: tap four or more times and it takes the median gap, so one missed tap does not throw it. Pick a time signature (1/4 to 5/4, 6/8, 7/8, 9/8, 12/8) and the accents fall where the metre is felt — 6/8 as two groups of three, 5/4 as 3+2, 7/8 as 2+2+3. Press any beat to step it through strong, medium, soft and silent. Subdivide into eighths, triplets or sixteenths, and choose a click, woodblock or beep\n" +
+      "• Trainer has a speed ramp — from, to, by how much and every how many bars, with how long it takes to arrive — and silent bars, where the click drops out for a few bars but keeps counting, so coming back in on beat one tells you whether the time was yours. Both can run at once\n" +
+      "• Songs keeps a setup under a name — tempo, metre, accents and subdivision — so a set list is one tap per song\n" +
+      "Keys: Space starts and stops, ↑ and ↓ change the tempo by 1 (Shift for 10), T taps. The clicks are booked ahead on the audio hardware's own clock rather than fired by a timer, so a busy page cannot make it drift, and every sound is synthesised, so it works offline from the first visit. It stops the moment you switch apps. For tuning an instrument use the Sound Meter.",
+    followUps: ["What can the Sound Meter do?", "What can the Timer do?", "Which apps need an internet connection?"],
+  },
+  {
+    id: "app-breathe",
+    title: "Breathe — paced breathing, led by an orb",
+    app: "breathe",
+    keywords: ["breathe", "breathing", "breathing exercise", "breath work", "breathwork", "box breathing", "square breathing", "4-7-8", "478", "coherent breathing", "resonance breathing", "physiological sigh", "double sigh", "long exhale", "inhale", "exhale", "calm down", "relax", "relaxation", "stress", "anxious", "anxiety", "wind down", "before sleep", "meditation", "mindfulness", "paced breathing", "breathing streak"],
+    answer:
+      "Breathe is a guided breathing exercise: an orb swells while you breathe in, rests while you hold, and shrinks while you breathe out, with a ring sweeping round it through each phase and a countdown in the middle.\n" +
+      "• Breathe plays the session. Pick a pattern, a length (1, 3, 5 or 10 minutes, or open-ended) and Begin — Space begins, pauses and resumes. A timed session always ends on a finished exhale rather than cutting you off mid-breath, and the screen is kept awake while it runs\n" +
+      "• Patterns: Box (4-4-4-4), Long exhale (4 in, 6 out — a good first one), Coherent (5.5 and 5.5, about five and a half breaths a minute), 4-7-8, Double sigh (two inhales, the second a short top-up, then a long exhale) and Triangle — each card draws its rhythm as a curve with a dot riding it at the real speed. Your own sets the four numbers yourself\n" +
+      "• History keeps a day streak (not shown as broken until a whole day is missed), total minutes, a two-week chart and recent sessions. A session counts once it has run twenty seconds\n" +
+      "Optional tones rise through an inhale and fall through an exhale, and on a phone it can vibrate at each change — so it works with your eyes closed. With reduced motion switched on the orb stops growing and the words, countdown, ring and colour carry the cue instead. Everything stays on this device and it works offline. These are exercises, not treatment: breathe gently, and shorten any hold that strains.",
+    followUps: ["What can the Timer do?", "What can the Metronome do?", "Is my data private?"],
   },
   {
     id: "app-color",

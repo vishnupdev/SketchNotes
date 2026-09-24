@@ -85,6 +85,8 @@ export const APP_STORAGE_NOTE: Record<AppId, string> = {
   translate: "Your language choices.",
   morse: "Speed, pitch and per-character progress.",
   sound: "Reference pitch, view and dB offset.",
+  metronome: "Your tempo, bar, accents, sound and trainer settings, and the songs you saved.",
+  breathe: "Your pattern, length and cue choices, and a log of finished sessions — when, which pattern and how long.",
   color: "Recently picked colours.",
   qr: "Codes you have scanned or made on this device.",
   qrfiles: "The names and sizes of files you converted — never the files themselves.",

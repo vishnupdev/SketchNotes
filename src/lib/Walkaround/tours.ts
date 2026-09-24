@@ -877,6 +877,114 @@ export const TOURS: Record<AppId, Tour> = {
     ],
   },
 
+  breathe: {
+    tagline: "in as it grows, out as it fades",
+    intro: "Paced breathing: the orb leads, you follow, and it can do it with your eyes shut.",
+    layout: {
+      blocks: [
+        { label: "Pattern", grow: 0.5 },
+        { label: "The orb", grow: 2.6 },
+        { label: "Begin · pause", grow: 0.6 },
+        { label: "Length · tones · vibrate", grow: 1 },
+      ],
+      tabs: ["Breathe", "Patterns", "History"],
+    },
+    steps: [
+      {
+        at: "body:1",
+        title: "Follow the orb",
+        direction:
+          "Breathe in while it swells, hold while it rests, out while it shrinks — the ring round it fills through each phase and the number counts it down.",
+        suggestion:
+          "Its colour turns from blue toward the accent as it fills, so even a glance from the corner of your eye tells you which way you are going.",
+      },
+      {
+        at: "body:0",
+        title: "Start with Long exhale",
+        direction: "The chips switch pattern: Box, Long exhale, Coherent, 4-7-8, Double sigh, Triangle or your own.",
+        suggestion:
+          "Breathing out for longer than in is the simplest way to slow down, which is why 4 in and 6 out is the default. Try 4-7-8 once that feels easy.",
+      },
+      {
+        at: "body:3",
+        title: "Close your eyes",
+        direction:
+          "Tones rise as you breathe in and fall as you breathe out; on a phone it can also buzz at each change.",
+        suggestion:
+          "With both on you need never look at the screen — and the screen is kept awake for the session anyway, so it will not lock mid-breath.",
+      },
+      {
+        at: "tab:1",
+        title: "Watch before you choose",
+        direction: "Patterns draws every rhythm as a curve with a dot riding it at the real speed.",
+        suggestion:
+          "Seeing 4-7-8's long flat hold next to Box's even sides says more than the numbers. Your own lets you set all four — a zero hold is simply left out.",
+      },
+      {
+        at: "tab:2",
+        title: "A kind streak",
+        direction: "History keeps a day streak, total minutes and a two-week chart.",
+        suggestion:
+          "The streak is not shown as broken until a whole day is missed, so it does not scold you at breakfast. A session counts once it has run twenty seconds.",
+      },
+    ],
+  },
+
+  metronome: {
+    tagline: "keep time, then keep it without the click",
+    intro: "A click on the audio clock, the bar you want, and two ways to practise with it.",
+    layout: {
+      blocks: [
+        { label: "Tempo · BPM", grow: 1.4 },
+        { label: "Start · Tap", grow: 0.6 },
+        { label: "The bar — accents", grow: 1.3 },
+        { label: "Subdivision & sound", grow: 1 },
+      ],
+      tabs: ["Beat", "Trainer", "Songs"],
+    },
+    steps: [
+      {
+        at: "body:1",
+        title: "Tap the tempo in",
+        direction:
+          "Tap four or more times in time with the song and the tempo follows; Start sets it clicking.",
+        suggestion:
+          "It takes the median gap, so one fumbled tap does not throw it. From the keyboard: Space starts and stops, T taps, and ↑ ↓ move 1 BPM (10 with Shift).",
+      },
+      {
+        at: "body:2",
+        title: "Press a beat to accent it",
+        direction:
+          "Each beat steps through strong, medium, soft and silent, and the metre chips set where the accents start.",
+        suggestion:
+          "6/8 comes grouped as two threes and 7/8 as 2+2+3, which is what makes it feel like the metre. Mute beats one and three to hear only the backbeat.",
+      },
+      {
+        at: "body:3",
+        title: "Subdivide slow passages",
+        direction: "Eighths, triplets or sixteenths add quieter clicks between the beats.",
+        suggestion:
+          "Below about 60 BPM the gap between beats is too long to feel; subdividing fills it so you stop rushing into the next beat.",
+      },
+      {
+        at: "tab:1",
+        title: "Ramp up, then drop out",
+        direction:
+          "Trainer raises the tempo a few BPM every few bars up to a target, and can silence the click for bars at a time.",
+        suggestion:
+          "Run both together: the ramp builds the speed, and silent bars check the time is yours and not the metronome's. Landing on beat one when it returns is the test.",
+      },
+      {
+        at: "tab:2",
+        title: "Keep a set list",
+        direction:
+          "Songs saves the whole setup — tempo, metre, accents, subdivision — under a name.",
+        suggestion:
+          "Loading a song switches the ramp off, so the tempo you get is the one you saved rather than wherever the trainer had got to.",
+      },
+    ],
+  },
+
   color: {
     tagline: "every colour in a picture, in every code",
     intro: "Reading a colour out of a photo, and everything that follows from it.",
